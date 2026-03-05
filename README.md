@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Camp Work
+
+A modern progressive web application for finding the perfect camping spots with reliable network coverage. Built with Next.js 16, TypeScript, and Tailwind CSS.
+
+## Features
+
+- 🗺️ Interactive map with camping locations
+- 📶 Network coverage visualization
+- 🔍 Advanced search and filtering
+- 📱 Progressive Web App (PWA) support
+- 🎨 Beautiful brand-consistent UI with shadcn/ui
+- 🌙 Dark/light mode support
+- 📋 Detailed campground information
+- 💾 Offline capability
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with Turbopack
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4
+- **UI Components**: shadcn/ui + Radix UI
+- **Maps**: MapLibre GL + react-map-gl
+- **State Management**: Zustand
+- **Data Fetching**: TanStack Query
+- **Validation**: Zod
+- **PWA**: Serwist
+- **Animation**: Framer Motion
+- **Icons**: Lucide React
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 20+
+- pnpm (recommended)
+
+### Installation
+
+1. Clone the repository
+2. Copy environment variables:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+3. Add your MapTiler API key to `.env.local`
+4. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+5. Run the development server:
+   ```bash
+   pnpm dev
+   ```
+
+Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+### Environment Variables
+
+Create a `.env.local` file with the following variables:
+
+```env
+NEXT_PUBLIC_MAPTILER_KEY=your_maptiler_api_key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Get a free API key from [MapTiler](https://maptiler.com).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Scripts
 
-## Learn More
+- `pnpm dev` - Start development server with Turbopack
+- `pnpm build` - Build for production
+- `pnpm start` - Start production server
+- `pnpm lint` - Run ESLint
+- `pnpm lint:fix` - Run ESLint with auto-fix
+- `pnpm type-check` - Run TypeScript type checking
+- `pnpm test` - Run unit tests with Vitest
+- `pnpm test:e2e` - Run end-to-end tests with Playwright
 
-To learn more about Next.js, take a look at the following resources:
+### Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/                 # Next.js App Router pages
+├── components/          # React components
+│   ├── layout/         # Layout components
+│   ├── map/            # Map-related components
+│   ├── cards/          # Card components
+│   ├── search/         # Search components
+│   └── ui/             # shadcn/ui components
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions and constants
+├── types/              # TypeScript type definitions
+├── data/               # Static data and mock content
+└── stores/             # Zustand stores
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Docker
 
-## Deploy on Vercel
+Build and run with Docker:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# Build image
+docker build -t camp-work .
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Run container
+docker run -p 3000:3000 camp-work
+
+# Or use docker-compose
+docker-compose up
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
