@@ -8,7 +8,6 @@ describe('coverageStore', () => {
 
     expect(result.current.isVisible).toBe(true);
     expect(result.current.opacity).toBe(0.5);
-    expect(result.current.source).toBe('o2');
   });
 
   it('should toggle visibility', () => {
@@ -49,21 +48,19 @@ describe('coverageStore', () => {
     expect(result.current.opacity).toBe(0.8);
   });
 
-  it('should switch data source', () => {
+  it('should provide BNetzA attribution in simplified store', () => {
     const { result } = renderHook(() => useCoverageStore());
 
-    expect(result.current.source).toBe('o2');
+    // Verify that the simplified store only has essential state
+    expect(Object.keys(result.current)).toEqual([
+      'isVisible',
+      'opacity',
+      'toggleVisibility',
+      'setOpacity',
+    ]);
 
-    act(() => {
-      result.current.setSource('bnetza');
-    });
-
-    expect(result.current.source).toBe('bnetza');
-
-    act(() => {
-      result.current.setSource('o2');
-    });
-
-    expect(result.current.source).toBe('o2');
+    // No source switching needed - always uses BNetzA WMS
+    expect('source' in result.current).toBe(false);
+    expect('setSource' in result.current).toBe(false);
   });
 });

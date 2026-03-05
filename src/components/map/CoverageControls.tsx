@@ -13,14 +13,8 @@ interface CoverageControlsProps {
 }
 
 export default function CoverageControls({ className }: CoverageControlsProps) {
-  const {
-    isVisible,
-    opacity,
-    source,
-    toggleVisibility,
-    setOpacity,
-    setSource,
-  } = useCoverageStore();
+  const { isVisible, opacity, toggleVisibility, setOpacity } =
+    useCoverageStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -29,7 +23,7 @@ export default function CoverageControls({ className }: CoverageControlsProps) {
         <div className="bg-white/90 backdrop-blur-md rounded-brand-md shadow-brand-card p-4 min-w-[240px] space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-medium text-foreground">
-              Netzabdeckung
+              O2 Netzabdeckung
             </h3>
             <Button
               variant="ghost"
@@ -40,6 +34,11 @@ export default function CoverageControls({ className }: CoverageControlsProps) {
               <Settings className="h-3 w-3" />
             </Button>
           </div>
+
+          {/* Attribution */}
+          <p className="text-[10px] text-muted-foreground">
+            Quelle: © Bundesnetzagentur
+          </p>
 
           {/* Visibility Toggle */}
           <div className="flex items-center justify-between">
@@ -64,42 +63,6 @@ export default function CoverageControls({ className }: CoverageControlsProps) {
                 step={0.1}
                 className="w-full"
               />
-            </div>
-          )}
-
-          {/* Data Source Toggle */}
-          {isVisible && (
-            <div className="space-y-2">
-              <label className="text-xs text-foreground block">
-                Datenquelle
-              </label>
-              <div className="flex gap-1">
-                <Button
-                  variant={source === 'bnetza' ? 'default' : 'outline'}
-                  size="sm"
-                  className="flex-1 text-xs h-7"
-                  onClick={() => setSource('bnetza')}
-                >
-                  BNetzA
-                </Button>
-                <Button
-                  variant={source === 'o2' ? 'default' : 'outline'}
-                  size="sm"
-                  className="flex-1 text-xs h-7 opacity-50"
-                  disabled={true}
-                  title="O2 Live-Daten demnächst verfügbar"
-                >
-                  O2 Live
-                  <span className="ml-1 text-[10px] font-normal opacity-70">
-                    (bald)
-                  </span>
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {source === 'bnetza'
-                  ? 'Bundesnetzagentur Daten'
-                  : 'Live O2 Abdeckung'}
-              </p>
             </div>
           )}
         </div>

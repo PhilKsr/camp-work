@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { coverageColors } from '@/lib/brand';
 import { useCoverageStore } from '@/stores/coverageStore';
 import { cn } from '@/lib/utils';
 
@@ -10,37 +9,31 @@ interface CoverageLegendProps {
 }
 
 export default function CoverageLegend({ className }: CoverageLegendProps) {
-  const { isVisible, source } = useCoverageStore();
+  const { isVisible } = useCoverageStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!isVisible) return null;
 
-  const title = source === 'o2' ? 'O2 Netzabdeckung' : 'BNetzA Netzabdeckung';
-
+  // BNetzA coverage map uses different colors than our synthetic data
+  // Blue = Coverage in buildings, Orange = Outdoor coverage, White/Transparent = No coverage
   const legendItems = [
     {
-      key: '5g' as const,
-      color: coverageColors['5g'].hex,
-      label: coverageColors['5g'].label,
-      description: coverageColors['5g'].description,
+      key: 'indoor' as const,
+      color: '#2563EB', // Blue - Coverage in buildings
+      label: 'Versorgung in Gebäuden',
+      description: 'Exzellent für Arbeiten',
     },
     {
-      key: '4g' as const,
-      color: coverageColors['4g'].hex,
-      label: coverageColors['4g'].label,
-      description: coverageColors['4g'].description,
-    },
-    {
-      key: '3g' as const,
-      color: coverageColors['3g'].hex,
-      label: coverageColors['3g'].label,
-      description: coverageColors['3g'].description,
+      key: 'outdoor' as const,
+      color: '#F59E0B', // Orange - Outdoor coverage
+      label: 'Versorgung im Freien',
+      description: 'Gut für draußen',
     },
     {
       key: 'none' as const,
-      color: coverageColors['none'].hex,
-      label: coverageColors['none'].label,
-      description: coverageColors['none'].description,
+      color: '#E5E7EB', // Light gray - No coverage
+      label: 'Keine Versorgung',
+      description: 'Kein Mobilfunk',
     },
   ];
 
@@ -54,8 +47,11 @@ export default function CoverageLegend({ className }: CoverageLegendProps) {
             onClick={() => setIsExpanded(false)}
           >
             <h3 className="text-xs font-medium text-foreground mb-2">
-              {title}
+              O2 Netzabdeckung
             </h3>
+            <p className="text-[10px] text-muted-foreground mb-2">
+              © Bundesnetzagentur, Stand: Okt. 2025
+            </p>
             <div className="space-y-2">
               {legendItems.map((item) => (
                 <div key={item.key} className="flex items-center gap-2">
@@ -98,7 +94,12 @@ export default function CoverageLegend({ className }: CoverageLegendProps) {
       {/* Desktop Full View */}
       <div className="hidden lg:block">
         <div className="bg-white/90 backdrop-blur-md rounded-brand-md shadow-brand-card p-3 min-w-[200px]">
-          <h3 className="text-xs font-medium text-foreground mb-3">{title}</h3>
+          <h3 className="text-xs font-medium text-foreground mb-2">
+            O2 Netzabdeckung
+          </h3>
+          <p className="text-[10px] text-muted-foreground mb-3">
+            © Bundesnetzagentur, Stand: Okt. 2025
+          </p>
           <div className="space-y-2">
             {legendItems.map((item) => (
               <div key={item.key} className="flex items-center gap-3">

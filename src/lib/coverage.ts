@@ -4,41 +4,11 @@ interface CoverageCache {
   [key: string]: CoverageLevel;
 }
 
-interface GeoJSONFeature {
-  geometry: { type: string; coordinates: [number, number] };
-  properties: {
-    technology: string;
-    coverage_level: 'excellent' | 'good' | 'limited' | 'none';
-    signal_strength: number;
-  };
-}
-
-interface BNetzAGeoJSON {
-  features: GeoJSONFeature[];
-}
-
 // In-memory cache for coverage lookups
 const coverageCache: CoverageCache = {};
 
-// Cache for GeoJSON data to avoid repeated fetches
-let cachedGeoJson: BNetzAGeoJSON | null = null;
-
 // Maximum cache size to prevent memory issues
 const MAX_CACHE_SIZE = 1000;
-
-async function loadGeoJson(): Promise<BNetzAGeoJSON> {
-  if (!cachedGeoJson) {
-    const response = await fetch('/data/coverage-bnetza.geojson');
-
-    if (!response.ok) {
-      throw new Error(`Failed to load BNetzA data: ${response.status}`);
-    }
-
-    cachedGeoJson = await response.json();
-  }
-
-  return cachedGeoJson!;
-}
 
 function createCacheKey(lat: number, lng: number): string {
   return `${lat.toFixed(4)},${lng.toFixed(4)}`;
@@ -46,11 +16,7 @@ function createCacheKey(lat: number, lng: number): string {
 
 /**
  * Get network coverage level at a specific geographic point
- * Uses multiple fallback strategies:
- * 1. Check cache first
- * 2. Sample coverage tile pixel (TODO: implement when O2 tiles are available)
- * 3. Lookup in BNetzA GeoJSON data
- * 4. Fallback to 'none'
+ * Uses WMS GetFeatureInfo to query the official BNetzA coverage data
  */
 export async function getCoverageAtPoint(
   lat: number,
@@ -66,11 +32,8 @@ export async function getCoverageAtPoint(
   let coverage: CoverageLevel = 'none';
 
   try {
-    // Strategy 1: Try BNetzA GeoJSON lookup
-    coverage = await lookupBNetzACoverage(lat, lng);
-
-    // Strategy 2: TODO - Canvas pixel sampling for O2 tiles
-    // coverage = await sampleCoverageTilePixel(lat, lng);
+    // Use WMS GetFeatureInfo to query coverage at point
+    coverage = await queryWMSCoverage(lat, lng);
   } catch (error) {
     console.warn('Coverage lookup failed:', error);
     coverage = 'none';
@@ -88,56 +51,81 @@ export async function getCoverageAtPoint(
 }
 
 /**
- * Lookup coverage in BNetzA GeoJSON data
+ * Query BNetzA WMS service for coverage at a specific point
  */
-async function lookupBNetzACoverage(
+async function queryWMSCoverage(
   lat: number,
   lng: number,
 ): Promise<CoverageLevel> {
   try {
-    // Load cached GeoJSON data
-    const geoJson = await loadGeoJson();
+    // Create a small BBOX around the point for WMS GetFeatureInfo
+    const delta = 0.001; // ~100m buffer
+    const bbox = `${lng - delta},${lat - delta},${lng + delta},${lat + delta}`;
 
-    // Find the closest coverage point within a reasonable distance
-    let bestMatch: { distance: number; level: CoverageLevel } | null = null;
-    const maxDistance = 0.05; // ~5km tolerance
+    const url =
+      'https://sgx.geodatenzentrum.de/wms_bnetza_mobilfunk?' +
+      'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo' +
+      '&LAYERS=mobilfunkmonitor&QUERY_LAYERS=mobilfunkmonitor' +
+      `&CRS=EPSG:4326&BBOX=${bbox}` +
+      '&WIDTH=3&HEIGHT=3&I=1&J=1' +
+      '&INFO_FORMAT=application/json';
 
-    for (const feature of geoJson.features) {
-      if (feature.geometry.type !== 'Point') continue;
+    const response = await fetch(url);
 
-      const [pointLng, pointLat] = feature.geometry.coordinates;
-      const distance = Math.sqrt(
-        Math.pow(pointLat - lat, 2) + Math.pow(pointLng - lng, 2),
-      );
-
-      if (distance <= maxDistance) {
-        const tech = feature.properties.technology;
-        const signalStrength = feature.properties.signal_strength;
-
-        // Map technology and signal strength to coverage level
-        let level: CoverageLevel = 'none';
-
-        if (signalStrength >= 60) {
-          if (tech === '5g') level = '5g';
-          else if (tech === '4g') level = '4g';
-          else if (tech === '3g') level = '3g';
-          else level = 'none';
-        } else if (signalStrength >= 30) {
-          // Weaker signal - downgrade one level
-          if (tech === '5g') level = '4g';
-          else if (tech === '4g') level = '3g';
-          else level = 'none';
-        }
-
-        if (!bestMatch || distance < bestMatch.distance) {
-          bestMatch = { distance, level };
-        }
-      }
+    if (!response.ok) {
+      throw new Error(`WMS request failed: ${response.status}`);
     }
 
-    return bestMatch?.level || 'none';
+    const data = await response.json();
+
+    // Parse the feature info response to determine coverage level
+    const level = parseCoverageFromFeatureInfo(data);
+    return level;
   } catch (error) {
-    console.warn('BNetzA coverage lookup failed:', error);
+    console.warn('WMS coverage query failed:', error);
+    return 'none';
+  }
+}
+
+/**
+ * Parse BNetzA WMS GetFeatureInfo response to coverage level
+ */
+function parseCoverageFromFeatureInfo(data: unknown): CoverageLevel {
+  try {
+    // Type guard for the data structure
+    if (
+      !data ||
+      typeof data !== 'object' ||
+      !('features' in data) ||
+      !Array.isArray((data as { features: unknown }).features) ||
+      (data as { features: unknown[] }).features.length === 0
+    ) {
+      return 'none';
+    }
+
+    const typedData = data as {
+      features: Array<{ properties: Record<string, unknown> }>;
+    };
+    const feature = typedData.features[0];
+    const properties = feature.properties;
+
+    // Look for coverage indicators in the feature properties
+    // These property names might need adjustment based on actual BNetzA response
+    if (properties?.coverage_indoor || properties?.indoor_coverage) {
+      // Indoor coverage indicates excellent signal
+      return '5g';
+    } else if (properties?.coverage_outdoor || properties?.outdoor_coverage) {
+      // Outdoor coverage indicates good signal
+      return '4g';
+    } else if (properties?.coverage_limited || properties?.weak_signal) {
+      // Limited coverage
+      return '3g';
+    }
+
+    // Default to no coverage if no indicators found
+    return 'none';
+  } catch (error) {
+    console.warn('Failed to parse coverage feature info:', error);
     return 'none';
   }
 }
