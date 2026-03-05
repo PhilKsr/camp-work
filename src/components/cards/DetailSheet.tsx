@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   Heart,
@@ -96,8 +97,18 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
   const { toggleFavorite, isFavorite } = useFavoriteStore();
   const [lng, lat] = campground.coordinates;
 
+  // Check for reduced motion preference
+  const prefersReducedMotion = typeof window !== 'undefined' && 
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   return (
     <div className="h-full overflow-y-auto">
+      <motion.div
+        initial={prefersReducedMotion ? false : { opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={prefersReducedMotion ? false : { opacity: 0, x: -20 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
+      >
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -270,6 +281,7 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
           </Button>
         </div>
       </div>
+      </motion.div>
     </div>
   );
 }

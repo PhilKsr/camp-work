@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import { useFilterStore } from '@/stores/filterStore';
@@ -163,6 +164,10 @@ export function CampingList() {
     flyTo(lat, lng, 14);
   };
 
+  // Check for reduced motion preference
+  const prefersReducedMotion = typeof window !== 'undefined' && 
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -234,14 +239,28 @@ export function CampingList() {
 
       {/* Campground List */}
       <div className="space-y-3">
-        {filteredAndSortedCampgrounds.map((campground) => (
-          <CampingCard
+        {filteredAndSortedCampgrounds.map((campground, index) => (
+          <motion.div
             key={campground.id}
-            campground={campground}
-            isFavorite={isFavorite(campground.id)}
-            onToggleFavorite={() => toggleFavorite(campground.id)}
-            onClick={() => handleCampgroundClick(campground)}
-          />
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={
+              prefersReducedMotion 
+                ? { duration: 0 } 
+                : { 
+                    delay: Math.min(index, 20) * 0.03, // Limit animation delay to first 20 items
+                    duration: 0.3,
+                    ease: 'easeOut'
+                  }
+            }
+          >
+            <CampingCard
+              campground={campground}
+              isFavorite={isFavorite(campground.id)}
+              onToggleFavorite={() => toggleFavorite(campground.id)}
+              onClick={() => handleCampgroundClick(campground)}
+            />
+          </motion.div>
         ))}
       </div>
     </div>

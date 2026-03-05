@@ -33,7 +33,7 @@ interface FilterState {
 
 const defaultState = {
   searchQuery: '',
-  coverageLevels: ['4g', '3g'], // Default: good for working
+  coverageLevels: ['5g', '4g', '3g', 'none'], // Show all campgrounds initially
   workFriendlyOnly: false,
   types: ['camp_site', 'caravan_site'], // Both types by default
   features: [],
@@ -89,7 +89,7 @@ export const useFilterStore = create<FilterState>()(
         // Coverage levels (not default)
         if (
           JSON.stringify(state.coverageLevels.sort()) !==
-          JSON.stringify(['3g', '4g'])
+          JSON.stringify(['3g', '4g', '5g', 'none'])
         )
           count++;
 

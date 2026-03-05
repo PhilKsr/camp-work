@@ -5,6 +5,8 @@ import MapView from '@/components/map/MapView';
 import MobileBottomSheet from '@/components/layout/MobileBottomSheet';
 import { CampingList } from '@/components/cards/CampingList';
 import { DetailSheet } from '@/components/cards/DetailSheet';
+import { InstallPrompt } from '@/components/ui/InstallPrompt';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useMapStore } from '@/stores/mapStore';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { useUrlState } from '@/hooks/useUrlState';
@@ -47,8 +49,10 @@ export default function Home() {
         </aside>
 
         {/* Map */}
-        <main className="flex-1 relative">
-          <MapView />
+        <main id="main-content" className="flex-1 relative">
+          <ErrorBoundary>
+            <MapView />
+          </ErrorBoundary>
         </main>
       </div>
 
@@ -58,6 +62,9 @@ export default function Home() {
         selectedCampground={selectedCampgroundData}
         onCloseDetail={handleCloseDetail}
       />
+
+      {/* Install Prompt */}
+      <InstallPrompt />
     </div>
   );
 }
