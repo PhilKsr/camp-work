@@ -45,7 +45,7 @@ export default function CoverageLegend({ className }: CoverageLegendProps) {
   ];
 
   return (
-    <div className={cn('absolute bottom-6 left-4 z-10', className)}>
+    <div className={cn('', className)}>
       {/* Mobile Compact View */}
       <div className="block lg:hidden">
         {isExpanded ? (

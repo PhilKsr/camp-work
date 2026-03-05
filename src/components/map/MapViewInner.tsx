@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import Map from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useMapStore } from '@/stores/mapStore';
@@ -18,10 +18,12 @@ export default function MapViewInner() {
     ? `https://api.maptiler.com/maps/hybrid/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`
     : 'https://demotiles.maplibre.org/style.json';
 
-  // Show info if using fallback style
-  if (!process.env.NEXT_PUBLIC_MAPTILER_KEY) {
-    console.warn('NEXT_PUBLIC_MAPTILER_KEY not set, using demo tiles');
-  }
+  // Show info if using fallback style (only once)
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_MAPTILER_KEY) {
+      console.warn('NEXT_PUBLIC_MAPTILER_KEY not set, using demo tiles');
+    }
+  }, []);
 
   const onMove = useCallback(
     (evt: {
@@ -49,11 +51,11 @@ export default function MapViewInner() {
         <GeolocationMarker />
       </Map>
 
-      {/* Coverage Controls - Bottom Left */}
-      <CoverageControls />
-
-      {/* Coverage Legend - Bottom Left (below controls) */}
-      <CoverageLegend />
+      {/* Coverage Controls & Legend - Bottom Left */}
+      <div className="absolute bottom-6 left-4 z-20 flex flex-col gap-2">
+        <CoverageControls />
+        <CoverageLegend />
+      </div>
 
       {/* Map Controls - Bottom Right */}
       <MapControls />

@@ -24,13 +24,7 @@ export default function CoverageControls({ className }: CoverageControlsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div
-      className={cn(
-        'absolute bottom-6 left-4 z-20', // Above legend
-        className,
-      )}
-      style={{ marginBottom: isVisible ? '280px' : '0px' }} // Adjust for legend
-    >
+    <div className={cn('', className)}>
       {isExpanded ? (
         <div className="bg-white/90 backdrop-blur-md rounded-brand-md shadow-brand-card p-4 min-w-[240px] space-y-4">
           <div className="flex items-center justify-between">
@@ -91,10 +85,14 @@ export default function CoverageControls({ className }: CoverageControlsProps) {
                 <Button
                   variant={source === 'o2' ? 'default' : 'outline'}
                   size="sm"
-                  className="flex-1 text-xs h-7"
-                  onClick={() => setSource('o2')}
+                  className="flex-1 text-xs h-7 opacity-50"
+                  disabled={true}
+                  title="O2 Live-Daten demnächst verfügbar"
                 >
                   O2 Live
+                  <span className="ml-1 text-[10px] font-normal opacity-70">
+                    (bald)
+                  </span>
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">

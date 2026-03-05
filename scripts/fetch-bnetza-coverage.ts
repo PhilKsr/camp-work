@@ -149,8 +149,8 @@ async function main() {
     // Convert to GeoJSON
     const geoJson = convertToGeoJSON(coverageData);
 
-    // Ensure data directory exists
-    const dataDir = path.join(process.cwd(), 'src/data');
+    // Ensure public data directory exists
+    const dataDir = path.join(process.cwd(), 'public/data');
     await fs.mkdir(dataDir, { recursive: true });
 
     // Write GeoJSON file

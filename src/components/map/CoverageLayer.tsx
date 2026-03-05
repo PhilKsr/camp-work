@@ -60,7 +60,7 @@ export default function CoverageLayer({
       <Source
         id="coverage-bnetza-source"
         type="geojson"
-        data="/src/data/coverage-bnetza.geojson"
+        data="/data/coverage-bnetza.geojson"
       >
         {/* 5G Coverage */}
         <Layer

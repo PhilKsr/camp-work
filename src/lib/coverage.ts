@@ -4,11 +4,41 @@ interface CoverageCache {
   [key: string]: CoverageLevel;
 }
 
+interface GeoJSONFeature {
+  geometry: { type: string; coordinates: [number, number] };
+  properties: {
+    technology: string;
+    coverage_level: 'excellent' | 'good' | 'limited' | 'none';
+    signal_strength: number;
+  };
+}
+
+interface BNetzAGeoJSON {
+  features: GeoJSONFeature[];
+}
+
 // In-memory cache for coverage lookups
 const coverageCache: CoverageCache = {};
 
+// Cache for GeoJSON data to avoid repeated fetches
+let cachedGeoJson: BNetzAGeoJSON | null = null;
+
 // Maximum cache size to prevent memory issues
 const MAX_CACHE_SIZE = 1000;
+
+async function loadGeoJson(): Promise<BNetzAGeoJSON> {
+  if (!cachedGeoJson) {
+    const response = await fetch('/data/coverage-bnetza.geojson');
+
+    if (!response.ok) {
+      throw new Error(`Failed to load BNetzA data: ${response.status}`);
+    }
+
+    cachedGeoJson = await response.json();
+  }
+
+  return cachedGeoJson!;
+}
 
 function createCacheKey(lat: number, lng: number): string {
   return `${lat.toFixed(4)},${lng.toFixed(4)}`;
@@ -65,14 +95,8 @@ async function lookupBNetzACoverage(
   lng: number,
 ): Promise<CoverageLevel> {
   try {
-    // Load BNetzA GeoJSON data
-    const response = await fetch('/src/data/coverage-bnetza.geojson');
-
-    if (!response.ok) {
-      throw new Error(`Failed to load BNetzA data: ${response.status}`);
-    }
-
-    const geoJson = await response.json();
+    // Load cached GeoJSON data
+    const geoJson = await loadGeoJson();
 
     // Find the closest coverage point within a reasonable distance
     let bestMatch: { distance: number; level: CoverageLevel } | null = null;
