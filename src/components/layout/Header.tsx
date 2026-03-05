@@ -1,14 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import SearchBar from '@/components/search/SearchBar';
+import FilterPanel from '@/components/search/FilterPanel';
+import { useFilterStore } from '@/stores/filterStore';
 import { cn } from '@/lib/utils';
 
 export default function Header() {
   const [hasScrolled, setHasScrolled] = useState(false);
+  const activeFilterCount = useFilterStore((state) =>
+    state.activeFilterCount(),
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,38 +39,29 @@ export default function Header() {
           <Logo variant="icon" size="md" className="block lg:hidden" />
         </div>
 
-        {/* Search - Desktop */}
-        <div className="hidden lg:flex flex-1 max-w-md mx-8">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Campingplatz suchen..."
-              className="pl-10 rounded-full bg-white border-[#E8E4D8] focus:border-primary transition-colors"
-              readOnly
-            />
-          </div>
-        </div>
-
-        {/* Search - Mobile */}
-        <Button
-          variant="outline"
-          size="icon"
-          className="lg:hidden rounded-full bg-white border-[#E8E4D8] hover:bg-[#F9F8E6] transition-colors"
-          onClick={() => console.log('Mobile search clicked')}
-        >
-          <Search className="h-4 w-4" />
-        </Button>
+        {/* Search Bar */}
+        <SearchBar className="flex-1 max-w-md mx-8" />
 
         {/* Filter Button */}
-        <Button
-          variant="outline"
-          size="icon"
-          className="rounded-full bg-white border-[#E8E4D8] hover:bg-[#F9F8E6] transition-colors"
-          onClick={() => console.log('Filter clicked')}
-        >
-          <SlidersHorizontal className="h-4 w-4" />
-        </Button>
+        <FilterPanel>
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-full bg-white border-[#E8E4D8] hover:bg-[#F9F8E6] transition-colors"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+            </Button>
+            {activeFilterCount > 0 && (
+              <Badge
+                variant="destructive"
+                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-primary-warmGold text-white"
+              >
+                {activeFilterCount}
+              </Badge>
+            )}
+          </div>
+        </FilterPanel>
       </div>
     </header>
   );

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { useFavoriteStore } from '@/stores/favoriteStore';
+import { useFilterStore } from '@/stores/filterStore';
 import { useMapStore } from '@/stores/mapStore';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { CampingCard } from './CampingCard';
@@ -15,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { Campground } from '@/types/campground';
+import type { Campground, CampgroundFeature } from '@/types/campground';
 
 type SortOption = 'coverage' | 'name' | 'distance';
 
@@ -55,6 +56,14 @@ export function CampingList() {
   const [sortBy, setSortBy] = useState<SortOption>('coverage');
   const { data: campgroundsData, isLoading } = useCampgrounds();
   const { toggleFavorite, isFavorite } = useFavoriteStore();
+  const {
+    searchQuery,
+    coverageLevels,
+    workFriendlyOnly,
+    types,
+    features,
+    favoritesOnly,
+  } = useFilterStore();
   const { setSelectedCampground, flyTo } = useMapStore();
   const { latitude, longitude } = useGeolocation();
 
@@ -62,11 +71,46 @@ export function CampingList() {
     return latitude && longitude ? { lat: latitude, lng: longitude } : null;
   }, [latitude, longitude]);
 
-  const sortedCampgrounds = useMemo(() => {
+  const filteredAndSortedCampgrounds = useMemo(() => {
     if (!campgroundsData?.features) return [];
 
-    const campgrounds = campgroundsData.features.map((f) => f.properties);
+    let campgrounds = campgroundsData.features.map((f) => f.properties);
 
+    // Apply filters
+    campgrounds = campgrounds.filter((c) => {
+      // Search query filter
+      if (searchQuery && searchQuery.length >= 2) {
+        const lower = searchQuery.toLowerCase();
+        const matchesSearch =
+          c.name.toLowerCase().includes(lower) ||
+          (c.address && c.address.toLowerCase().includes(lower));
+        if (!matchesSearch) return false;
+      }
+
+      // Coverage filter
+      if (!coverageLevels.includes(c.coverageLevel)) return false;
+
+      // Work-friendly filter
+      if (workFriendlyOnly && !['5g', '4g'].includes(c.coverageLevel))
+        return false;
+
+      // Type filter
+      if (!types.includes(c.type)) return false;
+
+      // Feature filter
+      if (
+        features.length > 0 &&
+        !features.every((f) => c.features.includes(f as CampgroundFeature))
+      )
+        return false;
+
+      // Favorites filter
+      if (favoritesOnly && !isFavorite(c.id)) return false;
+
+      return true;
+    });
+
+    // Apply sorting
     return [...campgrounds].sort((a, b) => {
       switch (sortBy) {
         case 'coverage':
@@ -98,7 +142,20 @@ export function CampingList() {
           return 0;
       }
     });
-  }, [campgroundsData, sortBy, userPosition]);
+  }, [
+    campgroundsData,
+    sortBy,
+    userPosition,
+    searchQuery,
+    coverageLevels,
+    workFriendlyOnly,
+    types,
+    features,
+    favoritesOnly,
+    isFavorite,
+  ]);
+
+  const totalCampgrounds = campgroundsData?.features?.length || 0;
 
   const handleCampgroundClick = (campground: Campground) => {
     const [lng, lat] = campground.coordinates;
@@ -133,7 +190,7 @@ export function CampingList() {
     );
   }
 
-  if (!sortedCampgrounds.length) {
+  if (!filteredAndSortedCampgrounds.length) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -154,7 +211,8 @@ export function CampingList() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-lg">
-          {sortedCampgrounds.length} Campingplätze
+          {filteredAndSortedCampgrounds.length} von {totalCampgrounds}{' '}
+          Campingplätze
         </h2>
 
         <Select
@@ -176,7 +234,7 @@ export function CampingList() {
 
       {/* Campground List */}
       <div className="space-y-3">
-        {sortedCampgrounds.map((campground) => (
+        {filteredAndSortedCampgrounds.map((campground) => (
           <CampingCard
             key={campground.id}
             campground={campground}

@@ -7,10 +7,14 @@ import { CampingList } from '@/components/cards/CampingList';
 import { DetailSheet } from '@/components/cards/DetailSheet';
 import { useMapStore } from '@/stores/mapStore';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
+import { useUrlState } from '@/hooks/useUrlState';
 
 export default function Home() {
   const { selectedCampground, setSelectedCampground } = useMapStore();
   const { data: campgroundsData } = useCampgrounds();
+
+  // Sync state with URL
+  useUrlState();
 
   const selectedCampgroundData =
     selectedCampground && campgroundsData
