@@ -68,3 +68,6 @@ playwright/.cache/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Project documentation (internal)
+CLAUDE.md
