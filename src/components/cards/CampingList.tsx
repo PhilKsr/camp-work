@@ -5,7 +5,7 @@ import { ChevronDown } from 'lucide-react';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import { useMapStore } from '@/stores/mapStore';
-import { useGeolocationStore } from '@/stores/geolocationStore';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import { CampingCard } from './CampingCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -56,7 +56,11 @@ export function CampingList() {
   const { data: campgroundsData, isLoading } = useCampgrounds();
   const { toggleFavorite, isFavorite } = useFavoriteStore();
   const { setSelectedCampground, flyTo } = useMapStore();
-  const { position: userPosition } = useGeolocationStore();
+  const { latitude, longitude } = useGeolocation();
+
+  const userPosition = useMemo(() => {
+    return latitude && longitude ? { lat: latitude, lng: longitude } : null;
+  }, [latitude, longitude]);
 
   const sortedCampgrounds = useMemo(() => {
     if (!campgroundsData?.features) return [];

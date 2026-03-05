@@ -2,7 +2,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import type { CampgroundGeoJSON } from '@/types/campground';
+import type { CampgroundGeoJSON } from '../src/types/campground';
 
 // Interface for coverage data structure (not directly used but helpful for documentation)
 

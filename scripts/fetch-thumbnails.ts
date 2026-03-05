@@ -6,7 +6,7 @@ import https from 'https';
 import http from 'http';
 import { createWriteStream } from 'fs';
 import sharp from 'sharp';
-import type { CampgroundGeoJSON } from '@/types/campground';
+import type { CampgroundGeoJSON } from '../src/types/campground';
 
 interface ThumbnailMapping {
   [campgroundId: string]: string; // path or URL

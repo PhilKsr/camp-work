@@ -6,19 +6,15 @@ import {
   CampgroundSchema,
   type Campground,
   type CampgroundGeoJSON,
-} from '@/types/campground';
+} from '../src/types/campground';
 
 const OVERPASS_API = 'https://overpass-api.de/api/interpreter';
 const OVERPASS_QUERY = `
-[out:json][timeout:300][maxsize:1000000000];
+[out:json][timeout:180][maxsize:500000000];
 area["ISO3166-1"="DE"]->.searchArea;
 (
   node["tourism"="camp_site"]["name"](area.searchArea);
-  way["tourism"="camp_site"]["name"](area.searchArea);
-  relation["tourism"="camp_site"]["name"](area.searchArea);
   node["tourism"="caravan_site"]["name"](area.searchArea);
-  way["tourism"="caravan_site"]["name"](area.searchArea);
-  relation["tourism"="caravan_site"]["name"](area.searchArea);
 );
 out center body;
 `;
@@ -83,7 +79,20 @@ function mapOSMTags(element: OSMElement): Campground | null {
     phone: tags.phone || tags['contact:phone'] || null,
     email: tags.email || tags['contact:email'] || null,
     rating: tags.stars ? parseFloat(tags.stars) : null,
-    features,
+    features: features as Array<
+      | 'power'
+      | 'wifi'
+      | 'dogs'
+      | 'shower'
+      | 'toilet'
+      | 'swimming'
+      | 'shop'
+      | 'restaurant'
+      | 'playground'
+      | 'laundry'
+      | 'bbq'
+      | 'campfire'
+    >,
     coverageLevel: 'none', // Will be enriched later
     thumbnail: tags.image || tags.wikimedia_commons || null,
     openingHours: tags.opening_hours || null,

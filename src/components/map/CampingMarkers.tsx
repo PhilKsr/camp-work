@@ -1,57 +1,15 @@
 'use client';
 
-import { useRef } from 'react';
-import { Source, Layer, type MapRef } from 'react-map-gl/maplibre';
+import { Source, Layer } from 'react-map-gl/maplibre';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { useMapStore } from '@/stores/mapStore';
 import { colors } from '@/lib/brand';
-import type { MapLayerMouseEvent } from 'maplibre-gl';
 
 export function CampingMarkers() {
   const { data: campgroundsData } = useCampgrounds();
-  const { setSelectedCampground, flyTo } = useMapStore();
-  const mapRef = useRef<MapRef>(null);
+  const { selectedCampground } = useMapStore();
 
   if (!campgroundsData) return null;
-
-  const handleClusterClick = (e: MapLayerMouseEvent) => {
-    const features = mapRef.current?.queryRenderedFeatures(e.point, {
-      layers: ['clusters'],
-    });
-
-    const clusterId = features?.[0]?.properties?.cluster_id;
-    if (!clusterId) return;
-
-    const mapboxSource = mapRef.current?.getSource('campgrounds') as {
-      getClusterExpansionZoom: (
-        id: number,
-        callback: (err: unknown, zoom: number) => void,
-      ) => void;
-    };
-    mapboxSource?.getClusterExpansionZoom(
-      clusterId,
-      (err: unknown, zoom: number) => {
-        if (err) return;
-
-        const [lng, lat] = (
-          features[0].geometry as { coordinates: [number, number] }
-        ).coordinates;
-        flyTo(lat, lng, zoom);
-      },
-    );
-  };
-
-  const handleMarkerClick = (e: MapLayerMouseEvent) => {
-    const feature = e.features?.[0];
-    if (!feature?.properties) return;
-
-    const campgroundId = feature.properties.id;
-    const [lng, lat] = (feature.geometry as { coordinates: [number, number] })
-      .coordinates;
-
-    setSelectedCampground(campgroundId);
-    flyTo(lat, lng, 14);
-  };
 
   return (
     <Source
@@ -69,7 +27,7 @@ export function CampingMarkers() {
         source="campgrounds"
         filter={['has', 'point_count']}
         paint={{
-          'circle-color': colors.brand.warmGold,
+          'circle-color': colors.primary.warmGold,
           'circle-radius': [
             'step',
             ['get', 'point_count'],
@@ -84,7 +42,6 @@ export function CampingMarkers() {
           'circle-stroke-width': 2,
           'circle-stroke-color': '#ffffff',
         }}
-        onClick={handleClusterClick}
       />
 
       {/* Cluster count labels */}
@@ -124,17 +81,6 @@ export function CampingMarkers() {
           'circle-stroke-width': 2,
           'circle-stroke-color': '#ffffff',
         }}
-        onClick={handleMarkerClick}
-        onMouseEnter={() => {
-          if (mapRef.current?.getCanvas) {
-            mapRef.current.getCanvas().style.cursor = 'pointer';
-          }
-        }}
-        onMouseLeave={() => {
-          if (mapRef.current?.getCanvas) {
-            mapRef.current.getCanvas().style.cursor = '';
-          }
-        }}
       />
 
       {/* Selected marker highlight */}
@@ -142,11 +88,7 @@ export function CampingMarkers() {
         id="campground-selected"
         type="circle"
         source="campgrounds"
-        filter={[
-          '==',
-          ['get', 'id'],
-          useMapStore.getState().selectedCampground || '',
-        ]}
+        filter={['==', ['get', 'id'], selectedCampground || '']}
         paint={{
           'circle-color': [
             'case',

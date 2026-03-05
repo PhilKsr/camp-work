@@ -8,6 +8,12 @@ import {
   Droplets,
   Phone,
   Globe,
+  UtensilsCrossed,
+  ShoppingBag,
+  Flame,
+  Baby,
+  Shirt,
+  Bath,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -26,14 +32,14 @@ const FEATURE_ICONS = {
   power: Zap,
   dogs: Dog,
   shower: Droplets,
-  toilet: Droplets,
+  toilet: Bath,
   swimming: Droplets,
-  shop: Globe,
-  restaurant: Globe,
-  playground: Globe,
-  laundry: Droplets,
-  bbq: Globe,
-  campfire: Globe,
+  shop: ShoppingBag,
+  restaurant: UtensilsCrossed,
+  playground: Baby,
+  laundry: Shirt,
+  bbq: Flame,
+  campfire: Flame,
 } as const;
 
 const getCoverageColor = (level: string): string => {
