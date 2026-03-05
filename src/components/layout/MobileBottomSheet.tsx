@@ -78,7 +78,7 @@ export default function MobileBottomSheet({
   return (
     <motion.div
       className={cn(
-        'fixed bottom-0 w-full bg-white rounded-t-2xl shadow-sheet z-40',
+        'fixed bottom-0 w-full bg-white rounded-t-2xl z-40',
         className,
       )}
       initial={{ height: getHeight(bottomSheetSnap) }}
@@ -88,7 +88,7 @@ export default function MobileBottomSheet({
       dragConstraints={{ top: 0, bottom: 0 }}
       dragElastic={0.1}
       onDragEnd={handleDragEnd}
-      style={{ touchAction: 'none' }}
+      style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.12)', touchAction: 'none' }}
     >
       {/* Drag Handle */}
       <div className="flex flex-col items-center pt-2 pb-4 px-4 border-b border-[#E8E4D8]">

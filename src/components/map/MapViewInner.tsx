@@ -1,10 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import Map, {
-  NavigationControl,
-  GeolocateControl,
-} from 'react-map-gl/maplibre';
+import Map from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useMapStore } from '@/stores/mapStore';
 import MapControls from './MapControls';
@@ -45,8 +42,6 @@ export default function MapViewInner() {
         mapStyle={mapStyle}
         attributionControl={false}
       >
-        <NavigationControl position="top-left" showCompass={false} />
-        <GeolocateControl position="top-left" trackUserLocation={true} />
         <GeolocationMarker />
       </Map>
       <MapControls />
