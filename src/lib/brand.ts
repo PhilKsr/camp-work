@@ -139,26 +139,6 @@ export const typography = {
   },
 } as const;
 
-// Brand-specific component variants
-export const brandVariants = {
-  button: {
-    primary: `bg-[${colors.primary.warmGold}] hover:bg-[${colors.extended.goldDark}] text-white`,
-    secondary: `bg-[${colors.primary.cream}] hover:bg-[${colors.extended.creamDark}] text-[${colors.text.primary}]`,
-    skyBlue: `bg-[${colors.primary.skyBlue}] hover:bg-[${colors.extended.skyBlueDark}] text-[${colors.text.primary}]`,
-    ghost: `hover:bg-[${colors.extended.goldLight}]/20 text-[${colors.text.primary}]`,
-  },
-  card: {
-    default: `bg-[${colors.text.backgroundWhite}] border-[${colors.extended.border}]`,
-    elevated: `bg-[${colors.text.backgroundWhite}] border-[${colors.extended.border}]`,
-    cream: `bg-[${colors.primary.cream}] border-[${colors.extended.creamDark}]`,
-  },
-  badge: {
-    default: `bg-[${colors.extended.creamDark}] text-[${colors.text.primary}]`,
-    coverage: (type: CoverageType | 'none') =>
-      `bg-[${coverageColors[type].hex}]/10 text-[${coverageColors[type].hex}] border border-[${coverageColors[type].hex}]/20`,
-  },
-} as const;
-
 // CSS custom property helpers
 export const getCSSVariable = (variableName: string) => {
   return `hsl(var(--${variableName}))`;

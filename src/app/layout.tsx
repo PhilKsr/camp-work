@@ -88,7 +88,7 @@ export default function RootLayout({
   return (
     <html lang="de">
       <body
-        className={`${inter.variable} font-inter bg-[${colors.text.backgroundWhite}] text-[${colors.text.primary}] antialiased`}
+        className={`${inter.variable} font-inter bg-background text-foreground antialiased`}
       >
         {children}
       </body>

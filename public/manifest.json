@@ -1,14 +1,14 @@
 {
   "name": "Camp Work",
   "short_name": "CampWork",
-  "description": "Find the perfect camping spots with network coverage",
+  "description": "Finde Campingplätze mit zuverlässiger Netzabdeckung",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F9F8E6",
   "theme_color": "#E19B53",
   "orientation": "portrait",
   "scope": "/",
-  "lang": "en",
+  "lang": "de",
   "categories": ["travel", "navigation", "lifestyle"],
   "icons": [
     {

@@ -10,9 +10,7 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
-  experimental: {
-    turbopack: true,
-  },
+  output: 'standalone',
   images: {
     remotePatterns: [
       {

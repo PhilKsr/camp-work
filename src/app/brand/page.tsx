@@ -91,6 +91,11 @@ const SpacingExample = ({ space, name }: { space: string; name: string }) => (
 );
 
 export default function BrandPage() {
+  // Hide brand page in production
+  if (process.env.NODE_ENV === 'production') {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream-50 to-white">
       <div className="container mx-auto px-6 py-8 max-w-6xl">

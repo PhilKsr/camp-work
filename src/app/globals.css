@@ -7,8 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -50,82 +49,73 @@
 :root {
   --radius: 0.625rem;
 
-  /* Brand Color Variables */
-  --brand-primary: 31 100% 50%; /* #E19B53 - Sunset Orange */
-  --brand-secondary: 54 92% 96%; /* #F9F8E6 - Warm Ivory */
-  --brand-accent: 141 38% 38%; /* #3D6B47 - Forest Green */
-  --brand-neutral: 23 12% 55%; /* #847A72 - Warm Stone */
-  --brand-earth: 23 30% 60%; /* #A68B5B - Earth Tone */
-  --brand-forest: 141 50% 25%; /* #205429 - Deep Forest */
-  --brand-sky: 201 100% 85%; /* #A8D8F0 - Light Sky */
-
   /* shadcn/ui colors mapped to brand */
-  --background: 54 92% 96%; /* Brand secondary - Warm Ivory */
-  --foreground: 141 50% 15%; /* Deep forest for text */
-  --card: 0 0% 100%; /* Pure white cards */
-  --card-foreground: 141 50% 15%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 141 50% 15%;
-  --primary: 31 100% 50%; /* Brand primary - Sunset Orange */
-  --primary-foreground: 0 0% 100%;
-  --secondary: 23 30% 95%; /* Light earth tone */
-  --secondary-foreground: 141 50% 15%;
-  --muted: 23 30% 93%;
-  --muted-foreground: 23 12% 45%;
-  --accent: 141 38% 38%; /* Brand accent - Forest Green */
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 84% 60%;
-  --border: 23 30% 85%;
-  --input: 23 30% 90%;
-  --ring: 31 100% 50%;
-  --chart-1: 31 100% 50%;
-  --chart-2: 141 38% 38%;
-  --chart-3: 201 100% 85%;
-  --chart-4: 23 30% 60%;
-  --chart-5: 141 50% 25%;
-  --sidebar: 54 92% 98%;
-  --sidebar-foreground: 141 50% 15%;
-  --sidebar-primary: 31 100% 50%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 23 30% 95%;
-  --sidebar-accent-foreground: 141 50% 15%;
-  --sidebar-border: 23 30% 85%;
-  --sidebar-ring: 31 100% 50%;
+  --background: 54 76% 94%; /* #F9F8E6 Cream */
+  --foreground: 30 7% 16%; /* #2D2A26 Dark Text */
+  --card: 60 33% 99%; /* #FEFDF8 Background White */
+  --card-foreground: 30 7% 16%; /* #2D2A26 */
+  --popover: 60 33% 99%; /* #FEFDF8 */
+  --popover-foreground: 30 7% 16%; /* #2D2A26 */
+  --primary: 30 70% 60%; /* #E19B53 Warm Gold */
+  --primary-foreground: 0 0% 100%; /* White */
+  --secondary: 205 68% 80%; /* #ABD8EF Sky Blue */
+  --secondary-foreground: 30 7% 16%; /* #2D2A26 */
+  --muted: 46 30% 90%; /* Leichtes Cream für muted */
+  --muted-foreground: 27 5% 35%; /* #5C5650 Secondary Text */
+  --accent: 30 70% 60%; /* #E19B53 Warm Gold als Accent */
+  --accent-foreground: 0 0% 100%; /* White */
+  --destructive: 0 72% 51%; /* #DC3545 */
+  --border: 37 18% 88%; /* #E8E4D8 Brand Border */
+  --input: 37 18% 91%; /* Etwas heller als Border */
+  --ring: 30 70% 60%; /* Warm Gold */
+  --chart-1: 30 70% 60%; /* Warm Gold */
+  --chart-2: 205 68% 80%; /* Sky Blue */
+  --chart-3: 120 61% 50%; /* Green für Coverage */
+  --chart-4: 45 93% 47%; /* Yellow für Coverage */
+  --chart-5: 0 72% 51%; /* Red für Coverage */
+  --sidebar: 54 76% 96%; /* Leichtes Cream für Sidebar */
+  --sidebar-foreground: 30 7% 16%; /* #2D2A26 */
+  --sidebar-primary: 30 70% 60%; /* Warm Gold */
+  --sidebar-primary-foreground: 0 0% 100%; /* White */
+  --sidebar-accent: 205 68% 85%; /* Light Sky Blue */
+  --sidebar-accent-foreground: 30 7% 16%; /* #2D2A26 */
+  --sidebar-border: 37 18% 88%; /* Brand Border */
+  --sidebar-ring: 30 70% 60%; /* Warm Gold */
 }
 
 .dark {
-  /* Dark theme with brand colors */
-  --background: 141 50% 8%; /* Very dark forest */
-  --foreground: 54 92% 96%; /* Warm ivory for text */
-  --card: 141 50% 12%; /* Dark forest cards */
-  --card-foreground: 54 92% 96%;
-  --popover: 141 50% 12%;
-  --popover-foreground: 54 92% 96%;
-  --primary: 31 100% 60%; /* Brighter orange for dark theme */
-  --primary-foreground: 141 50% 8%;
-  --secondary: 23 30% 20%; /* Dark earth tone */
-  --secondary-foreground: 54 92% 96%;
-  --muted: 23 30% 25%;
-  --muted-foreground: 23 12% 70%;
-  --accent: 141 38% 50%; /* Brighter forest green */
-  --accent-foreground: 54 92% 96%;
-  --destructive: 0 84% 70%;
-  --border: 23 30% 30%;
-  --input: 23 30% 25%;
-  --ring: 31 100% 60%;
-  --chart-1: 31 100% 60%;
-  --chart-2: 141 38% 50%;
-  --chart-3: 201 100% 70%;
-  --chart-4: 23 30% 50%;
-  --chart-5: 141 50% 35%;
-  --sidebar: 141 50% 10%;
-  --sidebar-foreground: 54 92% 96%;
-  --sidebar-primary: 31 100% 60%;
-  --sidebar-primary-foreground: 141 50% 8%;
-  --sidebar-accent: 23 30% 25%;
-  --sidebar-accent-foreground: 54 92% 96%;
-  --sidebar-border: 23 30% 30%;
-  --sidebar-ring: 31 100% 60%;
+  /* Dark theme with darker brand colors */
+  --background: 30 7% 8%; /* Very dark warm brown */
+  --foreground: 54 76% 94%; /* Cream for text */
+  --card: 30 7% 12%; /* Dark warm brown cards */
+  --card-foreground: 54 76% 94%;
+  --popover: 30 7% 12%;
+  --popover-foreground: 54 76% 94%;
+  --primary: 30 70% 65%; /* Brighter warm gold for dark theme */
+  --primary-foreground: 30 7% 8%;
+  --secondary: 205 30% 25%; /* Dark sky blue */
+  --secondary-foreground: 54 76% 94%;
+  --muted: 30 7% 20%;
+  --muted-foreground: 27 5% 65%;
+  --accent: 30 70% 65%; /* Brighter warm gold */
+  --accent-foreground: 30 7% 8%;
+  --destructive: 0 72% 61%;
+  --border: 30 7% 25%;
+  --input: 30 7% 22%;
+  --ring: 30 70% 65%;
+  --chart-1: 30 70% 65%;
+  --chart-2: 205 68% 70%;
+  --chart-3: 120 61% 60%;
+  --chart-4: 45 93% 57%;
+  --chart-5: 0 72% 61%;
+  --sidebar: 30 7% 10%;
+  --sidebar-foreground: 54 76% 94%;
+  --sidebar-primary: 30 70% 65%;
+  --sidebar-primary-foreground: 30 7% 8%;
+  --sidebar-accent: 30 7% 20%;
+  --sidebar-accent-foreground: 54 76% 94%;
+  --sidebar-border: 30 7% 25%;
+  --sidebar-ring: 30 70% 65%;
 }
 
 @layer base {
