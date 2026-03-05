@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import { colors, shadows, radii, spacing } from './src/lib/brand';
 
 const config: Config = {
   content: [
@@ -9,17 +10,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand colors as CSS variables for shadcn/ui integration
+        // Brand colors
         brand: {
-          primary: 'hsl(var(--brand-primary))',
-          secondary: 'hsl(var(--brand-secondary))',
-          accent: 'hsl(var(--brand-accent))',
-          neutral: 'hsl(var(--brand-neutral))',
-          earth: 'hsl(var(--brand-earth))',
-          forest: 'hsl(var(--brand-forest))',
-          sky: 'hsl(var(--brand-sky))',
+          'warm-gold': colors.primary.warmGold,
+          cream: colors.primary.cream,
+          'sky-blue': colors.primary.skyBlue,
+          'gold-dark': colors.extended.goldDark,
+          'gold-light': colors.extended.goldLight,
+          'sky-blue-dark': colors.extended.skyBlueDark,
+          'sky-blue-light': colors.extended.skyBlueLight,
+          'cream-dark': colors.extended.creamDark,
+          border: colors.extended.border,
+          'text-primary': colors.text.primary,
+          'text-secondary': colors.text.secondary,
+          'background-white': colors.text.backgroundWhite,
         },
-        // shadcn/ui color system
+        // Coverage colors
+        coverage: {
+          excellent: colors.coverage.excellent,
+          good: colors.coverage.good,
+          limited: colors.coverage.limited,
+          none: colors.coverage.none,
+        },
+        // shadcn/ui color system (keeping existing CSS variables)
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -61,13 +74,41 @@ const config: Config = {
           '5': 'hsl(var(--chart-5))',
         },
       },
+      boxShadow: {
+        'brand-subtle': shadows.subtle,
+        'brand-card': shadows.card,
+        'brand-card-hover': shadows.cardHover,
+        'brand-sheet': shadows.sheet,
+      },
       borderRadius: {
+        'brand-sm': radii.sm,
+        'brand-md': radii.md,
+        'brand-lg': radii.lg,
+        'brand-full': radii.full,
+        // Keep shadcn/ui radius system
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      spacing: {
+        'brand-xs': spacing.xs,
+        'brand-sm': spacing.sm,
+        'brand-md': spacing.md,
+        'brand-lg': spacing.lg,
+        'brand-xl': spacing.xl,
+        'brand-2xl': spacing['2xl'],
+      },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+      },
+      fontSize: {
+        'brand-display': ['3rem', { lineHeight: '1.1', fontWeight: '700' }],
+        'brand-h1': ['2.25rem', { lineHeight: '1.2', fontWeight: '700' }],
+        'brand-h2': ['1.875rem', { lineHeight: '1.3', fontWeight: '600' }],
+        'brand-h3': ['1.5rem', { lineHeight: '1.4', fontWeight: '600' }],
+        'brand-body': ['1rem', { lineHeight: '1.5', fontWeight: '400' }],
+        'brand-caption': ['0.875rem', { lineHeight: '1.4', fontWeight: '400' }],
       },
     },
   },

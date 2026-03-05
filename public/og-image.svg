@@ -1,0 +1,66 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#F9F8E6"/>
+  
+  <!-- Logo centered -->
+  <g transform="translate(600, 250)">
+    <!-- WiFi signal arcs on tent peak -->
+    <g transform="translate(0, -40)">
+      <path
+        d="M-24 24 C-24 10, -12 0, 0 0 C12 0, 24 10, 24 24"
+        stroke="#ABD8EF"
+        stroke-width="6"
+        fill="none"
+        stroke-linecap="round"
+      />
+      <path
+        d="M-16 20 C-16 12, -8 8, 0 8 C8 8, 16 12, 16 20"
+        stroke="#ABD8EF"
+        stroke-width="6"
+        fill="none"
+        stroke-linecap="round"
+      />
+      <path
+        d="M-8 18 C-8 15.2, -4 14, 0 14 C4 14, 8 15.2, 8 18"
+        stroke="#ABD8EF"
+        stroke-width="6"
+        fill="none"
+        stroke-linecap="round"
+      />
+    </g>
+    
+    <!-- Tent shape -->
+    <path
+      d="M-40 60 L0 -20 L40 60 Z"
+      fill="#E19B53"
+      stroke="#C47F35"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    
+    <!-- Tent door opening -->
+    <path
+      d="M-10 60 L0 30 L10 60"
+      fill="#C47F35"
+      stroke="none"
+    />
+    
+    <!-- Tent center line for depth -->
+    <line
+      x1="0"
+      y1="-20"
+      x2="0"
+      y2="60"
+      stroke="#C47F35"
+      stroke-width="3"
+      opacity="0.6"
+    />
+    
+    <!-- Wordmark -->
+    <text x="-120" y="120" font-family="Inter, sans-serif" font-size="48" font-weight="700" fill="#2D2A26" text-anchor="start">Camp</text>
+    <text x="15" y="120" font-family="Inter, sans-serif" font-size="48" font-weight="400" fill="#2D2A26" text-anchor="start">Work</text>
+  </g>
+  
+  <!-- Subtitle -->
+  <text x="600" y="450" font-family="Inter, sans-serif" font-size="24" font-weight="400" fill="#5C5650" text-anchor="middle">Finde Campingplätze mit gutem Netz</text>
+</svg>

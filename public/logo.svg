@@ -1,0 +1,57 @@
+<svg width="120" height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- WiFi signal arcs on tent peak -->
+  <g transform="translate(16, 4)">
+    <path
+      d="M-6 6 C-6 2.5, -3 0, 0 0 C3 0, 6 2.5, 6 6"
+      stroke="#ABD8EF"
+      stroke-width="1.5"
+      fill="none"
+      stroke-linecap="round"
+    />
+    <path
+      d="M-4 5 C-4 3, -2 2, 0 2 C2 2, 4 3, 4 5"
+      stroke="#ABD8EF"
+      stroke-width="1.5"
+      fill="none"
+      stroke-linecap="round"
+    />
+    <path
+      d="M-2 4.5 C-2 3.8, -1 3.5, 0 3.5 C1 3.5, 2 3.8, 2 4.5"
+      stroke="#ABD8EF"
+      stroke-width="1.5"
+      fill="none"
+      stroke-linecap="round"
+    />
+  </g>
+  
+  <!-- Tent shape -->
+  <path
+    d="M8 26 L16 10 L24 26 Z"
+    fill="#E19B53"
+    stroke="#C47F35"
+    stroke-width="1"
+    stroke-linejoin="round"
+  />
+  
+  <!-- Tent door opening -->
+  <path
+    d="M14 26 L16 18 L18 26"
+    fill="#C47F35"
+    stroke="none"
+  />
+  
+  <!-- Tent center line for depth -->
+  <line
+    x1="16"
+    y1="10"
+    x2="16"
+    y2="26"
+    stroke="#C47F35"
+    stroke-width="1"
+    opacity="0.6"
+  />
+  
+  <!-- Wordmark -->
+  <text x="36" y="21" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#2D2A26">Camp</text>
+  <text x="82" y="21" font-family="Inter, sans-serif" font-size="18" font-weight="400" fill="#2D2A26">Work</text>
+</svg>
