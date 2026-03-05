@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { colors } from '@/lib/brand';
+import Providers from './providers';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -88,9 +89,9 @@ export default function RootLayout({
   return (
     <html lang="de">
       <body
-        className={`${inter.variable} font-inter bg-background text-foreground antialiased`}
+        className={`${inter.variable} font-inter bg-[#FEFDF8] text-foreground antialiased`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

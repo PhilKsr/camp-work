@@ -1,5 +1,6 @@
 'use client';
 
+import { notFound } from 'next/navigation';
 import { Logo } from '@/components/ui/Logo';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -93,7 +94,7 @@ const SpacingExample = ({ space, name }: { space: string; name: string }) => (
 export default function BrandPage() {
   // Hide brand page in production
   if (process.env.NODE_ENV === 'production') {
-    return null;
+    notFound();
   }
 
   return (
