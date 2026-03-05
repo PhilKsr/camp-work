@@ -1,9 +1,28 @@
+'use client';
+
 import Header from '@/components/layout/Header';
 import MapView from '@/components/map/MapView';
-import SidebarPlaceholder from '@/components/layout/SidebarPlaceholder';
 import MobileBottomSheet from '@/components/layout/MobileBottomSheet';
+import { CampingList } from '@/components/cards/CampingList';
+import { DetailSheet } from '@/components/cards/DetailSheet';
+import { useMapStore } from '@/stores/mapStore';
+import { useCampgrounds } from '@/hooks/useCampgrounds';
 
 export default function Home() {
+  const { selectedCampground, setSelectedCampground } = useMapStore();
+  const { data: campgroundsData } = useCampgrounds();
+
+  const selectedCampgroundData =
+    selectedCampground && campgroundsData
+      ? campgroundsData.features.find(
+          (f) => f.properties.id === selectedCampground,
+        )?.properties
+      : null;
+
+  const handleCloseDetail = () => {
+    setSelectedCampground(null);
+  };
+
   return (
     <div className="h-screen flex flex-col">
       <Header />
@@ -11,7 +30,16 @@ export default function Home() {
       <div className="flex-1 flex overflow-hidden">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex w-[420px] flex-col border-r border-[#E8E4D8] bg-white overflow-y-auto">
-          <SidebarPlaceholder />
+          <div className="p-4 flex-1">
+            {selectedCampgroundData ? (
+              <DetailSheet
+                campground={selectedCampgroundData}
+                onClose={handleCloseDetail}
+              />
+            ) : (
+              <CampingList />
+            )}
+          </div>
         </aside>
 
         {/* Map */}
@@ -21,7 +49,11 @@ export default function Home() {
       </div>
 
       {/* Mobile Bottom Sheet */}
-      <MobileBottomSheet className="lg:hidden" />
+      <MobileBottomSheet
+        className="lg:hidden"
+        selectedCampground={selectedCampgroundData}
+        onCloseDetail={handleCloseDetail}
+      />
     </div>
   );
 }

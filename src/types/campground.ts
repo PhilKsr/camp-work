@@ -1,46 +1,49 @@
 import { z } from 'zod';
 
-// Campground type definitions
+export const CampgroundFeatureSchema = z.enum([
+  'power',
+  'wifi',
+  'dogs',
+  'shower',
+  'toilet',
+  'swimming',
+  'shop',
+  'restaurant',
+  'playground',
+  'laundry',
+  'bbq',
+  'campfire',
+]);
+
 export const CampgroundSchema = z.object({
   id: z.string(),
   name: z.string(),
-  description: z.string().optional(),
-  coordinates: z.object({
-    latitude: z.number(),
-    longitude: z.number(),
-  }),
-  amenities: z.array(z.string()).default([]),
-  rating: z.number().min(0).max(5).optional(),
-  priceRange: z.enum(['free', 'budget', 'moderate', 'premium']).optional(),
-  capacity: z.number().positive().optional(),
-  contact: z
-    .object({
-      phone: z.string().optional(),
-      email: z.string().email().optional(),
-      website: z.string().url().optional(),
-    })
-    .optional(),
-  images: z.array(z.string().url()).default([]),
-  tags: z.array(z.string()).default([]),
-  lastUpdated: z.string().datetime(),
+  type: z.enum(['camp_site', 'caravan_site']),
+  coordinates: z.tuple([z.number(), z.number()]), // [lng, lat] GeoJSON
+  address: z.string().optional().nullable(),
+  website: z.string().optional().nullable(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  rating: z.number().min(0).max(5).optional().nullable(),
+  features: z.array(CampgroundFeatureSchema).default([]),
+  coverageLevel: z.enum(['5g', '4g', '3g', 'none']).default('none'),
+  thumbnail: z.string().optional().nullable(),
+  openingHours: z.string().optional().nullable(),
+  fee: z.boolean().optional().nullable(),
+  capacity: z.number().positive().optional().nullable(),
+  source: z.literal('osm').default('osm'),
+  osmId: z.string().optional(),
+  lastUpdated: z.string(),
 });
 
 export type Campground = z.infer<typeof CampgroundSchema>;
+export type CampgroundFeature = z.infer<typeof CampgroundFeatureSchema>;
 
-// Search and filter types
-export const FilterSchema = z.object({
-  priceRange: z.array(CampgroundSchema.shape.priceRange).optional(),
-  amenities: z.array(z.string()).optional(),
-  rating: z.number().min(0).max(5).optional(),
-  maxDistance: z.number().positive().optional(), // in km
-});
-
-export type Filter = z.infer<typeof FilterSchema>;
-
-// Map bounds type
-export interface MapBounds {
-  north: number;
-  south: number;
-  east: number;
-  west: number;
+export interface CampgroundGeoJSON {
+  type: 'FeatureCollection';
+  features: Array<{
+    type: 'Feature';
+    geometry: { type: 'Point'; coordinates: [number, number] };
+    properties: Campground;
+  }>;
 }

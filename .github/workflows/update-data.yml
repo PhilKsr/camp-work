@@ -1,0 +1,34 @@
+name: Update Campground Data
+on:
+  schedule:
+    - cron: '0 2 1 * *'  # 1. des Monats, 02:00 UTC
+  workflow_dispatch:  # Manuell auslösbar
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Update campground data
+        run: pnpm data:update
+        
+      - name: Commit and Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/
+          git diff --staged --quiet || git commit -m "chore(data): monthly campground data update"
+          git push

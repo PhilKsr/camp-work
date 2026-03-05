@@ -3,16 +3,24 @@
 import { motion, PanInfo } from 'framer-motion';
 import { useUIStore } from '@/stores/uiStore';
 import { cn } from '@/lib/utils';
-import SidebarPlaceholder from './SidebarPlaceholder';
+import { CampingList } from '@/components/cards/CampingList';
+import { DetailSheet } from '@/components/cards/DetailSheet';
+import { useCampgrounds } from '@/hooks/useCampgrounds';
+import type { Campground } from '@/types/campground';
 
 interface MobileBottomSheetProps {
   className?: string;
+  selectedCampground?: Campground | null;
+  onCloseDetail?: () => void;
 }
 
 export default function MobileBottomSheet({
   className,
+  selectedCampground,
+  onCloseDetail,
 }: MobileBottomSheetProps) {
   const { bottomSheetSnap, setBottomSheetSnap } = useUIStore();
+  const { data: campgroundsData } = useCampgrounds();
 
   // Calculate heights based on viewport
   const getHeight = (snap: typeof bottomSheetSnap) => {
@@ -98,17 +106,31 @@ export default function MobileBottomSheet({
         {bottomSheetSnap !== 'closed' && (
           <div className="text-center">
             <p className="text-sm font-medium text-foreground">
-              12 Campingplätze
+              {selectedCampground
+                ? selectedCampground.name
+                : `${campgroundsData?.features.length || 0} Campingplätze`}
             </p>
-            <p className="text-xs text-muted-foreground">Tippen zum Öffnen</p>
+            <p className="text-xs text-muted-foreground">
+              {selectedCampground ? 'Details ansehen' : 'Tippen zum Öffnen'}
+            </p>
           </div>
         )}
       </div>
 
       {/* Content */}
       {(bottomSheetSnap === 'half' || bottomSheetSnap === 'full') && (
-        <div className="flex-1 overflow-y-auto">
-          <SidebarPlaceholder />
+        <div className="flex-1 overflow-y-auto p-4">
+          {selectedCampground && onCloseDetail ? (
+            <DetailSheet
+              campground={selectedCampground}
+              onClose={() => {
+                onCloseDetail();
+                setBottomSheetSnap('peek');
+              }}
+            />
+          ) : (
+            <CampingList />
+          )}
         </div>
       )}
     </motion.div>

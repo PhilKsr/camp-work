@@ -15,6 +15,10 @@
     "test:e2e": "playwright test",
     "generate:icons": "tsx scripts/generate-icons.ts",
     "fetch:coverage": "tsx scripts/fetch-bnetza-coverage.ts",
+    "fetch:campgrounds": "tsx scripts/fetch-osm-campgrounds.ts",
+    "fetch:thumbnails": "tsx scripts/fetch-thumbnails.ts",
+    "fetch:enrich": "tsx scripts/enrich-coverage.ts",
+    "data:update": "pnpm fetch:campgrounds && pnpm fetch:enrich",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -27,6 +31,7 @@
     ]
   },
   "dependencies": {
+    "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-switch": "^1.2.6",
     "@serwist/next": "^9.5.6",
     "@tanstack/react-query": "^5.90.21",

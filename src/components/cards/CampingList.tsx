@@ -1,0 +1,187 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { useCampgrounds } from '@/hooks/useCampgrounds';
+import { useFavoriteStore } from '@/stores/favoriteStore';
+import { useMapStore } from '@/stores/mapStore';
+import { useGeolocationStore } from '@/stores/geolocationStore';
+import { CampingCard } from './CampingCard';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import type { Campground } from '@/types/campground';
+
+type SortOption = 'coverage' | 'name' | 'distance';
+
+function calculateDistance(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function getCoverageScore(level: string): number {
+  switch (level) {
+    case '5g':
+      return 4;
+    case '4g':
+      return 3;
+    case '3g':
+      return 2;
+    default:
+      return 1;
+  }
+}
+
+export function CampingList() {
+  const [sortBy, setSortBy] = useState<SortOption>('coverage');
+  const { data: campgroundsData, isLoading } = useCampgrounds();
+  const { toggleFavorite, isFavorite } = useFavoriteStore();
+  const { setSelectedCampground, flyTo } = useMapStore();
+  const { position: userPosition } = useGeolocationStore();
+
+  const sortedCampgrounds = useMemo(() => {
+    if (!campgroundsData?.features) return [];
+
+    const campgrounds = campgroundsData.features.map((f) => f.properties);
+
+    return [...campgrounds].sort((a, b) => {
+      switch (sortBy) {
+        case 'coverage':
+          return (
+            getCoverageScore(b.coverageLevel) -
+            getCoverageScore(a.coverageLevel)
+          );
+
+        case 'name':
+          return a.name.localeCompare(b.name, 'de');
+
+        case 'distance':
+          if (!userPosition) return 0;
+          const distA = calculateDistance(
+            userPosition.lat,
+            userPosition.lng,
+            a.coordinates[1],
+            a.coordinates[0],
+          );
+          const distB = calculateDistance(
+            userPosition.lat,
+            userPosition.lng,
+            b.coordinates[1],
+            b.coordinates[0],
+          );
+          return distA - distB;
+
+        default:
+          return 0;
+      }
+    });
+  }, [campgroundsData, sortBy, userPosition]);
+
+  const handleCampgroundClick = (campground: Campground) => {
+    const [lng, lat] = campground.coordinates;
+    setSelectedCampground(campground.id);
+    flyTo(lat, lng, 14);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-10 w-36" />
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="space-y-3">
+              <Skeleton className="h-[180px] rounded-2xl" />
+              <div className="space-y-2 px-3 pb-3">
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-4 w-4 rounded" />
+                  <Skeleton className="h-4 w-4 rounded" />
+                  <Skeleton className="h-4 w-4 rounded" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!sortedCampgrounds.length) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+          <ChevronDown className="w-8 h-8 text-muted-foreground" />
+        </div>
+        <h3 className="font-semibold text-lg mb-2">
+          Keine Campingplätze gefunden
+        </h3>
+        <p className="text-muted-foreground text-sm mb-4">
+          Versuche es mit anderen Suchkriterien oder zoome die Karte heraus.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold text-lg">
+          {sortedCampgrounds.length} Campingplätze
+        </h2>
+
+        <Select
+          value={sortBy}
+          onValueChange={(value: SortOption) => setSortBy(value)}
+        >
+          <SelectTrigger className="w-36">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="coverage">Netzqualität</SelectItem>
+            <SelectItem value="name">Name A-Z</SelectItem>
+            {userPosition && (
+              <SelectItem value="distance">Entfernung</SelectItem>
+            )}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Campground List */}
+      <div className="space-y-3">
+        {sortedCampgrounds.map((campground) => (
+          <CampingCard
+            key={campground.id}
+            campground={campground}
+            isFavorite={isFavorite(campground.id)}
+            onToggleFavorite={() => toggleFavorite(campground.id)}
+            onClick={() => handleCampgroundClick(campground)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}

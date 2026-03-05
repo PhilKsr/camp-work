@@ -1,0 +1,86 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [13.405, 52.52]
+      },
+      "properties": {
+        "id": "demo_berlin",
+        "name": "Campingplatz Berlin Mitte",
+        "type": "camp_site",
+        "coordinates": [13.405, 52.52],
+        "address": "Unter den Linden 1, 10117 Berlin",
+        "website": "https://example.com/berlin-camping",
+        "phone": "+49 30 12345678",
+        "email": "info@berlin-camping.de",
+        "rating": 4.2,
+        "features": ["wifi", "power", "shower", "toilet", "shop"],
+        "coverageLevel": "5g",
+        "thumbnail": null,
+        "openingHours": "24/7",
+        "fee": true,
+        "capacity": 150,
+        "source": "osm",
+        "osmId": "node/12345",
+        "lastUpdated": "2025-01-14T10:00:00.000Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [9.9937, 53.5511]
+      },
+      "properties": {
+        "id": "demo_hamburg",
+        "name": "Wohnmobilstellplatz Hamburg",
+        "type": "caravan_site",
+        "coordinates": [9.9937, 53.5511],
+        "address": "Reeperbahn 123, 20359 Hamburg",
+        "website": null,
+        "phone": "+49 40 87654321",
+        "email": null,
+        "rating": 3.8,
+        "features": ["power", "toilet", "dogs"],
+        "coverageLevel": "4g",
+        "thumbnail": null,
+        "openingHours": "06:00-22:00",
+        "fee": false,
+        "capacity": 80,
+        "source": "osm",
+        "osmId": "way/67890",
+        "lastUpdated": "2025-01-14T10:00:00.000Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [11.582, 48.1351]
+      },
+      "properties": {
+        "id": "demo_munich",
+        "name": "Campingplatz München Süd",
+        "type": "camp_site",
+        "coordinates": [11.582, 48.1351],
+        "address": "Marienplatz 8, 80331 München",
+        "website": "https://muenchen-camping.de",
+        "phone": null,
+        "email": "kontakt@muenchen-camping.de",
+        "rating": null,
+        "features": ["wifi", "power", "shower", "toilet", "swimming", "restaurant", "playground"],
+        "coverageLevel": "5g",
+        "thumbnail": null,
+        "openingHours": null,
+        "fee": true,
+        "capacity": 200,
+        "source": "osm",
+        "osmId": "relation/11111",
+        "lastUpdated": "2025-01-14T10:00:00.000Z"
+      }
+    }
+  ]
+}

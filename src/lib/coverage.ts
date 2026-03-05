@@ -107,22 +107,20 @@ function parseCoverageFromFeatureInfo(data: unknown): CoverageLevel {
       features: Array<{ properties: Record<string, unknown> }>;
     };
     const feature = typedData.features[0];
-    const properties = feature.properties;
+    const props = feature.properties;
 
-    // Look for coverage indicators in the feature properties
-    // These property names might need adjustment based on actual BNetzA response
-    if (properties?.coverage_indoor || properties?.indoor_coverage) {
-      // Indoor coverage indicates excellent signal
-      return '5g';
-    } else if (properties?.coverage_outdoor || properties?.outdoor_coverage) {
-      // Outdoor coverage indicates good signal
-      return '4g';
-    } else if (properties?.coverage_limited || properties?.weak_signal) {
-      // Limited coverage
-      return '3g';
-    }
+    // Parse technology and coverage from BNetzA WMS response
+    const tech = props.technology as string; // '4g' | '5g'
+    const indoor = props.coverage_indoor as boolean;
+    const outdoor = props.coverage_outdoor as boolean;
 
-    // Default to no coverage if no indicators found
+    // Map coverage based on technology and location type
+    if (tech === '5g' && indoor) return '5g';
+    if (tech === '5g' && outdoor) return '4g'; // Outdoor 5G ≈ indoor 4G quality
+    if (tech === '4g' && indoor) return '4g';
+    if (tech === '4g' && outdoor) return '3g'; // Outdoor only = weaker signal
+    if (outdoor) return '3g'; // Any outdoor coverage
+
     return 'none';
   } catch (error) {
     console.warn('Failed to parse coverage feature info:', error);

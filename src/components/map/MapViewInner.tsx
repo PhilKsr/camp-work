@@ -9,6 +9,7 @@ import GeolocationMarker from './GeolocationMarker';
 import CoverageLayer from './CoverageLayer';
 import CoverageLegend from './CoverageLegend';
 import CoverageControls from './CoverageControls';
+import { CampingMarkers } from './CampingMarkers';
 
 export default function MapViewInner() {
   const { viewport, setViewport } = useMapStore();
@@ -48,6 +49,7 @@ export default function MapViewInner() {
         attributionControl={false}
       >
         <CoverageLayer />
+        <CampingMarkers />
         <GeolocationMarker />
       </Map>
 
