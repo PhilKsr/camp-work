@@ -6,6 +6,9 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { useMapStore } from '@/stores/mapStore';
 import MapControls from './MapControls';
 import GeolocationMarker from './GeolocationMarker';
+import CoverageLayer from './CoverageLayer';
+import CoverageLegend from './CoverageLegend';
+import CoverageControls from './CoverageControls';
 
 export default function MapViewInner() {
   const { viewport, setViewport } = useMapStore();
@@ -42,8 +45,17 @@ export default function MapViewInner() {
         mapStyle={mapStyle}
         attributionControl={false}
       >
+        <CoverageLayer />
         <GeolocationMarker />
       </Map>
+
+      {/* Coverage Controls - Bottom Left */}
+      <CoverageControls />
+
+      {/* Coverage Legend - Bottom Left (below controls) */}
+      <CoverageLegend />
+
+      {/* Map Controls - Bottom Right */}
       <MapControls />
     </div>
   );
