@@ -85,7 +85,7 @@ export const mockCampgrounds = [
 export const mockGeoJSON = createMockGeoJSON(mockCampgrounds);
 
 /**
- * Creates a mock UseQueryResult for TanStack Query
+ * Creates a mock UseQueryResult for TanStack Query tests
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createMockQueryResult<T>(data: T): any {
