@@ -75,9 +75,21 @@ export function CampingMarkers() {
             colors.coverage.limited,
             colors.coverage.none,
           ],
-          'circle-radius': 12,
+          'circle-radius': 14, // Erhöht von 12 auf 14px für bessere Touch-Targets
           'circle-stroke-width': 2,
           'circle-stroke-color': '#ffffff',
+        }}
+      />
+
+      {/* Invisible hit area for better click targets */}
+      <Layer
+        id="campground-markers-hitarea"
+        type="circle"
+        source="campgrounds"
+        filter={['!', ['has', 'point_count']]}
+        paint={{
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 6, 16, 14, 26], // Größerer Hit-Bereich
+          'circle-opacity': 0, // Unsichtbar aber klickbar
         }}
       />
     </Source>

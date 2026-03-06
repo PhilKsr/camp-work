@@ -43,9 +43,11 @@ export default function MapViewInner() {
 
   const handleMapClick = useCallback(
     (e: MapLayerMouseEvent) => {
-      // Check if a campground marker was clicked
+      // Check if a campground marker was clicked (including hit area)
       const campgroundFeature = e.features?.find(
-        (f) => f.layer?.id === 'campground-markers',
+        (f) =>
+          f.layer?.id === 'campground-markers' ||
+          f.layer?.id === 'campground-markers-hitarea',
       );
       if (campgroundFeature?.properties?.id) {
         const id = campgroundFeature.properties.id;
@@ -84,7 +86,11 @@ export default function MapViewInner() {
         onClick={handleMapClick}
         onMouseMove={onMouseMove}
         cursor={cursor}
-        interactiveLayerIds={['campground-markers', 'clusters']}
+        interactiveLayerIds={[
+          'campground-markers',
+          'campground-markers-hitarea',
+          'clusters',
+        ]}
         style={{ width: '100%', height: '100%' }}
         mapStyle={mapStyle}
         attributionControl={false}

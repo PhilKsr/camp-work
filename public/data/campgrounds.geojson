@@ -98,13 +98,13 @@
           "toilet"
         ],
         "coverageLevel": "none",
-        "thumbnail": null,
+        "thumbnail": "/campgrounds/osm_node_253774524.webp",
         "openingHours": null,
         "fee": true,
         "capacity": null,
         "source": "osm",
         "osmId": "node/253774524",
-        "lastUpdated": "2026-03-06T08:41:52.524Z"
+        "lastUpdated": "2026-03-06T12:56:32.653Z"
       }
     },
     {
@@ -365,13 +365,13 @@
           "power"
         ],
         "coverageLevel": "none",
-        "thumbnail": null,
+        "thumbnail": "/campgrounds/osm_node_274073501.webp",
         "openingHours": null,
         "fee": true,
         "capacity": 13,
         "source": "osm",
         "osmId": "node/274073501",
-        "lastUpdated": "2026-03-06T08:41:52.528Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -537,13 +537,13 @@
         "rating": null,
         "features": [],
         "coverageLevel": "none",
-        "thumbnail": null,
+        "thumbnail": "/campgrounds/osm_node_278129032.webp",
         "openingHours": null,
         "fee": true,
         "capacity": null,
         "source": "osm",
         "osmId": "node/278129032",
-        "lastUpdated": "2026-03-06T08:41:52.530Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -879,13 +879,13 @@
         "rating": null,
         "features": [],
         "coverageLevel": "none",
-        "thumbnail": null,
+        "thumbnail": "/campgrounds/osm_node_289884897.webp",
         "openingHours": null,
         "fee": null,
         "capacity": 25,
         "source": "osm",
         "osmId": "node/289884897",
-        "lastUpdated": "2026-03-06T08:41:52.531Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -1113,13 +1113,13 @@
         "rating": null,
         "features": [],
         "coverageLevel": "none",
-        "thumbnail": null,
+        "thumbnail": "/campgrounds/osm_node_295095671.webp",
         "openingHours": null,
         "fee": true,
         "capacity": 10,
         "source": "osm",
         "osmId": "node/295095671",
-        "lastUpdated": "2026-03-06T08:41:52.532Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -1218,7 +1218,7 @@
         "capacity": 20,
         "source": "osm",
         "osmId": "node/298979126",
-        "lastUpdated": "2026-03-06T08:41:52.532Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -1758,13 +1758,13 @@
           "shower"
         ],
         "coverageLevel": "none",
-        "thumbnail": null,
+        "thumbnail": "/campgrounds/osm_node_348094653.webp",
         "openingHours": null,
         "fee": null,
         "capacity": null,
         "source": "osm",
         "osmId": "node/348094653",
-        "lastUpdated": "2026-03-06T08:41:52.534Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -1791,13 +1791,13 @@
         "rating": null,
         "features": [],
         "coverageLevel": "none",
-        "thumbnail": null,
+        "thumbnail": "/campgrounds/osm_node_355960345.webp",
         "openingHours": null,
         "fee": null,
         "capacity": null,
         "source": "osm",
         "osmId": "node/355960345",
-        "lastUpdated": "2026-03-06T08:41:52.534Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -2294,13 +2294,13 @@
         "rating": null,
         "features": [],
         "coverageLevel": "none",
-        "thumbnail": null,
+        "thumbnail": "/campgrounds/osm_node_398251696.webp",
         "openingHours": null,
         "fee": null,
         "capacity": null,
         "source": "osm",
         "osmId": "node/398251696",
-        "lastUpdated": "2026-03-06T08:41:52.536Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -2497,13 +2497,13 @@
         "rating": null,
         "features": [],
         "coverageLevel": "none",
-        "thumbnail": null,
+        "thumbnail": "/campgrounds/osm_node_431049621.webp",
         "openingHours": null,
         "fee": null,
         "capacity": null,
         "source": "osm",
         "osmId": "node/431049621",
-        "lastUpdated": "2026-03-06T08:41:52.536Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -2631,13 +2631,13 @@
           "power"
         ],
         "coverageLevel": "none",
-        "thumbnail": null,
+        "thumbnail": "/campgrounds/osm_node_446122469.webp",
         "openingHours": null,
         "fee": true,
         "capacity": 10,
         "source": "osm",
         "osmId": "node/446122469",
-        "lastUpdated": "2026-03-06T08:41:52.537Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -4407,7 +4407,7 @@
         "capacity": 4,
         "source": "osm",
         "osmId": "node/655372089",
-        "lastUpdated": "2026-03-06T08:41:52.543Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -9501,7 +9501,7 @@
         "capacity": 8,
         "source": "osm",
         "osmId": "node/1691964049",
-        "lastUpdated": "2026-03-06T08:41:52.564Z"
+        "lastUpdated": "2026-03-06T12:56:32.655Z"
       }
     },
     {
@@ -20157,7 +20157,7 @@
         "capacity": 3,
         "source": "osm",
         "osmId": "node/4190452266",
-        "lastUpdated": "2026-03-06T08:41:52.594Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -22119,7 +22119,7 @@
         "capacity": null,
         "source": "osm",
         "osmId": "node/4683121078",
-        "lastUpdated": "2026-03-06T08:41:52.600Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -24637,7 +24637,7 @@
         "capacity": null,
         "source": "osm",
         "osmId": "node/5487895426",
-        "lastUpdated": "2026-03-06T08:41:52.607Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -27094,7 +27094,7 @@
         "capacity": null,
         "source": "osm",
         "osmId": "node/6310300497",
-        "lastUpdated": "2026-03-06T08:41:52.614Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -28144,7 +28144,7 @@
         "capacity": null,
         "source": "osm",
         "osmId": "node/6497072428",
-        "lastUpdated": "2026-03-06T08:41:52.617Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -35258,7 +35258,7 @@
         "capacity": 2,
         "source": "osm",
         "osmId": "node/8951060441",
-        "lastUpdated": "2026-03-06T08:41:52.637Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -37819,7 +37819,7 @@
         "capacity": null,
         "source": "osm",
         "osmId": "node/9790980387",
-        "lastUpdated": "2026-03-06T08:41:52.644Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -40178,7 +40178,7 @@
         "capacity": null,
         "source": "osm",
         "osmId": "node/10143062345",
-        "lastUpdated": "2026-03-06T08:41:52.651Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -45093,7 +45093,7 @@
         "capacity": null,
         "source": "osm",
         "osmId": "node/11739547368",
-        "lastUpdated": "2026-03-06T08:41:52.665Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -45820,7 +45820,7 @@
         "capacity": 2,
         "source": "osm",
         "osmId": "node/11806851939",
-        "lastUpdated": "2026-03-06T08:41:52.667Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -54899,7 +54899,7 @@
         "capacity": 6,
         "source": "osm",
         "osmId": "node/12511981581",
-        "lastUpdated": "2026-03-06T08:41:52.693Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -55216,7 +55216,7 @@
         "capacity": 200,
         "source": "osm",
         "osmId": "node/12578382297",
-        "lastUpdated": "2026-03-06T08:41:52.694Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -56716,7 +56716,7 @@
         "capacity": null,
         "source": "osm",
         "osmId": "node/12879276031",
-        "lastUpdated": "2026-03-06T08:41:52.698Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
@@ -57337,7 +57337,7 @@
         "capacity": 3,
         "source": "osm",
         "osmId": "node/12991928122",
-        "lastUpdated": "2026-03-06T08:41:52.700Z"
+        "lastUpdated": "2026-03-06T12:56:32.656Z"
       }
     },
     {
