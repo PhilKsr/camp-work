@@ -1,85 +1,66 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, MapPin, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useCampgrounds } from '@/hooks/useCampgrounds';
-import { useSearch, useDebounce } from '@/hooks/useSearch';
+import {
+  useGeocodingSearch,
+  type GeocodingResult,
+} from '@/hooks/useGeocodingSearch';
 import { useMapStore } from '@/stores/mapStore';
-import { useFilterStore } from '@/stores/filterStore';
 import { cn } from '@/lib/utils';
-import { colors } from '@/lib/brand';
-import type { Campground } from '@/types/campground';
 
 interface SearchResultItemProps {
-  campground: Campground;
+  place: GeocodingResult;
   onClick: () => void;
 }
 
-function SearchResultItem({ campground, onClick }: SearchResultItemProps) {
-  const getCoverageColor = (level: string): string => {
-    switch (level) {
-      case '5g':
-        return colors.coverage.excellent;
-      case '4g':
-        return colors.coverage.good;
-      case '3g':
-        return colors.coverage.limited;
+function SearchResultItem({ place, onClick }: SearchResultItemProps) {
+  const getPlaceTypeLabel = (type: string): string => {
+    switch (type) {
+      case 'city':
+        return 'Stadt';
+      case 'town':
+        return 'Ort';
+      case 'village':
+        return 'Dorf';
+      case 'address':
+        return 'Adresse';
       default:
-        return colors.coverage.none;
+        return 'Ort';
     }
   };
 
-  const getCoverageLabel = (level: string): string => {
-    switch (level) {
-      case '5g':
-        return '5G';
-      case '4g':
-        return '4G';
-      case '3g':
-        return '3G';
-      default:
-        return 'Kein Netz';
-    }
+  // Extract main place name and region from display name
+  const formatDisplayName = (
+    displayName: string,
+  ): { name: string; region: string } => {
+    const parts = displayName.split(', ');
+    const name = parts[0] || displayName;
+    const region = parts.slice(1, 3).join(', '); // Take next 1-2 parts as region
+    return { name, region };
   };
 
-  const getTypeLabel = (type: string): string => {
-    return type === 'caravan_site' ? 'Stellplatz' : 'Campingplatz';
-  };
+  const { name, region } = formatDisplayName(place.displayName);
 
   return (
     <button
       onClick={onClick}
       className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h4 className="font-medium text-gray-900 truncate">
-              {campground.name}
-            </h4>
-            <Badge
-              variant="secondary"
-              className="text-xs"
-              style={{
-                backgroundColor:
-                  getCoverageColor(campground.coverageLevel) + '20',
-              }}
-            >
-              {getCoverageLabel(campground.coverageLevel)}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <h4 className="font-medium text-gray-900 truncate">{name}</h4>
             <Badge variant="outline" className="text-xs">
-              {getTypeLabel(campground.type)}
+              {getPlaceTypeLabel(place.type)}
             </Badge>
-            {campground.address && (
-              <span className="truncate">{campground.address}</span>
-            )}
           </div>
+          {region && <p className="text-sm text-gray-600 truncate">{region}</p>}
         </div>
       </div>
     </button>
@@ -88,34 +69,55 @@ function SearchResultItem({ campground, onClick }: SearchResultItemProps) {
 
 interface SearchResultsProps {
   query: string;
-  results: Campground[];
-  onSelect: (campground: Campground) => void;
+  results: GeocodingResult[];
+  isLoading: boolean;
+  error: string | null;
+  onSelect: (place: GeocodingResult) => void;
 }
 
-function SearchResults({ query, results, onSelect }: SearchResultsProps) {
+function SearchResults({
+  query,
+  results,
+  isLoading,
+  error,
+  onSelect,
+}: SearchResultsProps) {
   if (!query) {
     return (
       <div className="px-4 py-8 text-center text-gray-500">
-        Suche nach Name oder Ort...
+        Suche nach Orten, Städten oder Adressen...
       </div>
     );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="px-4 py-8 text-center text-gray-500 flex items-center justify-center gap-2">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        Suche nach &quot;{query}&quot;...
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="px-4 py-8 text-center text-red-500">{error}</div>;
   }
 
   if (results.length === 0) {
     return (
       <div className="px-4 py-8 text-center text-gray-500">
-        Keine Ergebnisse für &quot;{query}&quot;
+        Keine Orte gefunden für &quot;{query}&quot;
       </div>
     );
   }
 
   return (
     <div className="divide-y divide-gray-100">
-      {results.map((campground) => (
+      {results.map((place, index) => (
         <SearchResultItem
-          key={campground.id}
-          campground={campground}
-          onClick={() => onSelect(campground)}
+          key={`${place.lat}-${place.lng}-${index}`}
+          place={place}
+          onClick={() => onSelect(place)}
         />
       ))}
     </div>
@@ -129,13 +131,8 @@ interface SearchBarDesktopProps {
 function SearchBarDesktop({ className }: SearchBarDesktopProps) {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const debouncedQuery = useDebounce(query, 300);
-  const { data: campgroundsData } = useCampgrounds();
-  const { setSelectedCampground, flyTo } = useMapStore();
-  const { setSearchQuery } = useFilterStore();
-
-  const campgrounds = campgroundsData?.features?.map((f) => f.properties) || [];
-  const searchResults = useSearch(debouncedQuery, campgrounds);
+  const { flyTo } = useMapStore();
+  const { results, isLoading, error } = useGeocodingSearch(query);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -166,19 +163,28 @@ function SearchBarDesktop({ className }: SearchBarDesktopProps) {
     };
   }, [isOpen]);
 
-  const handleSelect = (campground: Campground) => {
-    const [lng, lat] = campground.coordinates;
-    setSelectedCampground(campground.id);
-    flyTo(lat, lng, 14);
+  const handleSelect = (place: GeocodingResult) => {
+    // Determine zoom level based on place type
+    let zoom = 12;
+    switch (place.type) {
+      case 'city':
+        zoom = 12;
+        break;
+      case 'town':
+        zoom = 14;
+        break;
+      case 'village':
+        zoom = 15;
+        break;
+      case 'address':
+        zoom = 16;
+        break;
+    }
+
+    flyTo(place.lat, place.lng, zoom);
     setIsOpen(false);
     setQuery('');
-    setSearchQuery(''); // Clear search filter
   };
-
-  // Sync debounced query with filter store
-  useEffect(() => {
-    setSearchQuery(debouncedQuery);
-  }, [debouncedQuery, setSearchQuery]);
 
   return (
     <div ref={containerRef} className={cn('relative', className)}>
@@ -186,7 +192,7 @@ function SearchBarDesktop({ className }: SearchBarDesktopProps) {
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
         <Input
           type="text"
-          placeholder="Suche Campingplätze..."
+          placeholder="Suche nach Orten, Städten..."
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -201,8 +207,10 @@ function SearchBarDesktop({ className }: SearchBarDesktopProps) {
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 z-50 max-h-80 overflow-hidden">
           <div className="overflow-y-auto max-h-80">
             <SearchResults
-              query={debouncedQuery}
-              results={searchResults}
+              query={query}
+              results={results}
+              isLoading={isLoading}
+              error={error}
               onSelect={handleSelect}
             />
           </div>
@@ -219,26 +227,30 @@ interface SearchBarMobileProps {
 function SearchBarMobile({ className }: SearchBarMobileProps) {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const debouncedQuery = useDebounce(query, 300);
-  const { data: campgroundsData } = useCampgrounds();
-  const { setSelectedCampground, flyTo } = useMapStore();
-  const { setSearchQuery } = useFilterStore();
+  const { flyTo } = useMapStore();
+  const { results, isLoading, error } = useGeocodingSearch(query);
 
-  const campgrounds = campgroundsData?.features?.map((f) => f.properties) || [];
-  const searchResults = useSearch(debouncedQuery, campgrounds);
+  const handleSelect = (place: GeocodingResult) => {
+    // Determine zoom level based on place type
+    let zoom = 12;
+    switch (place.type) {
+      case 'city':
+        zoom = 12;
+        break;
+      case 'town':
+        zoom = 14;
+        break;
+      case 'village':
+        zoom = 15;
+        break;
+      case 'address':
+        zoom = 16;
+        break;
+    }
 
-  // Sync debounced query with filter store
-  useEffect(() => {
-    setSearchQuery(debouncedQuery);
-  }, [debouncedQuery, setSearchQuery]);
-
-  const handleSelect = (campground: Campground) => {
-    const [lng, lat] = campground.coordinates;
-    setSelectedCampground(campground.id);
-    flyTo(lat, lng, 14);
+    flyTo(place.lat, place.lng, zoom);
     setIsOpen(false);
     setQuery('');
-    setSearchQuery(''); // Clear search filter
   };
 
   return (
@@ -258,7 +270,7 @@ function SearchBarMobile({ className }: SearchBarMobileProps) {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               type="text"
-              placeholder="Suche Campingplätze..."
+              placeholder="Suche nach Orten, Städten..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               autoFocus
@@ -269,8 +281,10 @@ function SearchBarMobile({ className }: SearchBarMobileProps) {
 
         <div className="max-h-96 overflow-y-auto">
           <SearchResults
-            query={debouncedQuery}
-            results={searchResults}
+            query={query}
+            results={results}
+            isLoading={isLoading}
+            error={error}
             onSelect={handleSelect}
           />
         </div>

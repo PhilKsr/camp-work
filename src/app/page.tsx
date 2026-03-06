@@ -10,10 +10,14 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useMapStore } from '@/stores/mapStore';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { useUrlState } from '@/hooks/useUrlState';
+import { useInitialLocation } from '@/hooks/useInitialLocation';
 
 export default function Home() {
   const { selectedCampground, setSelectedCampground } = useMapStore();
   const { data: campgroundsData } = useCampgrounds();
+
+  // Initialize location on app start
+  const locationState = useInitialLocation();
 
   // Sync state with URL
   useUrlState();
@@ -53,6 +57,30 @@ export default function Home() {
           <ErrorBoundary>
             <MapView />
           </ErrorBoundary>
+
+          {/* Location Loading Overlay */}
+          {locationState.isLoading && (
+            <div className="absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-white rounded-xl px-6 py-4 shadow-lg flex items-center gap-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-warmGold"></div>
+                <span className="text-gray-900 font-medium">
+                  Standort wird ermittelt...
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Location Error Overlay */}
+          {locationState.error && !locationState.hasLocation && (
+            <div className="absolute top-4 left-4 right-4 z-50">
+              <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3">
+                <p className="text-orange-800 text-sm">
+                  <strong>Hinweis:</strong> {locationState.error}. Verwende die
+                  Suchleiste, um zu einem Ort zu navigieren.
+                </p>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 
