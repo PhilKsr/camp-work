@@ -3,7 +3,7 @@ import FilterPanel from '@/components/search/FilterPanel';
 import { useFilterStore } from '@/stores/filterStore';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
-import { mockGeoJSON } from '../helpers';
+import { mockGeoJSON, createMockQueryResult } from '../helpers';
 
 // Mock the stores and hooks
 vi.mock('@/stores/filterStore');
@@ -35,30 +35,9 @@ describe('FilterPanel', () => {
   beforeEach(() => {
     vi.mocked(useFilterStore).mockReturnValue(mockFilterStore);
     vi.mocked(useFavoriteStore).mockReturnValue(mockFavoriteStore);
-    vi.mocked(useCampgrounds).mockReturnValue({
-      data: mockCampgroundsData,
-      isLoading: false,
-      error: null,
-      isError: false,
-      isPending: false,
-      isLoadingError: false,
-      isRefetchError: false,
-      isSuccess: true,
-      status: 'success',
-      refetch: vi.fn(),
-      remove: vi.fn(),
-      isFetching: false,
-      isFetched: true,
-      isPaused: false,
-      isStale: false,
-      isPlaceholderData: false,
-      dataUpdatedAt: Date.now(),
-      errorUpdatedAt: 0,
-      failureCount: 0,
-      failureReason: null,
-      fetchStatus: 'idle',
-      errorUpdateCount: 0,
-    });
+    vi.mocked(useCampgrounds).mockReturnValue(
+      createMockQueryResult(mockCampgroundsData),
+    );
   });
 
   afterEach(() => {

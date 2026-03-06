@@ -83,3 +83,39 @@ export const mockCampgrounds = [
 ];
 
 export const mockGeoJSON = createMockGeoJSON(mockCampgrounds);
+
+/**
+ * Creates a mock UseQueryResult for TanStack Query
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createMockQueryResult<T>(data: T): any {
+  return {
+    data,
+    isLoading: false,
+    error: null,
+    isError: false,
+    isPending: false,
+    isLoadingError: false,
+    isRefetchError: false,
+    isSuccess: true,
+    status: 'success' as const,
+    refetch: vi.fn(),
+    isFetching: false,
+    isFetched: true,
+    isPaused: false,
+    isStale: false,
+    isPlaceholderData: false,
+    dataUpdatedAt: Date.now(),
+    errorUpdatedAt: 0,
+    failureCount: 0,
+    failureReason: null,
+    fetchStatus: 'idle' as const,
+    errorUpdateCount: 0,
+    isFetchedAfterMount: true,
+    isInitialLoading: false,
+    isRefetching: false,
+    isEnabled: true,
+    promise: Promise.resolve(data),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any;
+}
