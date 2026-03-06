@@ -1,122 +1,135 @@
-# Camp Work
+# Camp Work 🏕️📶
 
-A modern progressive web application for finding the perfect camping spots with reliable network coverage. Built with Next.js 16, TypeScript, and Tailwind CSS.
+Finde Campingplätze in Deutschland mit zuverlässiger O2-Netzabdeckung.
+Eine Progressive Web App für digitale Nomaden und Remote Worker.
 
 ## Features
 
-- 🗺️ Interactive map with camping locations
-- 📶 Network coverage visualization
-- 🔍 Advanced search and filtering
-- 📱 Progressive Web App (PWA) support
-- 🎨 Beautiful brand-consistent UI with shadcn/ui
-- 🌙 Dark/light mode support
-- 📋 Detailed campground information
-- 💾 Offline capability
+- 🗺️ Interaktive Hybridkarte (Satellit + Straßen) mit 1762 Campingplätzen
+- 📶 Offizielle O2/Telefónica Netzabdeckung (Quelle: © Bundesnetzagentur)
+- 🔍 Suche nach Name und Ort mit Autocomplete
+- 🎛️ Filter nach Netzqualität, Typ und Ausstattung
+- ❤️ Favoriten mit lokaler Speicherung
+- 📱 Progressive Web App – installierbar auf Handy und Desktop
+- 🔗 Deep-Links – Kartenposition und Filter in der URL
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 with Turbopack
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS 4
-- **UI Components**: shadcn/ui + Radix UI
-- **Maps**: MapLibre GL + react-map-gl
-- **State Management**: Zustand
-- **Data Fetching**: TanStack Query
-- **Validation**: Zod
-- **PWA**: Serwist
-- **Animation**: Framer Motion
-- **Icons**: Lucide React
+Next.js 16 · TypeScript · Tailwind CSS · shadcn/ui · MapLibre GL ·
+Zustand · TanStack Query · Framer Motion · Serwist (PWA)
 
-## Getting Started
+## Schnellstart
 
-### Prerequisites
+### Voraussetzungen
 
 - Node.js 20+
-- pnpm (recommended)
+- pnpm (`npm install -g pnpm`)
+- MapTiler API Key (kostenlos: https://cloud.maptiler.com/account/keys/)
 
 ### Installation
 
-1. Clone the repository
-2. Copy environment variables:
-   ```bash
-   cp .env.local.example .env.local
-   ```
-3. Add your MapTiler API key to `.env.local`
-4. Install dependencies:
-   ```bash
-   pnpm install
-   ```
-5. Run the development server:
-   ```bash
-   pnpm dev
-   ```
-
-Open [http://localhost:3000](http://localhost:3000) to view the application.
-
-### Environment Variables
-
-Create a `.env.local` file with the following variables:
-
-```env
-NEXT_PUBLIC_MAPTILER_KEY=your_maptiler_api_key
+```bash
+git clone https://github.com/PhilKsr/camp-work.git
+cd camp-work
+pnpm install
+cp .env.local.example .env.local
+# MapTiler Key in .env.local eintragen
 ```
 
-Get a free API key from [MapTiler](https://maptiler.com).
+### Daten aktualisieren (optional)
 
-## Development
-
-### Scripts
-
-- `pnpm dev` - Start development server with Turbopack
-- `pnpm build` - Build for production
-- `pnpm start` - Start production server
-- `pnpm lint` - Run ESLint
-- `pnpm lint:fix` - Run ESLint with auto-fix
-- `pnpm type-check` - Run TypeScript type checking
-- `pnpm test` - Run unit tests with Vitest
-- `pnpm test:e2e` - Run end-to-end tests with Playwright
-
-### Project Structure
-
+```bash
+pnpm fetch:campgrounds   # Campingplätze aus OpenStreetMap laden
+pnpm fetch:enrich        # Netzabdeckung pro Campingplatz berechnen
+pnpm fetch:thumbnails    # Bilder von Campingplatz-Websites laden (dauert lange)
 ```
-src/
-├── app/                 # Next.js App Router pages
-├── components/          # React components
-│   ├── layout/         # Layout components
-│   ├── map/            # Map-related components
-│   ├── cards/          # Card components
-│   ├── search/         # Search components
-│   └── ui/             # shadcn/ui components
-├── hooks/              # Custom React hooks
-├── lib/                # Utility functions and constants
-├── types/              # TypeScript type definitions
-├── data/               # Static data and mock content
-└── stores/             # Zustand stores
+
+### Entwicklung
+
+```bash
+pnpm dev                 # Dev-Server starten (http://localhost:3000)
+pnpm build               # Production Build
+pnpm test                # Tests ausführen
+pnpm lint                # Linting
 ```
 
 ## Docker
 
-Build and run with Docker:
-
 ```bash
-# Build image
+# Build
 docker build -t camp-work .
 
-# Run container
-docker run -p 3000:3000 camp-work
+# Run
+docker run -p 3000:3000 -e NEXT_PUBLIC_MAPTILER_KEY=dein_key camp-work
 
-# Or use docker-compose
-docker-compose up
+# Oder mit docker-compose
+docker compose up
 ```
 
-## Contributing
+### Raspberry Pi Deployment
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
+Für ARM64 (Raspberry Pi 4/5):
 
-## License
+```bash
+docker build --platform linux/arm64 -t camp-work .
+```
 
-MIT License - see [LICENSE](LICENSE) for details.
+Oder über GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/philksr/camp-work:latest
+docker run -p 3000:3000 -e NEXT_PUBLIC_MAPTILER_KEY=dein_key ghcr.io/philksr/camp-work:latest
+```
+
+### Tailscale (Remote-Zugriff)
+
+1. Tailscale auf dem Pi installieren:
+
+   ```bash
+   curl -fsSL https://tailscale.com/install.sh | sh
+   sudo tailscale up
+   ```
+
+2. Die App ist dann über dein Tailscale-Netz erreichbar:
+
+   ```
+   http://raspberrypi:3000
+   ```
+
+3. Optional – HTTPS via Tailscale Serve:
+   ```bash
+   sudo tailscale serve --bg 3000
+   # Erreichbar unter: https://raspberrypi.tail1234.ts.net
+   ```
+
+## Datenquellen
+
+- **Campingplätze:** OpenStreetMap via Overpass API (monatlich aktualisiert)
+- **Netzabdeckung:** © Bundesnetzagentur, Mobilfunk-Monitoring (CC BY-ND 3.0 DE)
+- **Karte:** MapTiler Hybrid (Satellit + Straßen)
+
+## Projektstruktur
+
+```
+src/
+├── app/              # Next.js App Router
+├── components/
+│   ├── cards/        # CampingCard, CampingList, DetailSheet
+│   ├── layout/       # Header, MobileBottomSheet
+│   ├── map/          # MapView, CoverageLayer, CampingMarkers
+│   ├── search/       # SearchBar, FilterPanel
+│   └── ui/           # shadcn/ui + Logo, InstallPrompt, ErrorBoundary
+├── hooks/            # useCampgrounds, useGeolocation, useSearch, useUrlState
+├── lib/              # brand.ts, coverage.ts, utils.ts
+├── stores/           # Zustand: map, coverage, filter, favorite, ui
+└── types/            # Zod schemas + TypeScript types
+scripts/
+├── fetch-osm-campgrounds.ts   # OSM Overpass API
+├── enrich-coverage.ts         # Coverage-Enrichment
+├── fetch-thumbnails.ts        # Website OG-Image Scraping
+└── generate-icons.ts          # PWA Icon Generation
+```
+
+## Lizenz
+
+MIT

@@ -1,18 +1,32 @@
+version: '3.8'
+
 services:
-  campwork-web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  campwork:
+    image: ghcr.io/philksr/camp-work:latest
+    # Oder lokal bauen:
+    # build:
+    #   context: .
+    #   args:
+    #     NEXT_PUBLIC_MAPTILER_KEY: ${NEXT_PUBLIC_MAPTILER_KEY}
     ports:
-      - "3000:3000"
+      - "${PORT:-3000}:3000"
     environment:
-      - NODE_ENV=production
-      - NEXT_TELEMETRY_DISABLED=1
-      - NEXT_PUBLIC_MAPTILER_KEY=${NEXT_PUBLIC_MAPTILER_KEY:-}
-    restart: unless-stopped
+      - NEXT_PUBLIC_MAPTILER_KEY=${NEXT_PUBLIC_MAPTILER_KEY}
+    restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 10s
+
+  # Optional: Automatische Updates
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=3600  # Jede Stunde prüfen
+      - WATCHTOWER_INCLUDE_STOPPED=false
+    restart: always

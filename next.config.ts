@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
     root: __dirname,
   }, // Enable Turbopack configuration with proper root
   images: {
+    unoptimized: true, // Kein externer Image-Optimization-Server nötig
     remotePatterns: [
       {
         protocol: 'https',
