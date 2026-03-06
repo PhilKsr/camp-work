@@ -20,6 +20,22 @@ vi.mock('@/components/ui/Logo', () => ({
   ),
 }));
 
+// Mock SearchBar component
+vi.mock('@/components/search/SearchBar', () => ({
+  default: () => (
+    <div data-testid="search-bar">
+      <input placeholder="Campingplatz suchen..." readOnly />
+    </div>
+  ),
+}));
+
+// Mock FilterPanel component
+vi.mock('@/components/search/FilterPanel', () => ({
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="filter-panel">{children}</div>
+  ),
+}));
+
 describe('Header', () => {
   it('renders logo', () => {
     render(<Header />);

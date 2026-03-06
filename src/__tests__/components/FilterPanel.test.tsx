@@ -3,6 +3,7 @@ import FilterPanel from '@/components/search/FilterPanel';
 import { useFilterStore } from '@/stores/filterStore';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
+import { mockGeoJSON } from '../helpers';
 
 // Mock the stores and hooks
 vi.mock('@/stores/filterStore');
@@ -28,32 +29,7 @@ const mockFavoriteStore = {
   favorites: ['1', '2'],
 };
 
-const mockCampgroundsData = {
-  features: [
-    {
-      properties: {
-        id: '1',
-        name: 'Test Camping',
-        coverageLevel: '4g',
-        type: 'camp_site',
-        features: ['wifi', 'power'],
-        coordinates: [13.4, 52.5],
-        rating: 4.5,
-      },
-    },
-    {
-      properties: {
-        id: '2',
-        name: 'Test Stellplatz',
-        coverageLevel: '5g',
-        type: 'caravan_site',
-        features: ['power', 'shower'],
-        coordinates: [11.5, 48.1],
-        rating: 4.8,
-      },
-    },
-  ],
-};
+const mockCampgroundsData = mockGeoJSON;
 
 describe('FilterPanel', () => {
   beforeEach(() => {
@@ -63,6 +39,25 @@ describe('FilterPanel', () => {
       data: mockCampgroundsData,
       isLoading: false,
       error: null,
+      isError: false,
+      isPending: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: true,
+      status: 'success',
+      refetch: vi.fn(),
+      remove: vi.fn(),
+      isFetching: false,
+      isFetched: true,
+      isPaused: false,
+      isStale: false,
+      isPlaceholderData: false,
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      failureCount: 0,
+      failureReason: null,
+      fetchStatus: 'idle',
+      errorUpdateCount: 0,
     });
   });
 
@@ -74,7 +69,7 @@ describe('FilterPanel', () => {
     render(
       <FilterPanel>
         <button>Open Filter</button>
-      </FilterPanel>
+      </FilterPanel>,
     );
 
     // Open the filter panel
@@ -92,7 +87,7 @@ describe('FilterPanel', () => {
     render(
       <FilterPanel>
         <button>Open Filter</button>
-      </FilterPanel>
+      </FilterPanel>,
     );
 
     fireEvent.click(screen.getByText('Open Filter'));
@@ -107,7 +102,7 @@ describe('FilterPanel', () => {
     render(
       <FilterPanel>
         <button>Open Filter</button>
-      </FilterPanel>
+      </FilterPanel>,
     );
 
     fireEvent.click(screen.getByText('Open Filter'));
@@ -120,23 +115,29 @@ describe('FilterPanel', () => {
     render(
       <FilterPanel>
         <button>Open Filter</button>
-      </FilterPanel>
+      </FilterPanel>,
     );
 
     fireEvent.click(screen.getByText('Open Filter'));
 
     // Test coverage level toggle
-    const fiveGCheckbox = screen.getByRole('checkbox', { name: /5g.*exzellent/i });
+    const fiveGCheckbox = screen.getByRole('checkbox', {
+      name: /5g.*exzellent/i,
+    });
     fireEvent.click(fiveGCheckbox);
     expect(mockFilterStore.toggleCoverageLevel).toHaveBeenCalledWith('5g');
 
     // Test work-friendly toggle
-    const workFriendlySwitch = screen.getByRole('switch', { name: /work-friendly/i });
+    const workFriendlySwitch = screen.getByRole('switch', {
+      name: /work-friendly/i,
+    });
     fireEvent.click(workFriendlySwitch);
     expect(mockFilterStore.setWorkFriendlyOnly).toHaveBeenCalledWith(true);
 
     // Test type toggle
-    const campSiteCheckbox = screen.getByRole('checkbox', { name: /campingplätze/i });
+    const campSiteCheckbox = screen.getByRole('checkbox', {
+      name: /campingplätze/i,
+    });
     fireEvent.click(campSiteCheckbox);
     expect(mockFilterStore.toggleType).toHaveBeenCalledWith('camp_site');
   });
@@ -145,13 +146,13 @@ describe('FilterPanel', () => {
     render(
       <FilterPanel>
         <button>Open Filter</button>
-      </FilterPanel>
+      </FilterPanel>,
     );
 
     fireEvent.click(screen.getByText('Open Filter'));
 
     // Should show filtered result count (both campgrounds match all filters)
-    expect(screen.getByText('2 Ergebnisse anzeigen')).toBeInTheDocument();
+    expect(screen.getByText('3 Ergebnisse anzeigen')).toBeInTheDocument();
   });
 
   it('should call reset filters when reset button is clicked', () => {
@@ -161,14 +162,16 @@ describe('FilterPanel', () => {
     render(
       <FilterPanel>
         <button>Open Filter</button>
-      </FilterPanel>
+      </FilterPanel>,
     );
 
     fireEvent.click(screen.getByText('Open Filter'));
 
-    const resetButton = screen.getByRole('button', { name: /filter zurücksetzen/i });
+    const resetButton = screen.getByRole('button', {
+      name: /filter zurücksetzen/i,
+    });
     expect(resetButton).not.toBeDisabled();
-    
+
     fireEvent.click(resetButton);
     expect(mockFilterStore.resetFilters).toHaveBeenCalled();
   });
@@ -177,12 +180,14 @@ describe('FilterPanel', () => {
     render(
       <FilterPanel>
         <button>Open Filter</button>
-      </FilterPanel>
+      </FilterPanel>,
     );
 
     fireEvent.click(screen.getByText('Open Filter'));
 
-    const resetButton = screen.getByRole('button', { name: /filter zurücksetzen/i });
+    const resetButton = screen.getByRole('button', {
+      name: /filter zurücksetzen/i,
+    });
     expect(resetButton).toBeDisabled();
   });
 
@@ -190,7 +195,7 @@ describe('FilterPanel', () => {
     render(
       <FilterPanel>
         <button>Open Filter</button>
-      </FilterPanel>
+      </FilterPanel>,
     );
 
     fireEvent.click(screen.getByText('Open Filter'));

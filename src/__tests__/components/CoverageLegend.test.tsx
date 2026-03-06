@@ -2,17 +2,21 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import CoverageLegend from '@/components/map/CoverageLegend';
+import { useCoverageStore } from '@/stores/coverageStore';
 
-// Mock the simplified coverage store
-const mockUseCoverageStore = vi.fn(() => ({
-  isVisible: true,
-}));
-
-vi.mock('@/stores/coverageStore', () => ({
-  useCoverageStore: mockUseCoverageStore,
-}));
+// Mock the coverage store
+vi.mock('@/stores/coverageStore');
 
 describe('CoverageLegend', () => {
+  beforeEach(() => {
+    vi.mocked(useCoverageStore).mockReturnValue({
+      isVisible: true,
+      setIsVisible: vi.fn(),
+      opacity: 0.7,
+      setOpacity: vi.fn(),
+    });
+  });
+
   it('renders BNetzA coverage legend when visible', () => {
     render(<CoverageLegend />);
 
@@ -26,8 +30,11 @@ describe('CoverageLegend', () => {
   });
 
   it('does not render when coverage layer is not visible', () => {
-    mockUseCoverageStore.mockReturnValue({
+    vi.mocked(useCoverageStore).mockReturnValue({
       isVisible: false,
+      setIsVisible: vi.fn(),
+      opacity: 0.7,
+      setOpacity: vi.fn(),
     });
 
     render(<CoverageLegend />);
