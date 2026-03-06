@@ -5,6 +5,7 @@ import { SlidersHorizontal } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { VersionBadge } from '@/components/ui/VersionBadge';
 import SearchBar from '@/components/search/SearchBar';
 import FilterPanel from '@/components/search/FilterPanel';
 import { useFilterStore } from '@/stores/filterStore';
@@ -34,9 +35,10 @@ export default function Header() {
     >
       <div className="flex items-center justify-between h-full px-4 lg:px-6">
         {/* Logo */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 flex items-center gap-3">
           <Logo variant="full" size="md" className="hidden lg:block" />
           <Logo variant="icon" size="md" className="block lg:hidden" />
+          <VersionBadge className="hidden lg:block" />
         </div>
 
         {/* Search Bar */}
