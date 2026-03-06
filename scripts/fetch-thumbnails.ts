@@ -2,9 +2,6 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import https from 'https';
-import http from 'http';
-import { createWriteStream } from 'fs';
 import sharp from 'sharp';
 import type { CampgroundGeoJSON } from '../src/types/campground';
 
@@ -13,36 +10,21 @@ interface ThumbnailMapping {
 }
 
 async function downloadImage(url: string, outputPath: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const protocol = url.startsWith('https:') ? https : http;
-    const timeout = 5000;
-
-    const request = protocol.get(url, { timeout }, (response) => {
-      if (response.statusCode !== 200) {
-        reject(new Error(`HTTP ${response.statusCode}`));
-        return;
-      }
-
-      const file = createWriteStream(outputPath);
-      response.pipe(file);
-
-      file.on('finish', () => {
-        file.close();
-        resolve();
-      });
-
-      file.on('error', (error) => {
-        fs.unlink(outputPath).catch(() => {}); // Clean up on error
-        reject(error);
-      });
-    });
-
-    request.on('error', reject);
-    request.on('timeout', () => {
-      request.destroy();
-      reject(new Error('Timeout'));
-    });
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const buffer = await response.arrayBuffer();
+    await fs.writeFile(outputPath, Buffer.from(buffer));
+  } catch (error) {
+    await fs.unlink(outputPath).catch(() => {}); // Clean up on error
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function extractOgImage(html: string): Promise<string | null> {
@@ -54,50 +36,42 @@ async function extractOgImage(html: string): Promise<string | null> {
 }
 
 async function fetchWebsiteOgImage(url: string): Promise<string | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
   try {
-    const protocol = url.startsWith('https:') ? https : http;
-
-    return new Promise((resolve) => {
-      const request = protocol.get(
-        url,
-        {
-          timeout: 5000,
-          headers: {
-            'User-Agent': 'CampWork Bot (https://campwork.app)',
-          },
-        },
-        (response) => {
-          if (response.statusCode !== 200) {
-            resolve(null);
-            return;
-          }
-
-          let html = '';
-          response.on('data', (chunk) => {
-            html += chunk.toString();
-            // Stop reading after we have enough data to find og:image
-            if (html.length > 50000) {
-              response.destroy();
-            }
-          });
-
-          response.on('end', () => {
-            resolve(extractOgImage(html));
-          });
-
-          response.on('error', () => resolve(null));
-        },
-      );
-
-      request.on('error', () => resolve(null));
-      request.on('timeout', () => {
-        request.destroy();
-        resolve(null);
-      });
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'CampWork Bot (https://campwork.app)' },
     });
+
+    if (!response.ok || !response.body) return null;
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let html = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        html += decoder.decode(value, { stream: true });
+        if (html.length > 50000) {
+          await reader.cancel();
+          break;
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    return extractOgImage(html);
   } catch (error) {
-    console.warn(`⚠️  Error fetching ${url}:`, error);
+    if ((error as Error).name !== 'AbortError') {
+      console.warn(`⚠️  Error fetching ${url}:`, error);
+    }
     return null;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -207,7 +181,7 @@ async function main() {
     );
 
     // Clean up temp directory
-    await fs.rmdir(tempDir, { recursive: true }).catch(() => {});
+    await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
 
     console.log('\n📊 Thumbnail Processing Complete:');
     console.log(`   ✅ Successful: ${successCount}`);
@@ -221,6 +195,7 @@ async function main() {
   }
 }
 
-if (require.main === module) {
-  main();
-}
+main().catch((error) => {
+  console.error('❌ Fatal error:', error);
+  process.exit(1);
+});

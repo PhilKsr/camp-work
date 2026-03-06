@@ -11,6 +11,9 @@ const withSerwist = withSerwistInit({
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  turbopack: {
+    root: __dirname,
+  }, // Enable Turbopack configuration with proper root
   images: {
     remotePatterns: [
       {

@@ -2,8 +2,6 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import https from 'https';
-import { createWriteStream } from 'fs';
 
 // Official BNetzA Mobile Coverage Data URLs
 const BNETZA_CSV_URL =
@@ -39,19 +37,12 @@ interface TelefoniCoverageJSON {
 }
 
 async function downloadFile(url: string, destPath: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const file = createWriteStream(destPath);
-    https
-      .get(url, (response) => {
-        response.pipe(file);
-        file.on('finish', () => {
-          file.close();
-          resolve();
-        });
-        file.on('error', reject);
-      })
-      .on('error', reject);
-  });
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  const buffer = await response.arrayBuffer();
+  await fs.writeFile(destPath, Buffer.from(buffer));
 }
 
 async function fetchBNetzACoverage(): Promise<CoverageDataPoint[]> {
@@ -78,7 +69,7 @@ async function fetchBNetzACoverage(): Promise<CoverageDataPoint[]> {
 
     // Clean up temp file
     await fs.rm(zipPath, { force: true });
-    await fs.rmdir(tempDir, { recursive: true }).catch(() => {});
+    await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
 
     // Return minimal Telefónica coverage data for offline fallback
     return generateMinimalTelefoniCoverage();
@@ -275,6 +266,7 @@ async function main() {
   }
 }
 
-if (require.main === module) {
-  main();
-}
+main().catch((error) => {
+  console.error('❌ Fatal error:', error);
+  process.exit(1);
+});

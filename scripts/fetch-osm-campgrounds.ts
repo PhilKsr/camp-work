@@ -218,6 +218,7 @@ async function main() {
   }
 }
 
-if (require.main === module) {
-  main();
-}
+main().catch((error) => {
+  console.error('❌ Fatal error:', error);
+  process.exit(1);
+});
