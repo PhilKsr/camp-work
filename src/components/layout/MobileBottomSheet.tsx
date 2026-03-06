@@ -4,23 +4,26 @@ import { motion, PanInfo } from 'framer-motion';
 import { useUIStore } from '@/stores/uiStore';
 import { cn } from '@/lib/utils';
 import { CampingList } from '@/components/cards/CampingList';
+import { CampingCardCompact } from '@/components/cards/CampingCardCompact';
 import { DetailSheet } from '@/components/cards/DetailSheet';
-import { useCampgrounds } from '@/hooks/useCampgrounds';
+import { useViewportCampgrounds } from '@/hooks/useViewportCampgrounds';
 import type { Campground } from '@/types/campground';
 
 interface MobileBottomSheetProps {
   className?: string;
   selectedCampground?: Campground | null;
   onCloseDetail?: () => void;
+  onSelectCampground?: (campground: Campground) => void;
 }
 
 export default function MobileBottomSheet({
   className,
   selectedCampground,
   onCloseDetail,
+  onSelectCampground,
 }: MobileBottomSheetProps) {
   const { bottomSheetSnap, setBottomSheetSnap } = useUIStore();
-  const { data: campgroundsData } = useCampgrounds();
+  const viewportCampgrounds = useViewportCampgrounds();
 
   // Calculate heights based on viewport
   const getHeight = (snap: typeof bottomSheetSnap) => {
@@ -100,7 +103,7 @@ export default function MobileBottomSheet({
     >
       {/* Drag Handle */}
       <div className="flex flex-col items-center pt-2 pb-4 px-4 border-b border-[#E8E4D8]">
-        <div className="w-10 h-1 bg-[#E8E4D8] rounded-full mb-2" />
+        <div className="w-10 h-1 bg-[#E19B53] rounded-full mb-2" />
 
         {/* Peek content */}
         {bottomSheetSnap !== 'closed' && (
@@ -108,7 +111,7 @@ export default function MobileBottomSheet({
             <p className="text-sm font-medium text-foreground">
               {selectedCampground
                 ? selectedCampground.name
-                : `${campgroundsData?.features.length || 0} Campingplätze`}
+                : `${viewportCampgrounds.length} Campingplätze in der Nähe`}
             </p>
             <p className="text-xs text-muted-foreground">
               {selectedCampground ? 'Details ansehen' : 'Tippen zum Öffnen'}
@@ -116,6 +119,24 @@ export default function MobileBottomSheet({
           </div>
         )}
       </div>
+
+      {/* Peek State: Horizontal Card Row */}
+      {bottomSheetSnap === 'peek' && !selectedCampground && (
+        <div className="px-4 pb-3">
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            {viewportCampgrounds.slice(0, 10).map((campground) => (
+              <CampingCardCompact
+                key={campground.id}
+                campground={campground}
+                onClick={() => {
+                  onSelectCampground?.(campground);
+                  setBottomSheetSnap('full');
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       {(bottomSheetSnap === 'half' || bottomSheetSnap === 'full') && (

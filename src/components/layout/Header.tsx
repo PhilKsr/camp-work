@@ -29,7 +29,7 @@ export default function Header() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 h-16 bg-[#F9F8E6]/80 backdrop-blur-md border-b border-[#E8E4D8] transition-shadow duration-200',
+        'sticky top-0 z-50 h-16 bg-[#F9F8E6]/80 backdrop-blur-md border-b border-[#E8E4D8] border-b-2 border-b-[#E19B53]/20 transition-shadow duration-200',
         hasScrolled && 'shadow-sm',
       )}
     >
@@ -57,7 +57,7 @@ export default function Header() {
             {activeFilterCount > 0 && (
               <Badge
                 variant="destructive"
-                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-primary-warmGold text-white"
+                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-[#E19B53] text-white"
               >
                 {activeFilterCount}
               </Badge>

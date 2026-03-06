@@ -125,9 +125,19 @@
   body {
     @apply bg-background text-foreground;
   }
-  
+
   /* Focus indicators for accessibility */
   *:focus-visible {
     @apply outline-2 outline-offset-2 outline-primary;
+  }
+
+  /* Utility: Hide scrollbar while keeping scroll functionality */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

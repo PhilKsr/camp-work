@@ -11,6 +11,7 @@ import { useMapStore } from '@/stores/mapStore';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { useUrlState } from '@/hooks/useUrlState';
 import { useInitialLocation } from '@/hooks/useInitialLocation';
+import type { Campground } from '@/types/campground';
 
 export default function Home() {
   const { selectedCampground, setSelectedCampground } = useMapStore();
@@ -31,6 +32,10 @@ export default function Home() {
 
   const handleCloseDetail = () => {
     setSelectedCampground(null);
+  };
+
+  const handleSelectCampground = (campground: Campground) => {
+    setSelectedCampground(campground.id);
   };
 
   return (
@@ -62,8 +67,8 @@ export default function Home() {
           {locationState.isLoading && (
             <div className="absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
               <div className="bg-white rounded-xl px-6 py-4 shadow-lg flex items-center gap-3">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-warmGold"></div>
-                <span className="text-gray-900 font-medium">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#E19B53]"></div>
+                <span className="text-foreground font-medium">
                   Standort wird ermittelt...
                 </span>
               </div>
@@ -89,6 +94,7 @@ export default function Home() {
         className="lg:hidden"
         selectedCampground={selectedCampgroundData}
         onCloseDetail={handleCloseDetail}
+        onSelectCampground={handleSelectCampground}
       />
 
       {/* Install Prompt */}

@@ -49,18 +49,20 @@ function SearchResultItem({ place, onClick }: SearchResultItemProps) {
   return (
     <button
       onClick={onClick}
-      className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+      className="w-full px-4 py-3 text-left hover:bg-[#F9F8E6] focus:bg-[#F9F8E6] focus:outline-none"
     >
       <div className="flex items-center gap-3">
-        <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
+        <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h4 className="font-medium text-gray-900 truncate">{name}</h4>
+            <h4 className="font-medium text-foreground truncate">{name}</h4>
             <Badge variant="outline" className="text-xs">
               {getPlaceTypeLabel(place.type)}
             </Badge>
           </div>
-          {region && <p className="text-sm text-gray-600 truncate">{region}</p>}
+          {region && (
+            <p className="text-sm text-muted-foreground truncate">{region}</p>
+          )}
         </div>
       </div>
     </button>
@@ -84,7 +86,7 @@ function SearchResults({
 }: SearchResultsProps) {
   if (!query) {
     return (
-      <div className="px-4 py-8 text-center text-gray-500">
+      <div className="px-4 py-8 text-center text-muted-foreground">
         Suche nach Orten, Städten oder Adressen...
       </div>
     );
@@ -92,7 +94,7 @@ function SearchResults({
 
   if (isLoading) {
     return (
-      <div className="px-4 py-8 text-center text-gray-500 flex items-center justify-center gap-2">
+      <div className="px-4 py-8 text-center text-muted-foreground flex items-center justify-center gap-2">
         <Loader2 className="w-4 h-4 animate-spin" />
         Suche nach &quot;{query}&quot;...
       </div>
@@ -105,14 +107,14 @@ function SearchResults({
 
   if (results.length === 0) {
     return (
-      <div className="px-4 py-8 text-center text-gray-500">
+      <div className="px-4 py-8 text-center text-muted-foreground">
         Keine Orte gefunden für &quot;{query}&quot;
       </div>
     );
   }
 
   return (
-    <div className="divide-y divide-gray-100">
+    <div className="divide-y divide-[#E8E4D8]/50">
       {results.map((place, index) => (
         <SearchResultItem
           key={`${place.lat}-${place.lng}-${index}`}
@@ -189,7 +191,7 @@ function SearchBarDesktop({ className }: SearchBarDesktopProps) {
   return (
     <div ref={containerRef} className={cn('relative', className)}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
         <Input
           type="text"
           placeholder="Suche nach Orten, Städten..."
@@ -199,12 +201,12 @@ function SearchBarDesktop({ className }: SearchBarDesktopProps) {
             setIsOpen(true);
           }}
           onFocus={() => setIsOpen(true)}
-          className="pl-10 rounded-full border-gray-200 focus:border-primary-warmGold focus:ring-primary-warmGold"
+          className="pl-10 rounded-full border-[#E8E4D8] focus:border-[#E19B53] focus:ring-[#E19B53]"
         />
       </div>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 z-50 max-h-80 overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-[#E8E4D8] z-50 max-h-80 overflow-hidden">
           <div className="overflow-y-auto max-h-80">
             <SearchResults
               query={query}
@@ -265,9 +267,9 @@ function SearchBarMobile({ className }: SearchBarMobileProps) {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md p-0 gap-0">
-        <div className="border-b border-gray-200 p-4">
+        <div className="border-b border-[#E8E4D8] p-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               type="text"
               placeholder="Suche nach Orten, Städten..."

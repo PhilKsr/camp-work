@@ -82,7 +82,7 @@ describe('CampingCard', () => {
     render(<CampingCard {...mockProps} isFavorite={true} />);
 
     const favoriteButton = screen.getByRole('button');
-    expect(favoriteButton).toHaveClass('bg-red-500/90');
+    expect(favoriteButton).toHaveClass('bg-[#E19B53]/90');
   });
 
   it('displays caravan site type correctly', () => {

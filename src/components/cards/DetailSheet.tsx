@@ -125,7 +125,7 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
             variant="ghost"
             size="sm"
             onClick={() => toggleFavorite(campground.id)}
-            className={cn('p-2', isFavorite(campground.id) && 'text-red-500')}
+            className={cn('p-2', isFavorite(campground.id) && 'text-[#E19B53]')}
           >
             <Heart
               className={cn(
@@ -205,7 +205,7 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
                   href={campground.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-brand-warm-gold hover:underline"
+                  className="text-sm text-[#ABD8EF] hover:text-[#6AA3C9] hover:underline"
                 >
                   Website besuchen
                 </a>
@@ -217,7 +217,7 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
                 <Phone className="w-4 h-4 mt-1 text-muted-foreground" />
                 <a
                   href={`tel:${campground.phone}`}
-                  className="text-sm text-brand-warm-gold hover:underline"
+                  className="text-sm text-[#ABD8EF] hover:text-[#6AA3C9] hover:underline"
                 >
                   {campground.phone}
                 </a>
@@ -229,7 +229,7 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
                 <Mail className="w-4 h-4 mt-1 text-muted-foreground" />
                 <a
                   href={`mailto:${campground.email}`}
-                  className="text-sm text-brand-warm-gold hover:underline"
+                  className="text-sm text-[#ABD8EF] hover:text-[#6AA3C9] hover:underline"
                 >
                   {campground.email}
                 </a>
@@ -265,7 +265,7 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
           {/* Actions */}
           <div className="sticky bottom-0 bg-background/95 backdrop-blur border-t -mx-4 px-4 py-4 space-y-3">
             <Button
-              className="w-full"
+              className="w-full bg-[#E19B53] hover:bg-[#C47F35] text-white"
               onClick={() => openRouteInGoogleMaps(lat, lng)}
             >
               <Navigation className="w-4 h-4 mr-2" />

@@ -54,12 +54,12 @@ describe('FilterPanel', () => {
     // Open the filter panel
     fireEvent.click(screen.getByText('Open Filter'));
 
-    expect(screen.getByText('Filter')).toBeInTheDocument();
-    expect(screen.getByText('Nur zum Arbeiten geeignet')).toBeInTheDocument();
-    expect(screen.getByText('Netzabdeckung')).toBeInTheDocument();
-    expect(screen.getByText('Typ')).toBeInTheDocument();
-    expect(screen.getByText('Ausstattung')).toBeInTheDocument();
-    expect(screen.getByText('Favoriten')).toBeInTheDocument();
+    expect(screen.getAllByText('Filter')).toHaveLength(2); // Desktop + Mobile
+    expect(screen.getAllByText('Nur zum Arbeiten geeignet')).toHaveLength(2);
+    expect(screen.getAllByText('Netzabdeckung')).toHaveLength(2);
+    expect(screen.getAllByText('Typ')).toHaveLength(2);
+    expect(screen.getAllByText('Ausstattung')).toHaveLength(2);
+    expect(screen.getAllByText('Favoriten')).toHaveLength(2);
   });
 
   it('should render coverage level options', () => {
@@ -71,10 +71,10 @@ describe('FilterPanel', () => {
 
     fireEvent.click(screen.getByText('Open Filter'));
 
-    expect(screen.getByText('5G – Exzellent')).toBeInTheDocument();
-    expect(screen.getByText('LTE/4G – Gut zum Arbeiten')).toBeInTheDocument();
-    expect(screen.getByText('3G – Eingeschränkt')).toBeInTheDocument();
-    expect(screen.getByText('Kein Netz')).toBeInTheDocument();
+    expect(screen.getAllByText('5G – Exzellent')).toHaveLength(2);
+    expect(screen.getAllByText('LTE/4G – Gut zum Arbeiten')).toHaveLength(2);
+    expect(screen.getAllByText('3G – Eingeschränkt')).toHaveLength(2);
+    expect(screen.getAllByText('Kein Netz')).toHaveLength(2);
   });
 
   it('should render campground types', () => {
@@ -86,8 +86,8 @@ describe('FilterPanel', () => {
 
     fireEvent.click(screen.getByText('Open Filter'));
 
-    expect(screen.getByText('Campingplätze')).toBeInTheDocument();
-    expect(screen.getByText('Wohnmobilstellplätze')).toBeInTheDocument();
+    expect(screen.getAllByText('Campingplätze')).toHaveLength(2);
+    expect(screen.getAllByText('Wohnmobilstellplätze')).toHaveLength(2);
   });
 
   it('should call toggle functions when options are clicked', () => {
@@ -99,25 +99,28 @@ describe('FilterPanel', () => {
 
     fireEvent.click(screen.getByText('Open Filter'));
 
-    // Test coverage level toggle
-    const fiveGCheckbox = screen.getByRole('checkbox', {
+    // Test coverage level toggle (use hidden: true to access aria-hidden elements)
+    const fiveGCheckboxes = screen.getAllByRole('checkbox', {
       name: /5g.*exzellent/i,
+      hidden: true,
     });
-    fireEvent.click(fiveGCheckbox);
+    fireEvent.click(fiveGCheckboxes[0]);
     expect(mockFilterStore.toggleCoverageLevel).toHaveBeenCalledWith('5g');
 
     // Test work-friendly toggle
-    const workFriendlySwitch = screen.getByRole('switch', {
+    const workFriendlySwitches = screen.getAllByRole('switch', {
       name: /mindestens lte\/4g verbindung/i,
+      hidden: true,
     });
-    fireEvent.click(workFriendlySwitch);
+    fireEvent.click(workFriendlySwitches[0]);
     expect(mockFilterStore.setWorkFriendlyOnly).toHaveBeenCalledWith(true);
 
     // Test type toggle
-    const campSiteCheckbox = screen.getByRole('checkbox', {
+    const campSiteCheckboxes = screen.getAllByRole('checkbox', {
       name: /campingplätze/i,
+      hidden: true,
     });
-    fireEvent.click(campSiteCheckbox);
+    fireEvent.click(campSiteCheckboxes[0]);
     expect(mockFilterStore.toggleType).toHaveBeenCalledWith('camp_site');
   });
 
@@ -131,7 +134,7 @@ describe('FilterPanel', () => {
     fireEvent.click(screen.getByText('Open Filter'));
 
     // Should show filtered result count (both campgrounds match all filters)
-    expect(screen.getByText('3 Ergebnisse anzeigen')).toBeInTheDocument();
+    expect(screen.getAllByText('3 Ergebnisse anzeigen')).toHaveLength(2);
   });
 
   it('should call reset filters when reset button is clicked', () => {
@@ -146,9 +149,11 @@ describe('FilterPanel', () => {
 
     fireEvent.click(screen.getByText('Open Filter'));
 
-    const resetButton = screen.getByRole('button', {
+    const resetButtons = screen.getAllByRole('button', {
       name: /filter zurücksetzen/i,
+      hidden: true,
     });
+    const resetButton = resetButtons[0];
     expect(resetButton).not.toBeDisabled();
 
     fireEvent.click(resetButton);
@@ -164,9 +169,11 @@ describe('FilterPanel', () => {
 
     fireEvent.click(screen.getByText('Open Filter'));
 
-    const resetButton = screen.getByRole('button', {
+    const resetButtons = screen.getAllByRole('button', {
       name: /filter zurücksetzen/i,
+      hidden: true,
     });
+    const resetButton = resetButtons[0];
     expect(resetButton).not.toBeDisabled();
   });
 
@@ -179,6 +186,6 @@ describe('FilterPanel', () => {
 
     fireEvent.click(screen.getByText('Open Filter'));
 
-    expect(screen.getByText(/2 gespeichert/)).toBeInTheDocument();
+    expect(screen.getAllByText(/2 gespeichert/)).toHaveLength(2);
   });
 });

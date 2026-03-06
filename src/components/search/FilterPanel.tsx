@@ -151,7 +151,10 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
                 checked={workFriendlyOnly}
                 onCheckedChange={setWorkFriendlyOnly}
               />
-              <Label htmlFor="work-friendly" className="text-sm text-gray-600">
+              <Label
+                htmlFor="work-friendly"
+                className="text-sm text-muted-foreground"
+              >
                 Mindestens LTE/4G Verbindung
               </Label>
             </div>
@@ -245,7 +248,10 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
                 checked={favoritesOnly}
                 onCheckedChange={setFavoritesOnly}
               />
-              <Label htmlFor="favorites-only" className="text-sm text-gray-600">
+              <Label
+                htmlFor="favorites-only"
+                className="text-sm text-muted-foreground"
+              >
                 Nur gespeicherte Favoriten anzeigen ({favorites.length}{' '}
                 gespeichert)
               </Label>
@@ -255,7 +261,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 border-t bg-gray-50">
+      <div className="px-6 py-4 border-t border-[#E8E4D8] bg-white sticky bottom-0">
         <div className="flex flex-col sm:flex-row gap-3">
           <Button
             variant="outline"
@@ -267,7 +273,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
           </Button>
           <Button
             onClick={onClose}
-            className="flex-1 bg-primary-warmGold hover:bg-primary-warmGold/90"
+            className="flex-1 bg-[#E19B53] hover:bg-[#C47F35] text-white"
           >
             {filteredCount} Ergebnisse anzeigen
           </Button>
@@ -283,9 +289,18 @@ export default function FilterPanel({ children }: FilterPanelProps) {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
+      {/* Desktop */}
       <SheetContent
         side="right"
-        className="w-full sm:w-[400px] lg:w-[450px] p-0"
+        className="hidden lg:block w-[380px] bg-white border-l border-[#E8E4D8] p-0 overflow-y-auto"
+      >
+        <FilterContent onClose={() => setIsOpen(false)} />
+      </SheetContent>
+
+      {/* Mobile */}
+      <SheetContent
+        side="bottom"
+        className="lg:hidden h-[85vh] bg-white rounded-t-2xl border-t border-[#E8E4D8] p-0 overflow-y-auto"
       >
         <FilterContent onClose={() => setIsOpen(false)} />
       </SheetContent>

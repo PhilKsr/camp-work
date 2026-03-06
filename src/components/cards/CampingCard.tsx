@@ -102,7 +102,7 @@ export function CampingCard({
           className={cn(
             'absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm transition-colors',
             isFavorite
-              ? 'bg-red-500/90 text-white'
+              ? 'bg-[#E19B53]/90 text-white'
               : 'bg-white/20 text-white hover:bg-white/30',
           )}
           onClick={(e) => {
@@ -159,7 +159,7 @@ export function CampingCard({
                   className={cn(
                     'text-xs',
                     i < Math.floor(campground.rating!)
-                      ? 'text-brand-warm-gold'
+                      ? 'text-[#E19B53]'
                       : 'text-gray-300',
                   )}
                 >
