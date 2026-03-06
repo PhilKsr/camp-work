@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useCampgrounds } from '@/hooks/useCampgrounds';
+import { useViewportCampgrounds } from '@/hooks/useViewportCampgrounds';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import { useFilterStore } from '@/stores/filterStore';
 import { useMapStore } from '@/stores/mapStore';
@@ -55,7 +55,7 @@ function getCoverageScore(level: string): number {
 
 export function CampingList() {
   const [sortBy, setSortBy] = useState<SortOption>('coverage');
-  const { data: campgroundsData, isLoading } = useCampgrounds();
+  const viewportCampgrounds = useViewportCampgrounds();
   const { toggleFavorite, isFavorite } = useFavoriteStore();
   const {
     searchQuery,
@@ -73,9 +73,9 @@ export function CampingList() {
   }, [latitude, longitude]);
 
   const filteredAndSortedCampgrounds = useMemo(() => {
-    if (!campgroundsData?.features) return [];
+    if (!viewportCampgrounds.length) return [];
 
-    let campgrounds = campgroundsData.features.map((f) => f.properties);
+    let campgrounds = viewportCampgrounds;
 
     // Apply filters
     campgrounds = campgrounds.filter((c) => {
@@ -144,7 +144,7 @@ export function CampingList() {
       }
     });
   }, [
-    campgroundsData,
+    viewportCampgrounds,
     sortBy,
     userPosition,
     searchQuery,
@@ -156,7 +156,7 @@ export function CampingList() {
     isFavorite,
   ]);
 
-  const totalCampgrounds = campgroundsData?.features?.length || 0;
+  const totalCampgrounds = viewportCampgrounds.length;
 
   const handleCampgroundClick = (campground: Campground) => {
     const [lng, lat] = campground.coordinates;
@@ -165,10 +165,12 @@ export function CampingList() {
   };
 
   // Check for reduced motion preference
-  const prefersReducedMotion = typeof window !== 'undefined' && 
+  const prefersReducedMotion =
+    typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (isLoading) {
+  if (false) {
+    // Remove loading state since viewport-based data loads instantly
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -245,12 +247,12 @@ export function CampingList() {
             initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={
-              prefersReducedMotion 
-                ? { duration: 0 } 
-                : { 
+              prefersReducedMotion
+                ? { duration: 0 }
+                : {
                     delay: Math.min(index, 20) * 0.03, // Limit animation delay to first 20 items
                     duration: 0.3,
-                    ease: 'easeOut'
+                    ease: 'easeOut',
                   }
             }
           >

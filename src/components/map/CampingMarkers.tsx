@@ -2,12 +2,10 @@
 
 import { Source, Layer } from 'react-map-gl/maplibre';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
-import { useMapStore } from '@/stores/mapStore';
 import { colors } from '@/lib/brand';
 
 export function CampingMarkers() {
   const { data: campgroundsData } = useCampgrounds();
-  const { selectedCampground } = useMapStore();
 
   if (!campgroundsData) return null;
 
@@ -17,8 +15,8 @@ export function CampingMarkers() {
       type="geojson"
       data={campgroundsData}
       cluster={true}
-      clusterMaxZoom={14}
-      clusterRadius={50}
+      clusterMaxZoom={12}
+      clusterRadius={60}
     >
       {/* Cluster circles */}
       <Layer
@@ -77,33 +75,9 @@ export function CampingMarkers() {
             colors.coverage.limited,
             colors.coverage.none,
           ],
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 6, 8, 14, 16],
+          'circle-radius': 12,
           'circle-stroke-width': 2,
           'circle-stroke-color': '#ffffff',
-        }}
-      />
-
-      {/* Selected marker highlight */}
-      <Layer
-        id="campground-selected"
-        type="circle"
-        source="campgrounds"
-        filter={['==', ['get', 'id'], selectedCampground || '']}
-        paint={{
-          'circle-color': [
-            'case',
-            ['==', ['get', 'coverageLevel'], '5g'],
-            colors.coverage.excellent,
-            ['==', ['get', 'coverageLevel'], '4g'],
-            colors.coverage.good,
-            ['==', ['get', 'coverageLevel'], '3g'],
-            colors.coverage.limited,
-            colors.coverage.none,
-          ],
-          'circle-radius': 20,
-          'circle-stroke-width': 4,
-          'circle-stroke-color': '#ffffff',
-          'circle-opacity': 0.9,
         }}
       />
     </Source>

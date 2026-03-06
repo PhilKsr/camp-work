@@ -88,6 +88,8 @@ export default function MapViewInner() {
         style={{ width: '100%', height: '100%' }}
         mapStyle={mapStyle}
         attributionControl={false}
+        maxZoom={18}
+        minZoom={5}
       >
         <CoverageLayer />
         <CampingMarkers />

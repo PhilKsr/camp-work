@@ -9,7 +9,7 @@ interface CoverageState {
 
 export const useCoverageStore = create<CoverageState>((set) => ({
   isVisible: true,
-  opacity: 0.5,
+  opacity: 0.35,
 
   toggleVisibility: () => set((state) => ({ isVisible: !state.isVisible })),
 

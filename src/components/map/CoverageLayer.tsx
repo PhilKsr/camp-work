@@ -33,16 +33,16 @@ export default function CoverageLayer({
           '&LAYERS=mobilfunkmonitor&CRS=EPSG:3857&STYLES=' +
           '&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}',
       ]}
-      tileSize={256}
-      minzoom={6}
-      maxzoom={16}
+      tileSize={512}
+      minzoom={8}
+      maxzoom={14}
     >
       <Layer
         id="bnetza-coverage-layer"
         type="raster"
         paint={{
           'raster-opacity': layerOpacity,
-          'raster-fade-duration': 300,
+          'raster-fade-duration': 0,
         }}
       />
     </Source>
