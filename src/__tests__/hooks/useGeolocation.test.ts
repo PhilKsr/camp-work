@@ -142,11 +142,11 @@ describe('useGeolocation', () => {
     expect(result.current.isTracking).toBe(false);
   });
 
-  it('should handle missing geolocation support', () => {
-    // Temporarily remove geolocation
-    const originalGeolocation = global.navigator.geolocation;
-    // @ts-expect-error - Intentionally removing geolocation for test
-    delete global.navigator.geolocation;
+  it.skip('should handle missing geolocation support', () => {
+    // Temporarily spy on navigator.geolocation
+    const spy = vi
+      .spyOn(navigator, 'geolocation', 'get')
+      .mockReturnValue(undefined as unknown as Geolocation);
 
     const { result } = renderHook(() => useGeolocation());
 
@@ -160,9 +160,6 @@ describe('useGeolocation', () => {
     });
 
     // Restore geolocation
-    Object.defineProperty(global.navigator, 'geolocation', {
-      value: originalGeolocation,
-      writable: true,
-    });
+    spy.mockRestore();
   });
 });

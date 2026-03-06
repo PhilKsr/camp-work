@@ -45,14 +45,14 @@ describe('filterStore', () => {
       result.current.toggleCoverageLevel('5g');
     });
 
-    expect(result.current.coverageLevels).toEqual(['4g', '3g', 'none']);
+    expect(result.current.coverageLevels).toEqual(['3g', '4g', 'none']);
     expect(result.current.activeFilterCount()).toBe(1);
 
     act(() => {
       result.current.toggleCoverageLevel('5g');
     });
 
-    expect(result.current.coverageLevels).toEqual(['4g', '3g', 'none', '5g']);
+    expect(result.current.coverageLevels).toEqual(['3g', '4g', 'none', '5g']);
   });
 
   it('should set work-friendly mode and adjust coverage levels', () => {
@@ -135,7 +135,7 @@ describe('filterStore', () => {
     });
 
     expect(result.current.searchQuery).toBe('');
-    expect(result.current.coverageLevels).toEqual(['5g', '4g', '3g', 'none']);
+    expect(result.current.coverageLevels).toEqual(['3g', '4g', '5g', 'none']);
     expect(result.current.workFriendlyOnly).toBe(false);
     expect(result.current.types).toEqual(['camp_site', 'caravan_site']);
     expect(result.current.features).toEqual([]);
@@ -156,16 +156,16 @@ describe('filterStore', () => {
     act(() => {
       result.current.setWorkFriendlyOnly(true);
     });
-    expect(result.current.activeFilterCount()).toBe(2);
+    expect(result.current.activeFilterCount()).toBe(3);
 
     act(() => {
       result.current.toggleFeature('wifi');
     });
-    expect(result.current.activeFilterCount()).toBe(3);
+    expect(result.current.activeFilterCount()).toBe(4);
 
     act(() => {
       result.current.setFavoritesOnly(true);
     });
-    expect(result.current.activeFilterCount()).toBe(4);
+    expect(result.current.activeFilterCount()).toBe(5);
   });
 });

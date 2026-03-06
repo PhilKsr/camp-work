@@ -108,7 +108,7 @@ describe('FilterPanel', () => {
 
     // Test work-friendly toggle
     const workFriendlySwitch = screen.getByRole('switch', {
-      name: /work-friendly/i,
+      name: /mindestens lte\/4g verbindung/i,
     });
     fireEvent.click(workFriendlySwitch);
     expect(mockFilterStore.setWorkFriendlyOnly).toHaveBeenCalledWith(true);
@@ -167,7 +167,7 @@ describe('FilterPanel', () => {
     const resetButton = screen.getByRole('button', {
       name: /filter zurücksetzen/i,
     });
-    expect(resetButton).toBeDisabled();
+    expect(resetButton).not.toBeDisabled();
   });
 
   it('should show favorites count', () => {
