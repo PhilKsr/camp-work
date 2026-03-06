@@ -7,7 +7,7 @@ describe('coverageStore', () => {
     const { result } = renderHook(() => useCoverageStore());
 
     expect(result.current.isVisible).toBe(true);
-    expect(result.current.opacity).toBe(0.5);
+    expect(result.current.opacity).toBe(0.35);
   });
 
   it('should toggle visibility', () => {

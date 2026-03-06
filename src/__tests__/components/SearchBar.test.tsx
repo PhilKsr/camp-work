@@ -1,176 +1,131 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import SearchBar from '@/components/search/SearchBar';
-import { useFilterStore } from '@/stores/filterStore';
-import { useMapStore } from '@/stores/mapStore';
-import { useCampgrounds } from '@/hooks/useCampgrounds';
-import { mockGeoJSON, createMockQueryResult } from '../helpers';
 
-// Mock the stores and hooks
-vi.mock('@/stores/filterStore');
-vi.mock('@/stores/mapStore');
-vi.mock('@/hooks/useCampgrounds');
+// Mock the geocoding hook
+const mockFlyTo = vi.fn();
 
-const mockFilterStore = {
-  setSearchQuery: vi.fn(),
-};
+vi.mock('@/stores/mapStore', () => ({
+  useMapStore: () => ({
+    flyTo: mockFlyTo,
+  }),
+}));
 
-const mockMapStore = {
-  setSelectedCampground: vi.fn(),
-  flyTo: vi.fn(),
-};
-
-const mockCampgroundsData = mockGeoJSON;
+vi.mock('@/hooks/useGeocodingSearch', () => ({
+  useGeocodingSearch: (query: string) => {
+    if (query === 'Berlin') {
+      return {
+        results: [
+          {
+            displayName: 'Berlin, Deutschland',
+            lat: 52.52,
+            lng: 13.405,
+            type: 'city',
+            importance: 0.9,
+            state: 'Berlin',
+          },
+        ],
+        isLoading: false,
+        error: null,
+      };
+    }
+    if (query === 'Nonexistent') {
+      return { results: [], isLoading: false, error: null };
+    }
+    if (query.length >= 2) {
+      return { results: [], isLoading: true, error: null };
+    }
+    return { results: [], isLoading: false, error: null };
+  },
+}));
 
 describe('SearchBar', () => {
   beforeEach(() => {
-    vi.mocked(useFilterStore).mockReturnValue(mockFilterStore);
-    vi.mocked(useMapStore).mockReturnValue(mockMapStore);
-    vi.mocked(useCampgrounds).mockReturnValue(
-      createMockQueryResult(mockCampgroundsData),
-    );
-  });
-
-  afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('should render search input on desktop', () => {
     render(<SearchBar />);
-
-    const searchInput = screen.getByPlaceholderText('Suche Campingplätze...');
-    expect(searchInput).toBeInTheDocument();
+    const input = screen.getByPlaceholderText(/Suche nach Orten, Städten/i);
+    expect(input).toBeInTheDocument();
   });
 
-  it('should update search query on input', async () => {
+  it('should update input value on typing', () => {
     render(<SearchBar />);
-
-    const searchInput = screen.getByPlaceholderText('Suche Campingplätze...');
-    fireEvent.change(searchInput, { target: { value: 'Berlin' } });
-
-    // Wait for debounced query to update
-    await waitFor(
-      () => {
-        expect(mockFilterStore.setSearchQuery).toHaveBeenCalledWith('Berlin');
-      },
-      { timeout: 500 },
-    );
+    const input = screen.getByPlaceholderText(/Suche nach Orten, Städten/i);
+    fireEvent.change(input, { target: { value: 'Berlin' } });
+    expect(input).toHaveValue('Berlin');
   });
 
-  it('should show search results when typing', async () => {
+  it('should show geocoding results', async () => {
     render(<SearchBar />);
-
-    const searchInput = screen.getByPlaceholderText('Suche Campingplätze...');
-    fireEvent.change(searchInput, { target: { value: 'Camping' } });
-    fireEvent.focus(searchInput);
-
-    // Wait for debounced search
-    await waitFor(
-      () => {
-        expect(screen.getByText('Camping am See')).toBeInTheDocument();
-      },
-      { timeout: 500 },
-    );
-  });
-
-  it('should show placeholder text for empty query', () => {
-    render(<SearchBar />);
-
-    const searchInput = screen.getByPlaceholderText('Suche Campingplätze...');
-    fireEvent.focus(searchInput);
-
-    expect(screen.getByText('Suche nach Name oder Ort...')).toBeInTheDocument();
-  });
-
-  it('should show no results message for query with no matches', async () => {
-    render(<SearchBar />);
-
-    const searchInput = screen.getByPlaceholderText('Suche Campingplätze...');
-    fireEvent.change(searchInput, { target: { value: 'Nonexistent' } });
-    fireEvent.focus(searchInput);
-
-    await waitFor(
-      () => {
-        expect(
-          screen.getByText('Keine Ergebnisse für "Nonexistent"'),
-        ).toBeInTheDocument();
-      },
-      { timeout: 500 },
-    );
-  });
-
-  it('should select campground when clicked', async () => {
-    render(<SearchBar />);
-
-    const searchInput = screen.getByPlaceholderText('Suche Campingplätze...');
-    fireEvent.change(searchInput, { target: { value: 'Camping' } });
-    fireEvent.focus(searchInput);
-
-    await waitFor(
-      () => {
-        const resultItem = screen.getByText('Camping am See');
-        fireEvent.click(resultItem);
-      },
-      { timeout: 500 },
-    );
-
-    expect(mockMapStore.setSelectedCampground).toHaveBeenCalledWith('1');
-    expect(mockMapStore.flyTo).toHaveBeenCalledWith(52.5, 13.4, 14);
-    expect(mockFilterStore.setSearchQuery).toHaveBeenCalledWith('');
-  });
-
-  it('should close dropdown on escape key', async () => {
-    render(<SearchBar />);
-
-    const searchInput = screen.getByPlaceholderText('Suche Campingplätze...');
-    fireEvent.change(searchInput, { target: { value: 'Camping' } });
-    fireEvent.focus(searchInput);
-
-    await waitFor(
-      () => {
-        expect(screen.getByText('Camping am See')).toBeInTheDocument();
-      },
-      { timeout: 500 },
-    );
-
-    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+    const input = screen.getByPlaceholderText(/Suche nach Orten, Städten/i);
+    fireEvent.change(input, { target: { value: 'Berlin' } });
+    fireEvent.focus(input);
 
     await waitFor(() => {
-      expect(screen.queryByText('Camping am See')).not.toBeInTheDocument();
+      expect(screen.getByText(/Berlin/)).toBeInTheDocument();
     });
   });
 
-  it('should show coverage and type badges in search results', async () => {
+  it('should show place type badge for results', async () => {
     render(<SearchBar />);
+    const input = screen.getByPlaceholderText(/Suche nach Orten, Städten/i);
+    fireEvent.change(input, { target: { value: 'Berlin' } });
+    fireEvent.focus(input);
 
-    const searchInput = screen.getByPlaceholderText('Suche Campingplätze...');
-    fireEvent.change(searchInput, { target: { value: 'Camping' } });
-    fireEvent.focus(searchInput);
-
-    await waitFor(
-      () => {
-        expect(screen.getByText('4G')).toBeInTheDocument();
-        expect(screen.getAllByText('Campingplatz')[0]).toBeInTheDocument();
-      },
-      { timeout: 500 },
-    );
+    await waitFor(() => {
+      expect(screen.getByText('Stadt')).toBeInTheDocument();
+    });
   });
 
-  it('should debounce search input', async () => {
+  it('should show empty state message', () => {
     render(<SearchBar />);
+    const input = screen.getByPlaceholderText(/Suche nach Orten, Städten/i);
+    fireEvent.focus(input);
 
-    const searchInput = screen.getByPlaceholderText('Suche Campingplätze...');
+    expect(screen.getByText(/Suche nach Orten, Städten/i)).toBeInTheDocument();
+  });
 
-    // Type multiple characters quickly
-    fireEvent.change(searchInput, { target: { value: 'C' } });
-    fireEvent.change(searchInput, { target: { value: 'Ca' } });
-    fireEvent.change(searchInput, { target: { value: 'Cam' } });
+  it('should show no results message', async () => {
+    render(<SearchBar />);
+    const input = screen.getByPlaceholderText(/Suche nach Orten, Städten/i);
+    fireEvent.change(input, { target: { value: 'Nonexistent' } });
+    fireEvent.focus(input);
 
-    // Should call setSearchQuery for each change but eventually settle on last value
-    await waitFor(
-      () => {
-        expect(mockFilterStore.setSearchQuery).toHaveBeenLastCalledWith('Cam');
-      },
-      { timeout: 500 },
-    );
+    await waitFor(() => {
+      expect(screen.getByText(/Keine Orte gefunden/i)).toBeInTheDocument();
+    });
+  });
+
+  it('should call flyTo when selecting a place', async () => {
+    render(<SearchBar />);
+    const input = screen.getByPlaceholderText(/Suche nach Orten, Städten/i);
+    fireEvent.change(input, { target: { value: 'Berlin' } });
+    fireEvent.focus(input);
+
+    await waitFor(() => {
+      const result = screen.getByText(/Berlin/);
+      fireEvent.click(result);
+    });
+
+    expect(mockFlyTo).toHaveBeenCalledWith(52.52, 13.405, 12); // city = zoom 12
+  });
+
+  it('should close dropdown on escape', async () => {
+    render(<SearchBar />);
+    const input = screen.getByPlaceholderText(/Suche nach Orten, Städten/i);
+    fireEvent.change(input, { target: { value: 'Berlin' } });
+    fireEvent.focus(input);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Berlin/)).toBeInTheDocument();
+    });
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    await waitFor(() => {
+      expect(screen.queryByText('Stadt')).not.toBeInTheDocument();
+    });
   });
 });
