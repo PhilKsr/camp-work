@@ -1,13 +1,13 @@
 # Stage 1: Dependencies
 FROM node:20-alpine AS deps
-RUN corepack enable pnpm && corepack install -g pnpm@8.15.5
+RUN corepack enable pnpm
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --no-frozen-lockfile --prod=false
+COPY package.json ./
+RUN pnpm install --prod=false
 
 # Stage 2: Build
 FROM node:20-alpine AS builder
-RUN corepack enable pnpm && corepack install -g pnpm@8.15.5
+RUN corepack enable pnpm
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
