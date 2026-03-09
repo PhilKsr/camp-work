@@ -70,7 +70,7 @@ describe('CampingCardCompact', () => {
     expect(screen.getByText('3G')).toBeInTheDocument();
   });
 
-  it('should render no coverage badge', () => {
+  it('should render no coverage badge for "none" level', () => {
     const campground = createMockCampground({
       coverageLevel: 'none',
     });
@@ -79,7 +79,11 @@ describe('CampingCardCompact', () => {
       <CampingCardCompact campground={campground} onClick={mockOnClick} />,
     );
 
-    expect(screen.getByText('Kein')).toBeInTheDocument();
+    // 'none' coverage should not show any badge
+    expect(screen.queryByText('Kein')).not.toBeInTheDocument();
+    expect(screen.queryByText('5G')).not.toBeInTheDocument();
+    expect(screen.queryByText('LTE')).not.toBeInTheDocument();
+    expect(screen.queryByText('3G')).not.toBeInTheDocument();
   });
 
   it('should call onClick when clicked', () => {

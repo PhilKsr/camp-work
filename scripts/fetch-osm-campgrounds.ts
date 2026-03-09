@@ -13,8 +13,10 @@ const OVERPASS_QUERY = `
 [out:json][timeout:180][maxsize:500000000];
 area["ISO3166-1"="DE"]->.searchArea;
 (
-  node["tourism"="camp_site"]["name"](area.searchArea);
-  node["tourism"="caravan_site"]["name"](area.searchArea);
+  node["tourism"="camp_site"](area.searchArea);
+  node["tourism"="caravan_site"](area.searchArea);
+  node["tourism"="alpine_hut"](area.searchArea);
+  node["leisure"="pitch"]["sport"="camping"](area.searchArea);
 );
 out center body;
 `;
@@ -34,12 +36,18 @@ interface OSMResponse {
 
 function mapOSMTags(element: OSMElement): Campground | null {
   const { tags, id } = element;
-  if (!tags || !tags.name) return null;
+  if (!tags) return null;
 
   const lat = element.lat ?? element.center?.lat;
   const lon = element.lon ?? element.center?.lon;
 
   if (!lat || !lon) return null;
+
+  // Generiere Namen für namenlose Plätze
+  const name =
+    tags.name || tags['addr:city']
+      ? `Campingplatz ${tags['addr:city']}`
+      : `Campingplatz (${lat.toFixed(2)}, ${lon.toFixed(2)})`;
 
   // Build address from OSM tags
   const address =
@@ -69,10 +77,20 @@ function mapOSMTags(element: OSMElement): Campground | null {
   if (tags.bbq === 'yes') features.push('bbq');
   if (tags.campfire === 'yes') features.push('campfire');
 
+  // Bestimme den Typ basierend auf OSM-Tags
+  let type: 'camp_site' | 'caravan_site' = 'camp_site';
+  if (tags.tourism === 'caravan_site') {
+    type = 'caravan_site';
+  } else if (tags.tourism === 'alpine_hut') {
+    type = 'camp_site'; // Alpine Hütten als Campingplätze klassifizieren
+  } else if (tags.leisure === 'pitch' && tags.sport === 'camping') {
+    type = 'camp_site'; // Zeltplätze als Campingplätze klassifizieren
+  }
+
   const campground: Campground = {
     id: `osm_${element.type}_${id}`,
-    name: tags.name,
-    type: tags.tourism === 'caravan_site' ? 'caravan_site' : 'camp_site',
+    name,
+    type,
     coordinates: [lon, lat],
     address,
     website: tags.website || tags.url || tags['contact:website'] || null,

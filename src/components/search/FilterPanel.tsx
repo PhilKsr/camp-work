@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {
   Sheet,
   SheetContent,
@@ -19,6 +20,7 @@ import { useFilterStore } from '@/stores/filterStore';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { colors } from '@/lib/brand';
+import { cn } from '@/lib/utils';
 import type { CampgroundFeature } from '@/types/campground';
 
 interface FilterPanelProps {
@@ -138,7 +140,10 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
         </SheetDescription>
       </SheetHeader>
 
-      <div className="flex-1 overflow-y-auto px-6">
+      <div
+        className="flex-1 overflow-y-auto px-6"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="space-y-6">
           {/* Work-Friendly Toggle */}
           <div className="space-y-3">
@@ -285,22 +290,17 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
 
 export default function FilterPanel({ children }: FilterPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 1023px)');
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      {/* Desktop */}
       <SheetContent
-        side="right"
-        className="hidden lg:block w-[380px] bg-white border-l border-[#E8E4D8] p-0 overflow-y-auto"
-      >
-        <FilterContent onClose={() => setIsOpen(false)} />
-      </SheetContent>
-
-      {/* Mobile */}
-      <SheetContent
-        side="bottom"
-        className="lg:hidden h-[85vh] bg-white rounded-t-2xl border-t border-[#E8E4D8] p-0 overflow-y-auto"
+        side={isMobile ? 'bottom' : 'right'}
+        className={cn(
+          'bg-white p-0 overflow-y-auto border-[#E8E4D8]',
+          isMobile ? 'h-[85vh] rounded-t-2xl border-t' : 'w-[380px] border-l',
+        )}
       >
         <FilterContent onClose={() => setIsOpen(false)} />
       </SheetContent>

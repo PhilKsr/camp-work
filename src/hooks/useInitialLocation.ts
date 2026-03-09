@@ -23,60 +23,82 @@ export function useInitialLocation() {
   );
 
   useEffect(() => {
-    // Skip if geolocation is not supported
-    if (!navigator.geolocation) {
-      setState({
-        isLoading: false,
-        error: 'Geolocation wird von diesem Browser nicht unterstützt',
-        hasLocation: false,
-      });
-      return;
-    }
-
-    setState((prev) => ({ ...prev, isLoading: true }));
-
-    const options: PositionOptions = {
-      enableHighAccuracy: true,
-      timeout: 10000, // 10 seconds
-      maximumAge: 300000, // 5 minutes cache
-    };
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-
-        // Initialize map with user location
-        initializeFromGeolocation(latitude, longitude);
-
+    async function requestLocation() {
+      if (!navigator.geolocation) {
         setState({
           isLoading: false,
-          error: null,
-          hasLocation: true,
-        });
-      },
-      (error) => {
-        let errorMessage = 'Standort konnte nicht ermittelt werden';
-
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = 'Standort-Berechtigung verweigert';
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Standort nicht verfügbar';
-            break;
-          case error.TIMEOUT:
-            errorMessage = 'Standort-Anfrage timeout';
-            break;
-        }
-
-        setState({
-          isLoading: false,
-          error: errorMessage,
+          error: 'Geolocation nicht unterstützt',
           hasLocation: false,
         });
-      },
-      options,
-    );
+        return;
+      }
+
+      // Prüfe Permission-Status
+      try {
+        if (navigator.permissions) {
+          const permission = await navigator.permissions.query({
+            name: 'geolocation',
+          });
+          if (permission.state === 'denied') {
+            setState({
+              isLoading: false,
+              error: 'Standort-Berechtigung verweigert',
+              hasLocation: false,
+            });
+            return;
+          }
+        }
+      } catch {
+        // permissions API nicht verfügbar, trotzdem versuchen
+      }
+
+      setState((prev) => ({ ...prev, isLoading: true }));
+
+      const options: PositionOptions = {
+        enableHighAccuracy: true,
+        timeout: 10000, // 10 seconds
+        maximumAge: 300000, // 5 minutes cache
+      };
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+
+          // Initialize map with user location
+          initializeFromGeolocation(latitude, longitude);
+
+          setState({
+            isLoading: false,
+            error: null,
+            hasLocation: true,
+          });
+        },
+        (error) => {
+          let errorMessage = 'Standort konnte nicht ermittelt werden';
+
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'Standort-Berechtigung verweigert';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'Standort nicht verfügbar';
+              break;
+            case error.TIMEOUT:
+              errorMessage = 'Standort-Anfrage timeout';
+              break;
+          }
+
+          setState({
+            isLoading: false,
+            error: errorMessage,
+            hasLocation: false,
+          });
+        },
+        options,
+      );
+    }
+
+    requestLocation();
   }, [initializeFromGeolocation]); // Include initializeFromGeolocation in dependencies
 
   return state;

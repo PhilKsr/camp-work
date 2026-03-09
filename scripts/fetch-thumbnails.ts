@@ -11,9 +11,13 @@ interface ThumbnailMapping {
 
 async function downloadImage(url: string, outputPath: string): Promise<void> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 5000);
+  const timer = setTimeout(() => controller.abort(), 8000); // Erhöht auf 8 Sekunden
   try {
-    const response = await fetch(url, { signal: controller.signal });
+    const response = await fetch(url, {
+      signal: controller.signal,
+      redirect: 'follow', // Redirect-Following hinzugefügt
+      headers: { 'User-Agent': 'CampWork Bot (https://campwork.app)' },
+    });
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
@@ -28,19 +32,42 @@ async function downloadImage(url: string, outputPath: string): Promise<void> {
 }
 
 async function extractOgImage(html: string): Promise<string | null> {
-  // Simple regex to extract og:image meta tag
+  // Erweiterte Bildersuche mit mehreren Fallback-Strategien
+
+  // 1. og:image
   const ogImageRegex =
     /<meta[^>]*property\s*=\s*["\']og:image["\'][^>]*content\s*=\s*["\']([^"']+)["\'][^>]*>/i;
-  const match = html.match(ogImageRegex);
-  return match ? match[1] : null;
+  let match = html.match(ogImageRegex);
+  if (match && match[1]) return match[1];
+
+  // 2. twitter:image
+  const twitterImageRegex =
+    /<meta[^>]*name\s*=\s*["\']twitter:image["\'][^>]*content\s*=\s*["\']([^"']+)["\'][^>]*>/i;
+  match = html.match(twitterImageRegex);
+  if (match && match[1]) return match[1];
+
+  // 3. image_src link
+  const imageSrcRegex =
+    /<link[^>]*rel\s*=\s*["\']image_src["\'][^>]*href\s*=\s*["\']([^"']+)["\'][^>]*>/i;
+  match = html.match(imageSrcRegex);
+  if (match && match[1]) return match[1];
+
+  // 4. Erstes img im header oder mit hero/banner/header-image class
+  const heroImageRegex =
+    /<img[^>]*(?:class\s*=\s*["\'][^"']*(?:hero|banner|header-image)[^"']*["\']|(?:(?:in|within)\s+)?header)[^>]*src\s*=\s*["\']([^"']+)["\'][^>]*>/i;
+  match = html.match(heroImageRegex);
+  if (match && match[1]) return match[1];
+
+  return null;
 }
 
 async function fetchWebsiteOgImage(url: string): Promise<string | null> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 5000);
+  const timer = setTimeout(() => controller.abort(), 8000); // Erhöht auf 8 Sekunden
   try {
     const response = await fetch(url, {
       signal: controller.signal,
+      redirect: 'follow', // Redirect-Following hinzugefügt
       headers: { 'User-Agent': 'CampWork Bot (https://campwork.app)' },
     });
 
@@ -118,55 +145,81 @@ async function main() {
     let errorCount = 0;
     let skippedCount = 0;
 
-    for (const feature of geoJson.features) {
-      const campground = feature.properties;
-      console.log(`🔍 Processing: ${campground.name}`);
+    // Verarbeite in Batches von 50 mit Pause dazwischen
+    const batchSize = 50;
+    const features = geoJson.features;
 
-      try {
-        let imageUrl: string | null = null;
+    for (
+      let batchStart = 0;
+      batchStart < features.length;
+      batchStart += batchSize
+    ) {
+      const batch = features.slice(batchStart, batchStart + batchSize);
+      console.log(
+        `📦 Processing batch ${Math.floor(batchStart / batchSize) + 1}/${Math.ceil(features.length / batchSize)} (${batch.length} items)`,
+      );
 
-        // First, check if campground has direct image from OSM
-        if (campground.thumbnail) {
-          imageUrl = campground.thumbnail;
-          console.log(`  📷 Using OSM image: ${imageUrl}`);
+      for (const feature of batch) {
+        const campground = feature.properties;
+        console.log(`🔍 Processing: ${campground.name}`);
+
+        try {
+          let imageUrl: string | null = null;
+
+          // First, check if campground has direct image from OSM
+          if (campground.thumbnail) {
+            imageUrl = campground.thumbnail;
+            console.log(`  📷 Using OSM image: ${imageUrl}`);
+          }
+          // Then, try to extract og:image from website
+          else if (campground.website) {
+            console.log(`  🌐 Fetching og:image from: ${campground.website}`);
+            imageUrl = await fetchWebsiteOgImage(campground.website);
+          }
+
+          if (imageUrl) {
+            const tempImagePath = path.join(
+              tempDir,
+              `temp_${campground.id}.jpg`,
+            );
+            const outputImagePath = path.join(
+              thumbnailsDir,
+              `${campground.id}.webp`,
+            );
+
+            // Download image
+            await downloadImage(imageUrl, tempImagePath);
+
+            // Process and convert to WebP
+            await processImage(tempImagePath, outputImagePath);
+
+            // Clean up temp file
+            await fs.unlink(tempImagePath).catch(() => {});
+
+            thumbnailMapping[campground.id] =
+              `/campgrounds/${campground.id}.webp`;
+            successCount++;
+            console.log(
+              `  ✅ Thumbnail saved (${successCount}/${successCount + errorCount + skippedCount})`,
+            );
+          } else {
+            skippedCount++;
+            console.log(`  ⏭️  No image source found`);
+          }
+        } catch (error) {
+          errorCount++;
+          console.log(`  ❌ Failed: ${error}`);
         }
-        // Then, try to extract og:image from website
-        else if (campground.website) {
-          console.log(`  🌐 Fetching og:image from: ${campground.website}`);
-          imageUrl = await fetchWebsiteOgImage(campground.website);
-        }
 
-        if (imageUrl) {
-          const tempImagePath = path.join(tempDir, `temp_${campground.id}.jpg`);
-          const outputImagePath = path.join(
-            thumbnailsDir,
-            `${campground.id}.webp`,
-          );
-
-          // Download image
-          await downloadImage(imageUrl, tempImagePath);
-
-          // Process and convert to WebP
-          await processImage(tempImagePath, outputImagePath);
-
-          // Clean up temp file
-          await fs.unlink(tempImagePath).catch(() => {});
-
-          thumbnailMapping[campground.id] =
-            `/campgrounds/${campground.id}.webp`;
-          successCount++;
-          console.log(`  ✅ Thumbnail saved`);
-        } else {
-          skippedCount++;
-          console.log(`  ⏭️  No image source found`);
-        }
-      } catch (error) {
-        errorCount++;
-        console.log(`  ❌ Failed: ${error}`);
+        // Rate limit: 1s pause between requests
+        await sleep(1000);
       }
 
-      // Rate limit: 500ms pause between requests
-      await sleep(500);
+      // Pause zwischen Batches
+      if (batchStart + batchSize < features.length) {
+        console.log('⏸️  Pausing 5 seconds between batches...');
+        await sleep(5000);
+      }
     }
 
     // Save thumbnail mapping

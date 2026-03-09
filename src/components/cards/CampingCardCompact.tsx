@@ -62,15 +62,17 @@ export function CampingCardCompact({
           </div>
         )}
 
-        {/* Coverage Badge */}
-        <div
-          className="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white"
-          style={{
-            backgroundColor: getCoverageColor(campground.coverageLevel),
-          }}
-        >
-          {getCoverageLabel(campground.coverageLevel)}
-        </div>
+        {/* Coverage Badge - nur für 5g/4g/3g anzeigen, 'none' überspringen */}
+        {campground.coverageLevel !== 'none' && (
+          <div
+            className="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white"
+            style={{
+              backgroundColor: getCoverageColor(campground.coverageLevel),
+            }}
+          >
+            {getCoverageLabel(campground.coverageLevel)}
+          </div>
+        )}
       </div>
 
       {/* Content */}

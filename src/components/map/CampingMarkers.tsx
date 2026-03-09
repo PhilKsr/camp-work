@@ -73,7 +73,7 @@ export function CampingMarkers() {
             colors.coverage.good,
             ['==', ['get', 'coverageLevel'], '3g'],
             colors.coverage.limited,
-            colors.coverage.none,
+            '#9CA3AF', // Neutral-Grau statt Rot für "unbekannt"
           ],
           'circle-radius': 14, // Erhöht von 12 auf 14px für bessere Touch-Targets
           'circle-stroke-width': 2,

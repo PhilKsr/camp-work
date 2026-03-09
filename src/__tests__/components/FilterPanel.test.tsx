@@ -54,12 +54,12 @@ describe('FilterPanel', () => {
     // Open the filter panel
     fireEvent.click(screen.getByText('Open Filter'));
 
-    expect(screen.getAllByText('Filter')).toHaveLength(2); // Desktop + Mobile
-    expect(screen.getAllByText('Nur zum Arbeiten geeignet')).toHaveLength(2);
-    expect(screen.getAllByText('Netzabdeckung')).toHaveLength(2);
-    expect(screen.getAllByText('Typ')).toHaveLength(2);
-    expect(screen.getAllByText('Ausstattung')).toHaveLength(2);
-    expect(screen.getAllByText('Favoriten')).toHaveLength(2);
+    expect(screen.getByText('Filter')).toBeInTheDocument(); // Single Sheet
+    expect(screen.getByText('Nur zum Arbeiten geeignet')).toBeInTheDocument();
+    expect(screen.getByText('Netzabdeckung')).toBeInTheDocument();
+    expect(screen.getByText('Typ')).toBeInTheDocument();
+    expect(screen.getByText('Ausstattung')).toBeInTheDocument();
+    expect(screen.getByText('Favoriten')).toBeInTheDocument();
   });
 
   it('should render coverage level options', () => {
@@ -71,10 +71,10 @@ describe('FilterPanel', () => {
 
     fireEvent.click(screen.getByText('Open Filter'));
 
-    expect(screen.getAllByText('5G – Exzellent')).toHaveLength(2);
-    expect(screen.getAllByText('LTE/4G – Gut zum Arbeiten')).toHaveLength(2);
-    expect(screen.getAllByText('3G – Eingeschränkt')).toHaveLength(2);
-    expect(screen.getAllByText('Kein Netz')).toHaveLength(2);
+    expect(screen.getByText('5G – Exzellent')).toBeInTheDocument();
+    expect(screen.getByText('LTE/4G – Gut zum Arbeiten')).toBeInTheDocument();
+    expect(screen.getByText('3G – Eingeschränkt')).toBeInTheDocument();
+    expect(screen.getByText('Kein Netz')).toBeInTheDocument();
   });
 
   it('should render campground types', () => {
@@ -86,8 +86,8 @@ describe('FilterPanel', () => {
 
     fireEvent.click(screen.getByText('Open Filter'));
 
-    expect(screen.getAllByText('Campingplätze')).toHaveLength(2);
-    expect(screen.getAllByText('Wohnmobilstellplätze')).toHaveLength(2);
+    expect(screen.getByText('Campingplätze')).toBeInTheDocument();
+    expect(screen.getByText('Wohnmobilstellplätze')).toBeInTheDocument();
   });
 
   it('should call toggle functions when options are clicked', () => {
@@ -134,7 +134,7 @@ describe('FilterPanel', () => {
     fireEvent.click(screen.getByText('Open Filter'));
 
     // Should show filtered result count (both campgrounds match all filters)
-    expect(screen.getAllByText('3 Ergebnisse anzeigen')).toHaveLength(2);
+    expect(screen.getByText('3 Ergebnisse anzeigen')).toBeInTheDocument();
   });
 
   it('should call reset filters when reset button is clicked', () => {
@@ -186,6 +186,6 @@ describe('FilterPanel', () => {
 
     fireEvent.click(screen.getByText('Open Filter'));
 
-    expect(screen.getAllByText(/2 gespeichert/)).toHaveLength(2);
+    expect(screen.getByText(/2 gespeichert/)).toBeInTheDocument();
   });
 });

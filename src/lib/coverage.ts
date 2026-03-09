@@ -201,7 +201,7 @@ export function getCoverageDescription(level: CoverageLevel): string {
     case '3g':
       return 'Eingeschränkt';
     case 'none':
-      return 'Nicht empfohlen';
+      return 'Prüfe Netzabdeckung auf der Karte';
     default:
       return 'Unbekannt';
   }

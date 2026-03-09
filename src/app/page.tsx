@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import MapView from '@/components/map/MapView';
 import MobileBottomSheet from '@/components/layout/MobileBottomSheet';
@@ -16,9 +17,18 @@ import type { Campground } from '@/types/campground';
 export default function Home() {
   const { selectedCampground, setSelectedCampground } = useMapStore();
   const { data: campgroundsData } = useCampgrounds();
+  const [showBanner, setShowBanner] = useState(true);
 
   // Initialize location on app start
   const locationState = useInitialLocation();
+
+  // Auto-dismiss banner after 5 seconds
+  useEffect(() => {
+    if (locationState.error && showBanner) {
+      const timer = setTimeout(() => setShowBanner(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [locationState.error, showBanner]);
 
   // Sync state with URL
   useUrlState();
@@ -41,6 +51,16 @@ export default function Home() {
   return (
     <div className="h-screen flex flex-col">
       <Header />
+
+      {/* Location Warning - direkt unter dem Header, nicht über der Karte */}
+      {locationState.error && !locationState.hasLocation && showBanner && (
+        <div className="bg-[#E19B53]/10 border-b border-[#E19B53]/20 px-4 py-2">
+          <p className="text-sm text-[#C47F35]">
+            <strong>Hinweis:</strong> {locationState.error}. Verwende die
+            Suchleiste um zu einem Ort zu navigieren.
+          </p>
+        </div>
+      )}
 
       <div className="flex-1 flex overflow-hidden">
         {/* Desktop Sidebar */}
@@ -71,18 +91,6 @@ export default function Home() {
                 <span className="text-foreground font-medium">
                   Standort wird ermittelt...
                 </span>
-              </div>
-            </div>
-          )}
-
-          {/* Location Error Overlay */}
-          {locationState.error && !locationState.hasLocation && (
-            <div className="absolute top-4 left-4 right-4 z-50">
-              <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3">
-                <p className="text-orange-800 text-sm">
-                  <strong>Hinweis:</strong> {locationState.error}. Verwende die
-                  Suchleiste, um zu einem Ort zu navigieren.
-                </p>
               </div>
             </div>
           )}

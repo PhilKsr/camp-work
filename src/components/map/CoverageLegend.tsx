@@ -14,24 +14,26 @@ export default function CoverageLegend({ className }: CoverageLegendProps) {
 
   if (!isVisible) return null;
 
-  // BNetzA coverage map uses different colors than our synthetic data
-  // Blue = Coverage in buildings, Orange = Outdoor coverage, White/Transparent = No coverage
+  // BNetzA WMS-Karte zeigt tatsächlich:
+  // Blau für Indoor-Versorgung (Gebäude)
+  // Dunkel-Orange/Rot-Orange für Outdoor-Versorgung
+  // Weiß/Transparent für keine Versorgung
   const legendItems = [
     {
       key: 'indoor' as const,
-      color: '#2563EB', // Blue - Coverage in buildings
+      color: '#2563EB', // Blau - wie im echten WMS
       label: 'Versorgung in Gebäuden',
       description: 'Exzellent für Arbeiten',
     },
     {
       key: 'outdoor' as const,
-      color: '#F59E0B', // Orange - Outdoor coverage
+      color: '#D97706', // Dunkel-Orange/Rot-Orange - angepasst an echte WMS-Farben
       label: 'Versorgung im Freien',
       description: 'Gut für draußen',
     },
     {
       key: 'none' as const,
-      color: '#E5E7EB', // Light gray - No coverage
+      color: '#E5E7EB',
       label: 'Keine Versorgung',
       description: 'Kein Mobilfunk',
     },
