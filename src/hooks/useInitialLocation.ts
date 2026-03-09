@@ -34,7 +34,13 @@ export function useInitialLocation() {
       }
 
       // Check if we're on HTTPS (required for geolocation in most browsers)
-      if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+      // Allow Tailscale internal IPs (100.x.x.x) as secure context
+      const isTailscaleIP = location.hostname.startsWith('100.');
+      if (
+        location.protocol !== 'https:' &&
+        location.hostname !== 'localhost' &&
+        !isTailscaleIP
+      ) {
         setState({
           isLoading: false,
           error:
