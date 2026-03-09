@@ -92,7 +92,22 @@ LANGUAGE sql
 STABLE
 AS $$
   SELECT 
-    c.*,
+    c.id,
+    c.name,
+    c.type,
+    c.location,
+    c.address,
+    c.website,
+    c.phone,
+    c.email,
+    c.rating,
+    c.features,
+    c.coverage_level,
+    c.opening_hours,
+    c.fee,
+    c.capacity,
+    c.source,
+    c.osm_id,
     ST_Distance(c.location, ST_Point(lng, lat)::geography) / 1000 AS distance_km
   FROM campgrounds c
   WHERE ST_DWithin(c.location, ST_Point(lng, lat)::geography, radius_km * 1000)
