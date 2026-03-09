@@ -5,6 +5,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import type { CampgroundGeoJSON } from '@/types/campground';
 
+// Mock Supabase
+vi.mock('@/lib/supabase', () => ({
+  supabase: {
+    from: vi.fn(() => ({
+      select: vi.fn(() => Promise.reject(new Error('Supabase not available in tests')))
+    }))
+  }
+}));
+
 const mockCampgrounds: CampgroundGeoJSON = {
   type: 'FeatureCollection',
   features: [
@@ -73,10 +82,10 @@ describe('useCampgrounds', () => {
     expect(result.current.isLoading).toBe(true);
     expect(result.current.data).toBeUndefined();
 
-    // Wait for data
+    // Wait for data with longer timeout since it tries Supabase first
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
-    });
+    }, { timeout: 5000 });
 
     expect(result.current.data).toEqual(mockCampgrounds);
     expect(fetch).toHaveBeenCalledWith('/data/campgrounds.geojson');
@@ -94,7 +103,7 @@ describe('useCampgrounds', () => {
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
-    });
+    }, { timeout: 5000 });
 
     expect(result.current.error).toBeDefined();
     expect(result.current.data).toBeUndefined();

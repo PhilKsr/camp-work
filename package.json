@@ -19,6 +19,7 @@
     "fetch:thumbnails": "tsx scripts/fetch-thumbnails.ts",
     "fetch:enrich": "tsx scripts/enrich-coverage.ts",
     "data:update": "pnpm fetch:campgrounds && pnpm fetch:enrich",
+    "migrate:supabase": "tsx scripts/migrate-to-supabase.ts",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -37,9 +38,11 @@
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-switch": "^1.2.6",
     "@serwist/next": "^9.5.6",
+    "@supabase/supabase-js": "^2.98.0",
     "@tanstack/react-query": "^5.90.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.3.1",
     "framer-motion": "^12.35.0",
     "jsdom": "^28.1.0",
     "lucide-react": "^0.577.0",

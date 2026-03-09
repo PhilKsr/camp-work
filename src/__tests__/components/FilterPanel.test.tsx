@@ -4,6 +4,16 @@ import { useFilterStore } from '@/stores/filterStore';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { mockGeoJSON, createMockQueryResult } from '../helpers';
+import { vi } from 'vitest';
+
+// Mock Supabase
+vi.mock('@/lib/supabase', () => ({
+  supabase: {
+    from: vi.fn(() => ({
+      select: vi.fn(() => Promise.reject(new Error('Supabase not available in tests')))
+    }))
+  }
+}));
 
 // Mock the stores and hooks
 vi.mock('@/stores/filterStore');
