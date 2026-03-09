@@ -33,6 +33,17 @@ export function useInitialLocation() {
         return;
       }
 
+      // Check if we're on HTTPS (required for geolocation in most browsers)
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+        setState({
+          isLoading: false,
+          error:
+            'Standort benötigt HTTPS. Nutze Tailscale Serve für HTTPS-Zugriff',
+          hasLocation: false,
+        });
+        return;
+      }
+
       // Prüfe Permission-Status
       try {
         if (navigator.permissions) {

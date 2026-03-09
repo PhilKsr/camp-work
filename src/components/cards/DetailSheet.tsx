@@ -62,7 +62,7 @@ const getCoverageIcon = (level: string): string => {
     case '3g':
       return '📡 3G verfügbar';
     default:
-      return '❌ Kein Netz';
+      return '❓ Netzabdeckung unbekannt';
   }
 };
 
@@ -164,27 +164,41 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
 
           {/* Coverage Section */}
           <Card className="p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div
-                className="p-3 rounded-full"
-                style={{
-                  backgroundColor: `${getCoverageColor(campground.coverageLevel)}20`,
-                }}
-              >
-                <Signal
-                  className="w-5 h-5"
-                  style={{ color: getCoverageColor(campground.coverageLevel) }}
-                />
+            {campground.coverageLevel === 'none' ? (
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <Signal className="w-5 h-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">Netzabdeckung unbekannt</p>
+                  <p className="text-xs text-muted-foreground">
+                    Prüfe den Coverage-Layer auf der Karte für diesen Standort
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-medium">
-                  {getCoverageIcon(campground.coverageLevel)}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {getCoverageDescription(campground.coverageLevel)}
-                </p>
+            ) : (
+              <div className="flex items-center gap-3">
+                <div
+                  className="p-3 rounded-full"
+                  style={{
+                    backgroundColor: `${getCoverageColor(campground.coverageLevel)}20`,
+                  }}
+                >
+                  <Signal
+                    className="w-5 h-5"
+                    style={{
+                      color: getCoverageColor(campground.coverageLevel),
+                    }}
+                  />
+                </div>
+                <div>
+                  <h3 className="font-medium">
+                    {getCoverageIcon(campground.coverageLevel)}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {getCoverageDescription(campground.coverageLevel)}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </Card>
 
           {/* Info Section */}

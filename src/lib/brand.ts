@@ -28,7 +28,7 @@ export const colors = {
     excellent: '#28A745', // 5G - Green
     good: '#E19B53', // LTE/4G - Gold
     limited: '#FFC107', // 3G - Yellow
-    none: '#DC3545', // No signal - Red
+    none: '#9CA3AF', // Unknown - Gray (not red)
   },
 } as const;
 
@@ -68,8 +68,8 @@ export const coverageColors: Record<
   },
   none: {
     hex: colors.coverage.none,
-    label: 'Kein Netz',
-    description: 'Nicht empfohlen',
+    label: 'Unbekannt',
+    description: 'Prüfe Netzabdeckung auf der Karte',
   },
 } as const;
 

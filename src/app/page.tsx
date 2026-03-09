@@ -54,11 +54,18 @@ export default function Home() {
 
       {/* Location Warning - direkt unter dem Header, nicht über der Karte */}
       {locationState.error && !locationState.hasLocation && showBanner && (
-        <div className="bg-[#E19B53]/10 border-b border-[#E19B53]/20 px-4 py-2">
+        <div className="bg-[#E19B53]/10 border-b border-[#E19B53]/20 px-4 py-2 flex items-center justify-between">
           <p className="text-sm text-[#C47F35]">
             <strong>Hinweis:</strong> {locationState.error}. Verwende die
             Suchleiste um zu einem Ort zu navigieren.
           </p>
+          <button
+            onClick={() => setShowBanner(false)}
+            className="text-[#C47F35] hover:text-[#E19B53] ml-2 shrink-0 p-1 rounded-md hover:bg-[#E19B53]/10 transition-colors"
+            aria-label="Banner schließen"
+          >
+            ✕
+          </button>
         </div>
       )}
 
