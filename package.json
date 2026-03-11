@@ -18,6 +18,10 @@
     "fetch:campgrounds": "tsx scripts/fetch-osm-campgrounds.ts",
     "fetch:thumbnails": "tsx scripts/fetch-thumbnails.ts",
     "fetch:enrich": "tsx scripts/enrich-coverage.ts",
+    "fetch:osm-images": "tsx scripts/fetch-osm-images.ts",
+    "fetch:website-images": "tsx scripts/fetch-website-images.ts",
+    "fetch:google-images": "tsx scripts/fetch-google-images.ts",
+    "fetch:all-images": "tsx scripts/fetch-all-images.ts",
     "data:update": "pnpm fetch:campgrounds && pnpm fetch:enrich",
     "migrate:supabase": "tsx scripts/migrate-to-supabase.ts",
     "prepare": "husky"
