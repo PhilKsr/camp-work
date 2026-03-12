@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -14,6 +14,9 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { ImageCarousel } from '@/components/ui/ImageCarousel';
+import { ImageLightbox } from '@/components/ui/ImageLightbox';
+import { useCampgroundImages } from '@/hooks/useCampgroundImages';
 import { cn } from '@/lib/utils';
 import { colors } from '@/lib/brand';
 import { getCoverageDescription } from '@/lib/coverage';
@@ -95,7 +98,12 @@ function openRouteInGoogleMaps(lat: number, lng: number) {
 
 export function DetailSheet({ campground, onClose }: DetailSheetProps) {
   const { toggleFavorite, isFavorite } = useFavoriteStore();
+  const { data: images } = useCampgroundImages(campground.id);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const [lng, lat] = campground.coordinates;
+
+  const imageUrls = images?.map((img) => img.url) || [];
 
   // Check for reduced motion preference
   const prefersReducedMotion =
@@ -137,26 +145,24 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
         </div>
 
         <div className="p-4 space-y-6">
-          {/* Hero Image */}
+          {/* Gallery */}
           <Card className="overflow-hidden">
-            <div className="relative h-[200px] bg-gradient-to-br from-brand-warm-gold to-brand-sky-blue">
-              {campground.thumbnail ? (
-                <Image
-                  src={campground.thumbnail}
-                  alt={campground.name}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-white/80">
-                  <div className="text-center">
-                    <MapPin className="w-12 h-12 mx-auto mb-2" />
-                    <p className="text-sm">
-                      {campground.type === 'camp_site'
-                        ? 'Campingplatz'
-                        : 'Wohnmobilstellplatz'}
-                    </p>
-                  </div>
+            <div className="relative">
+              <ImageCarousel
+                images={imageUrls}
+                alt={campground.name}
+                height="h-[250px]"
+                showArrows={true}
+                onImageClick={(index) => {
+                  setLightboxIndex(index);
+                  setLightboxOpen(true);
+                }}
+              />
+
+              {/* Bildzähler oben rechts */}
+              {imageUrls.length > 1 && (
+                <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                  {imageUrls.length} Fotos
                 </div>
               )}
             </div>
@@ -295,6 +301,15 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
               Teilen
             </Button>
           </div>
+
+          {/* Lightbox */}
+          <ImageLightbox
+            images={imageUrls}
+            initialIndex={lightboxIndex}
+            alt={campground.name}
+            isOpen={lightboxOpen}
+            onClose={() => setLightboxOpen(false)}
+          />
         </div>
       </motion.div>
     </div>

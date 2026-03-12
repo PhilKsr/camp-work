@@ -3,10 +3,12 @@ import { Tent } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { colors } from '@/lib/brand';
 import type { Campground } from '@/types/campground';
+import type { CampgroundImage } from '@/hooks/useBatchCampgroundImages';
 
 interface CampingCardCompactProps {
   campground: Campground;
   onClick: () => void;
+  images?: CampgroundImage[];
 }
 
 const getCoverageColor = (level: string): string => {
@@ -38,7 +40,9 @@ const getCoverageLabel = (level: string): string => {
 export function CampingCardCompact({
   campground,
   onClick,
+  images = [],
 }: CampingCardCompactProps) {
+  const firstImage = images[0]?.url;
   return (
     <div
       className={cn(
@@ -49,9 +53,9 @@ export function CampingCardCompact({
     >
       {/* Thumbnail */}
       <div className="relative h-[80px] bg-gradient-to-br from-[#E19B53] to-[#ABD8EF]">
-        {campground.thumbnail ? (
+        {firstImage ? (
           <Image
-            src={campground.thumbnail}
+            src={firstImage}
             alt={campground.name}
             fill
             className="object-cover"

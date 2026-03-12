@@ -42,7 +42,7 @@ async function extractImageUrl(
 
   // Priorität 4: Erstes großes Bild (hero/banner/header)
   const heroMatch = html.match(
-    /<img[^>]*(?:class\s*=\s*["'][^"']*(?:hero|banner|header|main|cover|featured)[^"']*["'][^>]*src\s*=\s*["']([^"']+)["']/i,
+    /<img[^>]*class\s*=\s*["'][^"']*(?:hero|banner|header|main|cover|featured)[^"']*["'][^>]*src\s*=\s*["']([^"']+)["']/i,
   );
   if (heroMatch) return resolveUrl(heroMatch[1], baseUrl);
 

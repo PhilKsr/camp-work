@@ -98,13 +98,24 @@ describe('CampingCardCompact', () => {
     expect(mockOnClick).toHaveBeenCalledOnce();
   });
 
-  it('should render with thumbnail', () => {
-    const campground = createMockCampground({
-      thumbnail: '/campgrounds/test.webp',
-    });
+  it('should render with images', () => {
+    const campground = createMockCampground();
+    const mockImages = [
+      {
+        id: '1',
+        campground_id: 'test-campground-1',
+        url: '/campgrounds/test.webp',
+        source: 'og_image' as const,
+        sort_order: 1,
+      },
+    ];
 
     render(
-      <CampingCardCompact campground={campground} onClick={mockOnClick} />,
+      <CampingCardCompact
+        campground={campground}
+        onClick={mockOnClick}
+        images={mockImages}
+      />,
     );
 
     const image = screen.getByRole('img');
@@ -112,7 +123,7 @@ describe('CampingCardCompact', () => {
     expect(image).toHaveAttribute('alt', 'Test Camping am See');
   });
 
-  it('should render tent icon when no thumbnail', () => {
+  it('should render tent icon when no images', () => {
     const campground = createMockCampground({
       thumbnail: undefined,
     });

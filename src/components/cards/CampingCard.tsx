@@ -1,7 +1,6 @@
-import Image from 'next/image';
+import { useState } from 'react';
 import {
   Heart,
-  Tent,
   Wifi,
   Zap,
   Dog,
@@ -16,15 +15,19 @@ import {
   Bath,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { ImageCarousel } from '@/components/ui/ImageCarousel';
+import { ImageLightbox } from '@/components/ui/ImageLightbox';
 import { cn } from '@/lib/utils';
 import { colors } from '@/lib/brand';
 import type { Campground } from '@/types/campground';
+import type { CampgroundImage } from '@/hooks/useBatchCampgroundImages';
 
 interface CampingCardProps {
   campground: Campground;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onClick: () => void;
+  images?: CampgroundImage[];
 }
 
 const FEATURE_ICONS = {
@@ -73,7 +76,12 @@ export function CampingCard({
   isFavorite,
   onToggleFavorite,
   onClick,
+  images = [],
 }: CampingCardProps) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const imageUrls = images.map((img) => img.url);
   return (
     <Card
       className={cn(
@@ -82,25 +90,23 @@ export function CampingCard({
       )}
       onClick={onClick}
     >
-      {/* Thumbnail */}
-      <div className="relative h-[180px] bg-gradient-to-br from-brand-warm-gold to-brand-sky-blue">
-        {campground.thumbnail ? (
-          <Image
-            src={campground.thumbnail}
-            alt={campground.name}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <Tent className="w-12 h-12 text-white/80" />
-          </div>
-        )}
+      {/* Image Carousel */}
+      <div className="relative">
+        <ImageCarousel
+          images={imageUrls}
+          alt={campground.name}
+          height="h-[180px]"
+          showArrows={true}
+          onImageClick={(index) => {
+            setLightboxIndex(index);
+            setLightboxOpen(true);
+          }}
+        />
 
         {/* Favorite Heart */}
         <button
           className={cn(
-            'absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm transition-colors',
+            'absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm transition-colors z-10',
             isFavorite
               ? 'bg-[#E19B53]/90 text-white'
               : 'bg-white/20 text-white hover:bg-white/30',
@@ -116,7 +122,7 @@ export function CampingCard({
         {/* Coverage Badge - nur für 5g/4g/3g anzeigen, 'none' überspringen */}
         {campground.coverageLevel !== 'none' && (
           <div
-            className="absolute bottom-3 left-3 px-2 py-0.5 rounded-full text-xs font-bold text-white"
+            className="absolute bottom-3 left-3 px-2 py-0.5 rounded-full text-xs font-bold text-white z-10"
             style={{
               backgroundColor: getCoverageColor(campground.coverageLevel),
             }}
@@ -181,6 +187,15 @@ export function CampingCard({
           {campground.website && <Globe className="w-3.5 h-3.5" />}
         </div>
       </div>
+
+      {/* Lightbox */}
+      <ImageLightbox
+        images={imageUrls}
+        initialIndex={lightboxIndex}
+        alt={campground.name}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
     </Card>
   );
 }
