@@ -70,8 +70,9 @@ export const coverageColors: Record<
   },
   none: {
     hex: colors.coverage.none,
-    label: 'Unbekannt',
-    description: 'Prüfe Netzabdeckung auf der Karte',
+    label: 'Kein O2-Netz',
+    description:
+      'Kein O2-Mobilfunk am Standort. Andere Anbieter können verfügbar sein.',
   },
 } as const;
 

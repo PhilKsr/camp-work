@@ -32,6 +32,8 @@ const getCoverageLabel = (level: string): string => {
       return 'LTE';
     case '3g':
       return '3G';
+    case 'none':
+      return 'Kein O2';
     default:
       return 'Kein';
   }

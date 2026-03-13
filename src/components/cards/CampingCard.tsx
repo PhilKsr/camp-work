@@ -37,6 +37,8 @@ const getCoverageLabel = (level: string): string => {
       return 'LTE Netz verfügbar';
     case '3g':
       return '3G Netz verfügbar';
+    case 'none':
+      return 'Kein O2-Netz';
     default:
       return 'Netz prüfen';
   }

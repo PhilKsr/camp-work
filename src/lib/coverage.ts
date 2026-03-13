@@ -201,7 +201,7 @@ export function getCoverageDescription(level: CoverageLevel): string {
     case '3g':
       return 'Eingeschränkt';
     case 'none':
-      return 'Prüfe Netzabdeckung auf der Karte';
+      return 'Kein O2-Netz am Standort';
     default:
       return 'Unbekannt';
   }
