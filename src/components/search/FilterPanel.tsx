@@ -111,7 +111,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
       <SheetHeader className="px-6 py-4">
         <SheetTitle>Filter</SheetTitle>
         <SheetDescription>
-          Filtere Campingplätze nach deinen Bedürfnissen
+          Filter gelten für den aktuellen Kartenausschnitt
         </SheetDescription>
       </SheetHeader>
 
@@ -284,7 +284,9 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
           className="w-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white cursor-pointer"
           onClick={onClose}
         >
-          {filteredCount} Ergebnisse im Kartenbereich
+          {activeFilterCount() > 0
+            ? `Filter anwenden (${filteredCount} Ergebnisse)`
+            : `${filteredCount} Ergebnisse anzeigen`}
         </Button>
         <Button
           variant="ghost"

@@ -145,9 +145,8 @@ describe('FilterPanel', () => {
     fireEvent.click(screen.getByText('Open Filter'));
 
     // Should show filtered result count (both campgrounds match all filters)
-    expect(
-      screen.getByText('3 Ergebnisse im Kartenbereich'),
-    ).toBeInTheDocument();
+    // With no active filters, the button should show "Ergebnisse anzeigen"
+    expect(screen.getByText('3 Ergebnisse anzeigen')).toBeInTheDocument();
   });
 
   it('should call reset filters when reset button is clicked', () => {

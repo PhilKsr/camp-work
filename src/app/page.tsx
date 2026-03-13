@@ -9,6 +9,7 @@ import { CampingList } from '@/components/cards/CampingList';
 import { DetailSheet } from '@/components/cards/DetailSheet';
 import { InstallPrompt } from '@/components/ui/InstallPrompt';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { ActiveFilters } from '@/components/search/ActiveFilters';
 import { useMapStore } from '@/stores/mapStore';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { useUrlState } from '@/hooks/useUrlState';
@@ -53,6 +54,7 @@ export default function Home() {
     <ErrorBoundary>
       <div className="h-screen flex flex-col">
         <Header />
+        <ActiveFilters />
 
         {/* Location Warning - direkt unter dem Header, nicht über der Karte */}
         {locationState.error && !locationState.hasLocation && showBanner && (
