@@ -57,8 +57,8 @@ export function useViewportCampgroundsQuery() {
 
       const { data, error } = await supabase.rpc(
         'campgrounds_in_viewport',
-        bounds as any,
-      ); // eslint-disable-line @typescript-eslint/no-explicit-any
+        bounds,
+      );
 
       if (error) throw error;
 
