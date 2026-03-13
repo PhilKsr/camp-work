@@ -12,18 +12,11 @@ const config: Config = {
       colors: {
         // Brand colors
         brand: {
-          'warm-gold': colors.primary.warmGold,
-          cream: colors.primary.cream,
-          'sky-blue': colors.primary.skyBlue,
-          'gold-dark': colors.extended.goldDark,
-          'gold-light': colors.extended.goldLight,
-          'sky-blue-dark': colors.extended.skyBlueDark,
-          'sky-blue-light': colors.extended.skyBlueLight,
-          'cream-dark': colors.extended.creamDark,
-          border: colors.extended.border,
-          'text-primary': colors.text.primary,
-          'text-secondary': colors.text.secondary,
-          'background-white': colors.text.backgroundWhite,
+          forest: colors.primary.forest,
+          'forest-light': colors.primary.forestLight,
+          'forest-muted': colors.primary.forestMuted,
+          sage: colors.primary.sage,
+          mint: colors.primary.mint,
         },
         // Coverage colors
         coverage: {

@@ -34,7 +34,7 @@ async function generateIcons() {
   // Generate Apple Touch Icon with cream background padding
   const appleTouchIconSvg = `
     <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="180" height="180" fill="${colors.primary.cream}" rx="20"/>
+      <rect width="180" height="180" fill="${colors.primary.mint}" rx="20"/>
       <g transform="translate(90, 90) scale(2.8)">
         <!-- WiFi signal arcs on tent peak -->
         <g transform="translate(0, -8)">

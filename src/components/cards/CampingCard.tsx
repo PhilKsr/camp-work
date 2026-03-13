@@ -175,15 +175,18 @@ export function CampingCard({
               const Icon = FEATURE_ICONS[feature as keyof typeof FEATURE_ICONS];
               const label =
                 FEATURE_LABELS[feature as keyof typeof FEATURE_LABELS];
-              return Icon && label ? (
-                <span
-                  key={feature}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D8F3DC] text-[#1B4332] text-xs"
-                >
-                  <Icon className="w-3 h-3" />
-                  {label}
-                </span>
-              ) : null;
+              return (
+                Icon &&
+                label && (
+                  <span
+                    key={feature}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D8F3DC] text-[#1B4332] text-xs"
+                  >
+                    <Icon className="w-3 h-3" />
+                    {label}
+                  </span>
+                )
+              );
             })}
             {campground.features.length > 4 && (
               <span className="text-xs text-gray-400">

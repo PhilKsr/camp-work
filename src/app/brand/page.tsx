@@ -120,7 +120,7 @@ export default function BrandPage() {
               {/* Light Theme */}
               <Card
                 className="p-6"
-                style={{ backgroundColor: colors.text.backgroundWhite }}
+                style={{ backgroundColor: colors.neutral.white }}
               >
                 <CardHeader>
                   <CardTitle>Light Theme</CardTitle>
@@ -150,7 +150,7 @@ export default function BrandPage() {
               {/* Dark Theme */}
               <Card
                 className="p-6"
-                style={{ backgroundColor: colors.text.primary }}
+                style={{ backgroundColor: colors.neutral.gray800 }}
               >
                 <CardHeader>
                   <CardTitle className="text-white">Dark Theme</CardTitle>
@@ -201,82 +201,68 @@ export default function BrandPage() {
                 </h3>
                 <div className="flex flex-wrap gap-6">
                   <ColorSwatch
-                    color={colors.primary.warmGold}
-                    name="Warm Gold"
-                    description="CTAs, Akzente"
+                    color={colors.primary.forest}
+                    name="Forest Green"
+                    description="CTAs, Primary Actions"
                   />
                   <ColorSwatch
-                    color={colors.primary.cream}
-                    name="Cream"
-                    description="Backgrounds, Cards"
-                  />
-                  <ColorSwatch
-                    color={colors.primary.skyBlue}
-                    name="Sky Blue"
-                    description="Sekundäre Elemente"
-                  />
-                </div>
-              </div>
-
-              {/* Extended Colors */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  Erweiterte Palette
-                </h3>
-                <div className="flex flex-wrap gap-6">
-                  <ColorSwatch
-                    color={colors.extended.goldDark}
-                    name="Gold Dark"
+                    color={colors.primary.forestLight}
+                    name="Forest Light"
                     description="Hover States"
                   />
                   <ColorSwatch
-                    color={colors.extended.goldLight}
-                    name="Gold Light"
-                    description="Highlights"
+                    color={colors.primary.forestMuted}
+                    name="Forest Muted"
+                    description="Sekundäre Elemente"
                   />
                   <ColorSwatch
-                    color={colors.extended.skyBlueDark}
-                    name="Sky Blue Dark"
-                    description="Link Hover"
+                    color={colors.primary.sage}
+                    name="Sage"
+                    description="Backgrounds, Tags"
                   />
                   <ColorSwatch
-                    color={colors.extended.skyBlueLight}
-                    name="Sky Blue Light"
-                    description="Info Backgrounds"
-                  />
-                  <ColorSwatch
-                    color={colors.extended.creamDark}
-                    name="Cream Dark"
-                    description="Borders"
-                  />
-                  <ColorSwatch
-                    color={colors.extended.border}
-                    name="Border"
-                    description="Card Borders"
+                    color={colors.primary.mint}
+                    name="Mint"
+                    description="Light Backgrounds"
                   />
                 </div>
               </div>
 
-              {/* Text Colors */}
+              {/* Neutral Colors */}
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  Text-Farben
+                  Neutral-Palette
                 </h3>
                 <div className="flex flex-wrap gap-6">
                   <ColorSwatch
-                    color={colors.text.primary}
-                    name="Primary Text"
-                    description="Überschriften"
+                    color={colors.neutral.white}
+                    name="White"
+                    description="Haupt-Hintergrund"
                   />
                   <ColorSwatch
-                    color={colors.text.secondary}
-                    name="Secondary Text"
+                    color={colors.neutral.gray50}
+                    name="Gray 50"
+                    description="Page Background"
+                  />
+                  <ColorSwatch
+                    color={colors.neutral.gray100}
+                    name="Gray 100"
+                    description="Card Backgrounds"
+                  />
+                  <ColorSwatch
+                    color={colors.neutral.gray600}
+                    name="Gray 600"
                     description="Body Text"
                   />
                   <ColorSwatch
-                    color={colors.text.backgroundWhite}
-                    name="Background White"
-                    description="Haupt-Hintergrund"
+                    color={colors.neutral.gray800}
+                    name="Gray 800"
+                    description="Headings"
+                  />
+                  <ColorSwatch
+                    color={colors.neutral.gray900}
+                    name="Gray 900"
+                    description="Primary Text"
                   />
                 </div>
               </div>
@@ -353,14 +339,12 @@ export default function BrandPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex flex-wrap gap-3">
-                    <Button
-                      style={{ backgroundColor: colors.primary.warmGold }}
-                    >
+                    <Button style={{ backgroundColor: colors.primary.forest }}>
                       Primary Button
                     </Button>
                     <Button
                       variant="secondary"
-                      style={{ backgroundColor: colors.primary.cream }}
+                      style={{ backgroundColor: colors.primary.sage }}
                     >
                       Secondary
                     </Button>
@@ -370,18 +354,16 @@ export default function BrandPage() {
                   <div className="flex flex-wrap gap-3">
                     <Button
                       size="sm"
-                      style={{ backgroundColor: colors.primary.warmGold }}
+                      style={{ backgroundColor: colors.primary.forest }}
                     >
                       Small
                     </Button>
-                    <Button
-                      style={{ backgroundColor: colors.primary.warmGold }}
-                    >
+                    <Button style={{ backgroundColor: colors.primary.forest }}>
                       Default
                     </Button>
                     <Button
                       size="lg"
-                      style={{ backgroundColor: colors.primary.warmGold }}
+                      style={{ backgroundColor: colors.primary.forest }}
                     >
                       Large
                     </Button>
@@ -442,7 +424,7 @@ export default function BrandPage() {
                   <Button
                     size="sm"
                     className="w-full"
-                    style={{ backgroundColor: colors.primary.warmGold }}
+                    style={{ backgroundColor: colors.primary.forest }}
                   >
                     Details anzeigen
                   </Button>
@@ -466,16 +448,16 @@ export default function BrandPage() {
               <Card
                 className="p-4"
                 style={{
-                  backgroundColor: colors.primary.cream,
-                  border: `1px solid ${colors.extended.creamDark}`,
+                  backgroundColor: colors.primary.mint,
+                  border: `1px solid ${colors.primary.sage}`,
                 }}
               >
                 <CardHeader>
-                  <CardTitle>Cream Background</CardTitle>
+                  <CardTitle>Mint Background</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600 text-sm">
-                    Alternative Card mit Cream Hintergrund.
+                    Alternative Card mit Mint Hintergrund.
                   </p>
                 </CardContent>
               </Card>

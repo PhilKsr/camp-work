@@ -78,8 +78,8 @@ export const metadata: Metadata = {
     capable: true,
   },
   other: {
-    'msapplication-TileColor': colors.primary.warmGold,
-    'theme-color': colors.primary.warmGold,
+    'msapplication-TileColor': colors.primary.forest,
+    'theme-color': colors.primary.forest,
   },
 };
 

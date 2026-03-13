@@ -28,21 +28,21 @@ const TentIcon = ({ size }: { size: number }) => (
     <g transform="translate(12, 4)">
       <path
         d="M-6 6 C-6 2.5, -3 0, 0 0 C3 0, 6 2.5, 6 6"
-        stroke={colors.primary.skyBlue}
+        stroke={colors.primary.sage}
         strokeWidth="1.5"
         fill="none"
         strokeLinecap="round"
       />
       <path
         d="M-4 5 C-4 3, -2 2, 0 2 C2 2, 4 3, 4 5"
-        stroke={colors.primary.skyBlue}
+        stroke={colors.primary.sage}
         strokeWidth="1.5"
         fill="none"
         strokeLinecap="round"
       />
       <path
         d="M-2 4.5 C-2 3.8, -1 3.5, 0 3.5 C1 3.5, 2 3.8, 2 4.5"
-        stroke={colors.primary.skyBlue}
+        stroke={colors.primary.sage}
         strokeWidth="1.5"
         fill="none"
         strokeLinecap="round"
@@ -52,8 +52,8 @@ const TentIcon = ({ size }: { size: number }) => (
     {/* Tent shape */}
     <path
       d="M4 20 L12 6 L20 20 Z"
-      fill={colors.primary.warmGold}
-      stroke={colors.extended.goldDark}
+      fill={colors.primary.forest}
+      stroke={colors.primary.forestLight}
       strokeWidth="1"
       strokeLinejoin="round"
     />
@@ -61,7 +61,7 @@ const TentIcon = ({ size }: { size: number }) => (
     {/* Tent door opening */}
     <path
       d="M10 20 L12 14 L14 20"
-      fill={colors.extended.goldDark}
+      fill={colors.primary.forestMuted}
       stroke="none"
     />
 
@@ -71,7 +71,7 @@ const TentIcon = ({ size }: { size: number }) => (
       y1="6"
       x2="12"
       y2="20"
-      stroke={colors.extended.goldDark}
+      stroke={colors.primary.forestMuted}
       strokeWidth="1"
       opacity="0.6"
     />
@@ -101,7 +101,7 @@ export function Logo({
   theme = 'light',
 }: LogoProps) {
   const { iconSize, fontSize } = sizeMap[size];
-  const textColor = theme === 'dark' ? 'white' : colors.text.primary;
+  const textColor = theme === 'dark' ? 'white' : colors.neutral.gray900;
   const spacing = size === 'sm' ? 6 : size === 'md' ? 8 : 12;
 
   if (variant === 'icon') {
