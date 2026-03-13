@@ -3,7 +3,7 @@ import { useMapStore } from '@/stores/mapStore';
 import { useFilterStore } from '@/stores/filterStore';
 
 export function useUrlState() {
-  const { viewport, setViewport } = useMapStore();
+  const { viewport, flyTo } = useMapStore();
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const {
     coverageLevels,
@@ -31,11 +31,7 @@ export function useUrlState() {
     const zoom = params.get('zoom');
 
     if (lat && lng && zoom) {
-      setViewport({
-        latitude: parseFloat(lat),
-        longitude: parseFloat(lng),
-        zoom: parseFloat(zoom),
-      });
+      flyTo(parseFloat(lat), parseFloat(lng), parseFloat(zoom));
     }
 
     // Filters

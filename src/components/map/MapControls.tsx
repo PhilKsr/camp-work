@@ -10,7 +10,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
 
 export default function MapControls() {
-  const { viewport, setViewport, flyTo } = useMapStore();
+  const { viewport, flyTo } = useMapStore();
   const {
     latitude,
     longitude,
@@ -23,11 +23,19 @@ export default function MapControls() {
   const bottomSheetSnap = useUIStore((s) => s.bottomSheetSnap);
 
   const zoomIn = () => {
-    setViewport({ zoom: Math.min(viewport.zoom + 1, 20) });
+    flyTo(
+      viewport.latitude,
+      viewport.longitude,
+      Math.min(viewport.zoom + 1, 18),
+    );
   };
 
   const zoomOut = () => {
-    setViewport({ zoom: Math.max(viewport.zoom - 1, 0) });
+    flyTo(
+      viewport.latitude,
+      viewport.longitude,
+      Math.max(viewport.zoom - 1, 5),
+    );
   };
 
   const handleGeolocation = () => {
