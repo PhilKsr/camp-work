@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {
   Sheet,
@@ -110,19 +109,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
   return (
     <div className="flex flex-col h-full">
       <SheetHeader className="px-6 py-4">
-        <div className="flex items-center justify-between">
-          <SheetTitle>Filter</SheetTitle>
-          {onClose && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="lg:hidden"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
+        <SheetTitle>Filter</SheetTitle>
         <SheetDescription>
           Filtere Campingplätze nach deinen Bedürfnissen
         </SheetDescription>

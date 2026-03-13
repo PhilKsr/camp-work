@@ -52,38 +52,45 @@ const getCoverageColor = (level: string): string => {
 };
 
 async function handleShare(campground: Campground) {
-  const shareData = {
-    title: campground.name,
-    text: `${campground.name} – Campingplatz mit ${campground.coverageLevel !== 'none' ? campground.coverageLevel.toUpperCase() + ' Netz' : 'Netzabdeckung auf der Karte prüfen'}`,
-    url: window.location.href,
-  };
+  const [lng, lat] = campground.coordinates;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+
+  const shareText = [
+    campground.name,
+    campground.type === 'caravan_site' ? 'Wohnmobilstellplatz' : 'Campingplatz',
+    campground.website ? `🌐 ${campground.website}` : null,
+    `📍 ${mapsUrl}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
 
   if (navigator.share) {
     try {
-      await navigator.share(shareData);
+      await navigator.share({
+        title: campground.name,
+        text: shareText,
+        url: mapsUrl,
+      });
+      return;
     } catch {
-      // User cancelled or error - ignore
+      // User cancelled – fallthrough to clipboard
     }
-  } else {
-    // Fallback: Copy to clipboard
-    try {
-      await navigator.clipboard.writeText(
-        `${shareData.title}\n${shareData.url}`,
-      );
-      // Quick visual feedback - you could replace this with a proper toast
-      const button = document.querySelector(
-        '[data-share-button]',
-      ) as HTMLElement;
-      if (button) {
-        const originalText = button.textContent;
-        button.textContent = 'Link kopiert!';
-        setTimeout(() => {
-          button.textContent = originalText;
-        }, 2000);
-      }
-    } catch (error) {
-      console.log('Clipboard copy failed:', error);
+  }
+
+  // Fallback: Clipboard
+  try {
+    await navigator.clipboard.writeText(shareText);
+    // Visuelles Feedback: Button-Text kurz ändern
+    const button = document.querySelector('[data-share-button]') as HTMLElement;
+    if (button) {
+      const originalText = button.textContent;
+      button.textContent = '✓ Link kopiert';
+      setTimeout(() => {
+        button.textContent = originalText;
+      }, 2000);
     }
+  } catch {
+    // Clipboard nicht verfügbar
   }
 }
 

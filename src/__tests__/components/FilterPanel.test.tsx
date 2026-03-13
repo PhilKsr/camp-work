@@ -65,7 +65,7 @@ describe('FilterPanel', () => {
     // Open the filter panel
     fireEvent.click(screen.getByText('Open Filter'));
 
-    expect(screen.getByText('Filter')).toBeInTheDocument(); // Single Sheet
+    expect(screen.getByText('Filter')).toBeInTheDocument();
     expect(screen.getByText('Nur zum Arbeiten geeignet')).toBeInTheDocument();
     expect(screen.getByText('Netzabdeckung')).toBeInTheDocument();
     expect(screen.getByText('Typ')).toBeInTheDocument();
