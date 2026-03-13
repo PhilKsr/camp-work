@@ -1,5 +1,5 @@
 import type { Config } from 'tailwindcss';
-import { colors, shadows, radii, spacing } from './src/lib/brand';
+import { colors, shadows, radii, spacing } from '@/lib/brand';
 
 const config: Config = {
   content: [

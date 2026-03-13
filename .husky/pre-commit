@@ -1,1 +1,16 @@
-pnpm lint-staged
+# Run linting and testing before commit
+echo "🔍 Running pre-commit checks..."
+
+# Type checking
+echo "📝 TypeScript type check..."
+pnpm type-check || exit 1
+
+# Linting and formatting (staged files)
+echo "🧹 Linting and formatting staged files..."
+pnpm lint-staged || exit 1
+
+# Run tests
+echo "🧪 Running tests..."
+pnpm test || exit 1
+
+echo "✅ All pre-commit checks passed!"
