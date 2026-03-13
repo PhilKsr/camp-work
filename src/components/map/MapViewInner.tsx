@@ -20,6 +20,11 @@ export default function MapViewInner() {
     useMapStore();
   const { isVisible } = useCoverageStore();
   const [cursor, setCursor] = useState('auto');
+  const [hoveredCampground, setHoveredCampground] = useState<{
+    name: string;
+    x: number;
+    y: number;
+  } | null>(null);
 
   // Map style with fallback
   const mapStyle = process.env.NEXT_PUBLIC_MAPTILER_KEY
@@ -96,8 +101,26 @@ export default function MapViewInner() {
   );
 
   const onMouseMove = useCallback((e: MapLayerMouseEvent) => {
-    const hasFeature = e.features && e.features.length > 0;
-    setCursor(hasFeature ? 'pointer' : 'auto');
+    const feature = e.features?.find(
+      (f) =>
+        f.layer?.id === 'campground-markers' ||
+        f.layer?.id === 'campground-markers-hitarea',
+    );
+
+    if (feature?.properties?.name) {
+      setCursor('pointer');
+      setHoveredCampground({
+        name: feature.properties.name,
+        x: e.point.x,
+        y: e.point.y,
+      });
+    } else if (e.features?.some((f) => f.layer?.id === 'clusters')) {
+      setCursor('pointer');
+      setHoveredCampground(null);
+    } else {
+      setCursor('auto');
+      setHoveredCampground(null);
+    }
   }, []);
 
   return (
@@ -124,6 +147,23 @@ export default function MapViewInner() {
         <CoverageLayer />
         <CampingMarkers />
         <GeolocationMarker />
+
+        {/* Marker Hover Tooltip – nur Desktop */}
+        {hoveredCampground && (
+          <div
+            className="hidden lg:block absolute z-20 pointer-events-none"
+            style={{
+              left: hoveredCampground.x,
+              top: hoveredCampground.y - 40,
+              transform: 'translateX(-50%)',
+            }}
+          >
+            <div className="bg-gray-900 text-white text-xs px-2.5 py-1.5 rounded-lg shadow-lg whitespace-nowrap max-w-[200px] truncate">
+              {hoveredCampground.name}
+            </div>
+            <div className="w-2 h-2 bg-gray-900 rotate-45 mx-auto -mt-1" />
+          </div>
+        )}
       </Map>
 
       {/* Minimal Coverage Legend - Only when layer is active */}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Header from '@/components/layout/Header';
 import MapView from '@/components/map/MapView';
 import MobileBottomSheet from '@/components/layout/MobileBottomSheet';
@@ -72,17 +73,35 @@ export default function Home() {
 
         <div className="flex-1 flex overflow-hidden">
           {/* Desktop Sidebar */}
-          <aside className="hidden lg:flex w-[420px] flex-col bg-white overflow-y-auto shadow-[4px_0_12px_-4px_rgba(0,0,0,0.08)]">
-            <div className="p-4 flex-1">
+          <aside className="hidden lg:flex w-[420px] flex-col bg-white overflow-hidden shadow-[4px_0_12px_-4px_rgba(0,0,0,0.08)]">
+            <AnimatePresence mode="wait">
               {selectedCampgroundData ? (
-                <DetailSheet
-                  campground={selectedCampgroundData}
-                  onClose={handleCloseDetail}
-                />
+                <motion.div
+                  key="detail"
+                  initial={{ x: 420, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: 420, opacity: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="h-full overflow-y-auto p-4"
+                >
+                  <DetailSheet
+                    campground={selectedCampgroundData}
+                    onClose={handleCloseDetail}
+                  />
+                </motion.div>
               ) : (
-                <CampingList />
+                <motion.div
+                  key="list"
+                  initial={{ x: -420, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -420, opacity: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="h-full overflow-y-auto p-4"
+                >
+                  <CampingList />
+                </motion.div>
               )}
-            </div>
+            </AnimatePresence>
           </aside>
 
           {/* Map */}
