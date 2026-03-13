@@ -20,23 +20,27 @@ export default function MapViewInner() {
     useMapStore();
   const { source, visibleLayers } = useCoverageStore();
   const [cursor, setCursor] = useState('auto');
+  const [mapError, setMapError] = useState(false);
   const [hoveredCampground, setHoveredCampground] = useState<{
     name: string;
     x: number;
     y: number;
   } | null>(null);
 
-  // Map style with fallback
-  const mapStyle = process.env.NEXT_PUBLIC_MAPTILER_KEY
-    ? `https://api.maptiler.com/maps/hybrid/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`
-    : 'https://demotiles.maplibre.org/style.json';
+  // Map style with error fallback
+  const mapStyle =
+    mapError || !process.env.NEXT_PUBLIC_MAPTILER_KEY
+      ? 'https://demotiles.maplibre.org/style.json'
+      : `https://api.maptiler.com/maps/hybrid/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`;
 
   // Show info if using fallback style (only once)
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_MAPTILER_KEY) {
       console.warn('NEXT_PUBLIC_MAPTILER_KEY not set, using demo tiles');
+    } else if (mapError) {
+      console.warn('MapTiler tiles failed, switched to demo tiles');
     }
-  }, []);
+  }, [mapError]);
 
   // Effect für flyTo target
   useEffect(() => {
@@ -131,6 +135,10 @@ export default function MapViewInner() {
         onMoveEnd={onMoveEnd}
         onClick={handleMapClick}
         onMouseMove={onMouseMove}
+        onError={(e) => {
+          console.error('Map error:', e);
+          setMapError(true);
+        }}
         cursor={cursor}
         interactiveLayerIds={[
           'campground-markers',
