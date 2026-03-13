@@ -17,7 +17,7 @@ export interface CampgroundImage {
  */
 export function useBatchCampgroundImages(campgroundIds: string[]) {
   return useQuery({
-    queryKey: ['campground-images-batch', campgroundIds.sort().join(',')],
+    queryKey: ['campground-images-batch', [...campgroundIds].sort().join(',')],
     queryFn: async (): Promise<Map<string, CampgroundImage[]>> => {
       if (campgroundIds.length === 0) return new Map();
 

@@ -97,15 +97,18 @@ export function useUrlState() {
     // Coverage levels (only if not default)
     const defaultCoverage = ['4g', '3g'];
     if (
-      JSON.stringify(coverageLevels.sort()) !==
-      JSON.stringify(defaultCoverage.sort())
+      JSON.stringify([...coverageLevels].sort()) !==
+      JSON.stringify([...defaultCoverage].sort())
     ) {
       params.set('coverage', coverageLevels.join(','));
     }
 
     // Types (only if not default)
     const defaultTypes = ['camp_site', 'caravan_site'];
-    if (JSON.stringify(types.sort()) !== JSON.stringify(defaultTypes.sort())) {
+    if (
+      JSON.stringify([...types].sort()) !==
+      JSON.stringify([...defaultTypes].sort())
+    ) {
       params.set('type', types.join(','));
     }
 

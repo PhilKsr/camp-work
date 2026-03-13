@@ -9,7 +9,16 @@ const inter = Inter({
   weight: ['400', '500', '600', '700'],
   variable: '--font-inter',
   display: 'swap',
-  fallback: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+  fallback: [
+    'system-ui',
+    '-apple-system',
+    'Segoe UI',
+    'Roboto',
+    'Helvetica',
+    'Arial',
+    'sans-serif',
+  ],
+  preload: true,
 });
 
 export const metadata: Metadata = {

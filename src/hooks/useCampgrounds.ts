@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import type { Campground, CampgroundGeoJSON } from '@/types/campground';
 
 export function useCampgrounds() {
@@ -7,7 +7,11 @@ export function useCampgrounds() {
     queryKey: ['campgrounds'],
     queryFn: async () => {
       try {
-        // Versuche Supabase
+        // Only use Supabase if configured
+        if (!isSupabaseConfigured) {
+          throw new Error('Supabase not configured, using fallback');
+        }
+
         const { data, error } = await supabase.from('campgrounds').select('*');
 
         if (error) throw error;
