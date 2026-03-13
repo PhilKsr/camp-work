@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, useRef } from 'react';
-import Map from 'react-map-gl/maplibre';
+import Map, { type MapRef } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useMapStore } from '@/stores/mapStore';
 import { useCoverageStore } from '@/stores/coverageStore';
@@ -12,10 +12,11 @@ import CoverageLayer from './CoverageLayer';
 import { CampingMarkers } from './CampingMarkers';
 
 export default function MapViewInner() {
-  const { viewport, setViewport, setSelectedCampground, flyTo } = useMapStore();
+  const mapRef = useRef<MapRef>(null);
+  const { viewport, setViewport, setSelectedCampground, flyToTarget } =
+    useMapStore();
   const { isVisible } = useCoverageStore();
   const [cursor, setCursor] = useState('auto');
-  const lastUpdate = useRef(0);
 
   // Map style with fallback
   const mapStyle = process.env.NEXT_PUBLIC_MAPTILER_KEY
@@ -29,14 +30,22 @@ export default function MapViewInner() {
     }
   }, []);
 
-  const onMove = useCallback(
+  // Effect für flyTo target
+  useEffect(() => {
+    if (flyToTarget && mapRef.current) {
+      mapRef.current.flyTo({
+        center: [flyToTarget.longitude, flyToTarget.latitude],
+        zoom: flyToTarget.zoom,
+        duration: 1000,
+      });
+    }
+  }, [flyToTarget]);
+
+  // Nur bei MoveEnd den Store aktualisieren
+  const onMoveEnd = useCallback(
     (evt: {
       viewState: { longitude: number; latitude: number; zoom: number };
     }) => {
-      const now = Date.now();
-      if (now - lastUpdate.current < 100) return; // Max 10 updates/sec
-      lastUpdate.current = now;
-
       setViewport({
         longitude: evt.viewState.longitude,
         latitude: evt.viewState.latitude,
@@ -59,7 +68,7 @@ export default function MapViewInner() {
         const [lng, lat] = (campgroundFeature.geometry as GeoJSON.Point)
           .coordinates as [number, number];
         setSelectedCampground(id);
-        flyTo(lat, lng, 14);
+        mapRef.current?.flyTo({ center: [lng, lat], zoom: 14, duration: 1000 });
         return;
       }
 
@@ -71,11 +80,16 @@ export default function MapViewInner() {
         // Zoom to cluster
         const [lng, lat] = (clusterFeature.geometry as GeoJSON.Point)
           .coordinates as [number, number];
-        flyTo(lat, lng, Math.min(viewport.zoom + 3, 16));
+        const currentZoom = mapRef.current?.getZoom() || 10;
+        mapRef.current?.flyTo({
+          center: [lng, lat],
+          zoom: Math.min(currentZoom + 3, 16),
+          duration: 800,
+        });
         return;
       }
     },
-    [setSelectedCampground, flyTo, viewport.zoom],
+    [setSelectedCampground],
   );
 
   const onMouseMove = useCallback((e: MapLayerMouseEvent) => {
@@ -86,8 +100,9 @@ export default function MapViewInner() {
   return (
     <div className="h-full w-full relative">
       <Map
-        {...viewport}
-        onMove={onMove}
+        ref={mapRef}
+        initialViewState={viewport}
+        onMoveEnd={onMoveEnd}
         onClick={handleMapClick}
         onMouseMove={onMouseMove}
         cursor={cursor}
