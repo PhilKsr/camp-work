@@ -13,7 +13,7 @@ interface CoverageControlsProps {
 }
 
 export default function CoverageControls({ className }: CoverageControlsProps) {
-  const { isVisible, opacity, toggleVisibility, setOpacity } =
+  const { visibleLayers, opacity, setAllLayers, setOpacity } =
     useCoverageStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -43,11 +43,16 @@ export default function CoverageControls({ className }: CoverageControlsProps) {
           {/* Visibility Toggle */}
           <div className="flex items-center justify-between">
             <label className="text-xs text-foreground">Layer anzeigen</label>
-            <Switch checked={isVisible} onCheckedChange={toggleVisibility} />
+            <Switch
+              checked={visibleLayers.length > 0}
+              onCheckedChange={(checked) =>
+                setAllLayers(checked ? ['all'] : [])
+              }
+            />
           </div>
 
           {/* Opacity Slider */}
-          {isVisible && (
+          {visibleLayers.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-xs text-foreground">Deckkraft</label>
@@ -77,7 +82,9 @@ export default function CoverageControls({ className }: CoverageControlsProps) {
             <Layers
               className={cn(
                 'h-4 w-4 transition-colors',
-                isVisible ? 'text-primary' : 'text-muted-foreground',
+                visibleLayers.length > 0
+                  ? 'text-primary'
+                  : 'text-muted-foreground',
               )}
             />
           </Button>

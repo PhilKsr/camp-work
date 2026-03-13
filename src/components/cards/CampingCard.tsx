@@ -32,15 +32,13 @@ const getCoverageColor = (level: string): string => {
 const getCoverageLabel = (level: string): string => {
   switch (level) {
     case '5g':
-      return '5G Netz verfügbar';
+      return 'O2 5G';
     case '4g':
-      return 'LTE Netz verfügbar';
+      return 'O2 LTE';
     case '3g':
-      return '3G Netz verfügbar';
-    case 'none':
-      return 'Kein O2-Netz';
+      return 'O2 2G';
     default:
-      return 'Netz prüfen';
+      return 'Kein O2-Netz';
   }
 };
 

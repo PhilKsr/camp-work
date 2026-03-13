@@ -61,15 +61,8 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
     activeFilterCount,
   } = useFilterStore();
 
-  const {
-    visibleLayers,
-    opacity: coverageOpacity,
-    toggleLayer,
-    setOpacity: setCoverageOpacity,
-    // Legacy support
-    isVisible: isCoverageLayerVisible,
-    toggleVisibility: toggleCoverageLayer,
-  } = useCoverageStore();
+  const { source, visibleLayers, opacity, setSource, toggleLayer, setOpacity } =
+    useCoverageStore();
 
   const viewportCampgrounds = useViewportCampgrounds();
   const { favorites } = useFavoriteStore();
@@ -182,72 +175,82 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
               Netzabdeckung auf Karte
             </Label>
 
-            {/* Layer toggles */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <span
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: colors.coverage.excellent }}
-                  />
-                  <span className="text-sm text-gray-600">5G Layer</span>
-                </div>
-                <Switch
-                  checked={visibleLayers.includes('5g')}
-                  onCheckedChange={() => toggleLayer('5g')}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <span
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: colors.coverage.good }}
-                  />
-                  <span className="text-sm text-gray-600">LTE Layer</span>
-                </div>
-                <Switch
-                  checked={visibleLayers.includes('lte')}
-                  onCheckedChange={() => toggleLayer('lte')}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <span
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: colors.coverage.limited }}
-                  />
-                  <span className="text-sm text-gray-600">GSM Layer</span>
-                </div>
-                <Switch
-                  checked={visibleLayers.includes('gsm')}
-                  onCheckedChange={() => toggleLayer('gsm')}
-                />
-              </div>
+            {/* Quellen-Toggle */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSource('o2')}
+                className={cn(
+                  'flex-1 py-1.5 text-xs rounded-lg border transition-colors',
+                  source === 'o2'
+                    ? 'bg-[#1B4332] text-white border-[#1B4332]'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300',
+                )}
+              >
+                O2 / Telefónica
+              </button>
+              <button
+                onClick={() => setSource('bnetza')}
+                className={cn(
+                  'flex-1 py-1.5 text-xs rounded-lg border transition-colors',
+                  source === 'bnetza'
+                    ? 'bg-[#1B4332] text-white border-[#1B4332]'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300',
+                )}
+              >
+                Alle Anbieter
+              </button>
             </div>
 
-            {/* All layers toggle */}
-            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-              <span className="text-sm text-gray-600">Alle Layer</span>
-              <Switch
-                checked={isCoverageLayerVisible}
-                onCheckedChange={toggleCoverageLayer}
-              />
-            </div>
+            {/* Layer-Checkboxen */}
+            {source === 'o2' ? (
+              <div className="space-y-2">
+                {[
+                  { id: '5g', label: '5G', color: '#22C55E' },
+                  { id: '4g', label: 'LTE / 4G', color: '#3B82F6' },
+                  { id: '2g', label: '2G / GSM', color: '#F59E0B' },
+                ].map((layer) => (
+                  <div
+                    key={layer.id}
+                    className="flex items-center justify-between"
+                  >
+                    <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                      <span
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: layer.color }}
+                      />
+                      {layer.label}
+                    </label>
+                    <Switch
+                      checked={visibleLayers.includes(layer.id)}
+                      onCheckedChange={() => toggleLayer(layer.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">
+                  Anbieterneutral (BNetzA)
+                </span>
+                <Switch
+                  checked={visibleLayers.includes('all')}
+                  onCheckedChange={() => toggleLayer('all')}
+                />
+              </div>
+            )}
 
-            {/* Opacity slider */}
+            {/* Deckkraft */}
             {visibleLayers.length > 0 && (
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 pt-1">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">Deckkraft</span>
                   <span className="text-xs text-gray-400">
-                    {Math.round(coverageOpacity * 100)}%
+                    {Math.round(opacity * 100)}%
                   </span>
                 </div>
                 <Slider
-                  value={[coverageOpacity]}
-                  onValueChange={([v]) => setCoverageOpacity(v)}
+                  value={[opacity]}
+                  onValueChange={([v]) => setOpacity(v)}
                   min={0.1}
                   max={0.8}
                   step={0.05}

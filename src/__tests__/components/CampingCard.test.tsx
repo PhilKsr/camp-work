@@ -42,7 +42,7 @@ describe('CampingCard', () => {
   it('displays coverage badge with correct label', () => {
     render(<CampingCard {...mockProps} />);
 
-    expect(screen.getByText('5G Netz verfügbar')).toBeInTheDocument();
+    expect(screen.getByText('O2 5G')).toBeInTheDocument();
   });
 
   it('shows rating stars when rating is provided', () => {

@@ -34,7 +34,7 @@ export const colors = {
   },
 } as const;
 
-// Network coverage color mapping
+// Network coverage color mapping - O2-specific
 export const coverageColors: Record<
   CoverageType | 'none',
   {
@@ -44,24 +44,24 @@ export const coverageColors: Record<
   }
 > = {
   '5g': {
-    hex: colors.coverage.excellent,
-    label: '5G',
-    description: 'Exzellente Geschwindigkeit',
+    hex: '#22C55E',
+    label: 'O2 5G',
+    description: '5G-Netz von O2 verfügbar',
   },
   '4g': {
-    hex: colors.coverage.good,
-    label: 'LTE/4G',
-    description: 'Gut zum Arbeiten',
+    hex: '#3B82F6',
+    label: 'O2 LTE',
+    description: 'LTE/4G-Netz von O2 – gut zum Arbeiten',
   },
   '3g': {
-    hex: colors.coverage.limited,
-    label: '3G',
-    description: 'Eingeschränkt',
+    hex: '#F59E0B',
+    label: 'O2 2G',
+    description: 'Nur GSM-Basisversorgung (O2 hat kein 3G mehr)',
   },
   '2g': {
-    hex: colors.coverage.limited,
-    label: '2G',
-    description: 'Nur für Notfälle',
+    hex: '#F59E0B',
+    label: 'O2 2G',
+    description: 'Nur GSM-Basisversorgung (O2 hat kein 3G mehr)',
   },
   wifi: {
     hex: colors.primary.sage,
@@ -69,10 +69,9 @@ export const coverageColors: Record<
     description: 'WLAN verfügbar',
   },
   none: {
-    hex: colors.coverage.none,
+    hex: '#D4D4D4',
     label: 'Kein O2-Netz',
-    description:
-      'Kein O2-Mobilfunk am Standort. Andere Anbieter können verfügbar sein.',
+    description: 'Kein O2-Mobilfunk. Andere Anbieter können verfügbar sein.',
   },
 } as const;
 

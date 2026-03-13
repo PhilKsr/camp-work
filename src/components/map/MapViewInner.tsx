@@ -18,7 +18,7 @@ export default function MapViewInner() {
   const mapRef = useRef<MapRef>(null);
   const { viewport, setViewport, setSelectedCampground, flyToTarget } =
     useMapStore();
-  const { isVisible } = useCoverageStore();
+  const { source, visibleLayers } = useCoverageStore();
   const [cursor, setCursor] = useState('auto');
   const [hoveredCampground, setHoveredCampground] = useState<{
     name: string;
@@ -166,29 +166,38 @@ export default function MapViewInner() {
         )}
       </Map>
 
-      {/* Dynamic Coverage Legend - Shows active layers */}
-      {isVisible && (
+      {/* Inline Coverage Legend - Adapts to selected source */}
+      {visibleLayers.length > 0 && (
         <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm">
           <p className="text-[10px] text-gray-400 mb-1.5">
-            Mobilfunk · © BNetzA
+            {source === 'o2' ? 'O2 / Telefónica' : 'Alle Anbieter · © BNetzA'}
           </p>
           <div className="flex flex-col gap-1 text-xs text-gray-600">
-            {useCoverageStore.getState().visibleLayers.includes('5g') && (
+            {source === 'o2' ? (
+              <>
+                {visibleLayers.includes('5g') && (
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-green-500" />{' '}
+                    5G
+                  </span>
+                )}
+                {visibleLayers.includes('4g') && (
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />{' '}
+                    LTE / 4G
+                  </span>
+                )}
+                {visibleLayers.includes('2g') && (
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />{' '}
+                    2G / GSM
+                  </span>
+                )}
+              </>
+            ) : (
               <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                5G verfügbar
-              </span>
-            )}
-            {useCoverageStore.getState().visibleLayers.includes('lte') && (
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-yellow-600" />
-                LTE/4G verfügbar
-              </span>
-            )}
-            {useCoverageStore.getState().visibleLayers.includes('gsm') && (
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
-                GSM/3G verfügbar
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />{' '}
+                Mobilfunk
               </span>
             )}
           </div>

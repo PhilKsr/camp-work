@@ -188,10 +188,16 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
           <div>
             <SectionDivider label="Netzabdeckung" />
             {campground.coverageLevel === 'none' ? (
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-2 rounded-full bg-gray-200"></div>
-                <span className="text-sm text-gray-500">Netz prüfen</span>
-              </div>
+              <>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-2 rounded-full bg-gray-200"></div>
+                  <span className="text-sm text-gray-500">Kein O2-Netz</span>
+                </div>
+                <p className="text-sm text-gray-500">
+                  Kein O2-Mobilfunk am Standort. Andere Anbieter können
+                  verfügbar sein.
+                </p>
+              </>
             ) : (
               <>
                 <div className="flex items-center gap-3 mb-1">
@@ -215,12 +221,12 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
                   </div>
                   <span className="text-sm font-medium">
                     {campground.coverageLevel === '5g'
-                      ? '5G'
+                      ? 'O2 5G'
                       : campground.coverageLevel === '4g'
-                        ? 'LTE/4G'
+                        ? 'O2 LTE'
                         : campground.coverageLevel === '3g'
-                          ? '3G'
-                          : 'Unbekannt'}
+                          ? 'O2 2G'
+                          : 'Kein O2-Netz'}
                   </span>
                 </div>
                 <p className="text-sm text-gray-500">

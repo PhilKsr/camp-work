@@ -9,10 +9,10 @@ interface CoverageLegendProps {
 }
 
 export default function CoverageLegend({ className }: CoverageLegendProps) {
-  const { isVisible } = useCoverageStore();
+  const { visibleLayers } = useCoverageStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
-  if (!isVisible) return null;
+  if (visibleLayers.length === 0) return null;
 
   // BNetzA WMS-Karte zeigt tatsächlich:
   // Blau für Indoor-Versorgung (Gebäude)

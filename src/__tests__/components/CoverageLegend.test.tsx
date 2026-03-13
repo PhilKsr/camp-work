@@ -10,9 +10,12 @@ vi.mock('@/stores/coverageStore');
 describe('CoverageLegend', () => {
   beforeEach(() => {
     vi.mocked(useCoverageStore).mockReturnValue({
-      isVisible: true,
-      setIsVisible: vi.fn(),
-      opacity: 0.7,
+      source: 'o2' as const,
+      visibleLayers: ['5g', '4g'],
+      opacity: 0.4,
+      setSource: vi.fn(),
+      toggleLayer: vi.fn(),
+      setAllLayers: vi.fn(),
       setOpacity: vi.fn(),
     });
   });
@@ -31,9 +34,12 @@ describe('CoverageLegend', () => {
 
   it('does not render when coverage layer is not visible', () => {
     vi.mocked(useCoverageStore).mockReturnValue({
-      isVisible: false,
-      setIsVisible: vi.fn(),
-      opacity: 0.7,
+      source: 'o2' as const,
+      visibleLayers: [],
+      opacity: 0.4,
+      setSource: vi.fn(),
+      toggleLayer: vi.fn(),
+      setAllLayers: vi.fn(),
       setOpacity: vi.fn(),
     });
 
