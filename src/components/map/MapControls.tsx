@@ -1,9 +1,12 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Plus, Minus, Crosshair } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMapStore } from '@/stores/mapStore';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import { useUIStore } from '@/stores/uiStore';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
 
 export default function MapControls() {
@@ -16,6 +19,8 @@ export default function MapControls() {
     startTracking,
     stopTracking,
   } = useGeolocation();
+  const isMobile = useMediaQuery('(max-width: 1023px)');
+  const bottomSheetSnap = useUIStore((s) => s.bottomSheetSnap);
 
   const zoomIn = () => {
     setViewport({ zoom: Math.min(viewport.zoom + 1, 20) });
@@ -28,17 +33,39 @@ export default function MapControls() {
   const handleGeolocation = () => {
     if (isTracking) {
       stopTracking();
-    } else if (latitude && longitude) {
-      flyTo(latitude, longitude, 15);
-    } else {
-      startTracking();
+      return;
     }
+
+    if (latitude && longitude) {
+      // Already have location → fly there
+      flyTo(latitude, longitude, 15);
+      return;
+    }
+
+    // No location → request permission
+    startTracking();
   };
 
+  // Auto-fly to location after successful tracking
+  useEffect(() => {
+    if (latitude && longitude && isTracking) {
+      flyTo(latitude, longitude, 15);
+    }
+  }, [latitude, longitude, isTracking, flyTo]);
+
+  // Calculate mobile bottom offset for geolocation button
+  const mobileBottomClass = isMobile
+    ? bottomSheetSnap === 'full'
+      ? 'bottom-[80vh]'
+      : bottomSheetSnap === 'peek'
+        ? 'bottom-44'
+        : 'bottom-24'
+    : 'bottom-6';
+
   return (
-    <div className="absolute bottom-6 right-4 flex flex-col gap-2 z-10">
-      {/* Zoom Controls */}
-      <div className="flex flex-col rounded-2xl overflow-hidden shadow-md">
+    <>
+      {/* Zoom Controls – nur Desktop */}
+      <div className="hidden lg:flex absolute bottom-6 right-4 flex-col rounded-2xl overflow-hidden shadow-md z-10">
         <Button
           size="icon"
           variant="outline"
@@ -58,28 +85,30 @@ export default function MapControls() {
       </div>
 
       {/* Geolocation Button */}
-      <Button
-        size="icon"
-        variant="outline"
-        className={cn(
-          'w-10 h-10 rounded-full shadow-md border-0 transition-all duration-200',
-          {
-            // Inactive state
-            'bg-white text-[#5C5650] hover:bg-[#F9F8E6]':
-              !isTracking && !latitude,
-            // Active state (has location)
-            'bg-[#D5ECF7] text-[#6AA3C9] hover:bg-[#ABD8EF]/20':
-              !isTracking && latitude,
-            // Tracking state
-            'bg-[#ABD8EF] text-white ring-2 ring-[#ABD8EF]/50 animate-pulse':
-              isTracking,
-          },
-        )}
-        onClick={handleGeolocation}
-        disabled={isLoading}
-      >
-        <Crosshair className={cn('h-4 w-4', isLoading && 'animate-spin')} />
-      </Button>
-    </div>
+      <div className={cn('absolute right-4 z-10', mobileBottomClass)}>
+        <Button
+          size="icon"
+          variant="outline"
+          className={cn(
+            'w-10 h-10 rounded-full shadow-md border-0 transition-all duration-200',
+            {
+              // Inactive state
+              'bg-white text-[#5C5650] hover:bg-[#F9F8E6]':
+                !isTracking && !latitude,
+              // Active state (has location)
+              'bg-[#D5ECF7] text-[#6AA3C9] hover:bg-[#ABD8EF]/20':
+                !isTracking && latitude,
+              // Tracking state
+              'bg-[#ABD8EF] text-white ring-2 ring-[#ABD8EF]/50 animate-pulse':
+                isTracking,
+            },
+          )}
+          onClick={handleGeolocation}
+          disabled={isLoading}
+        >
+          <Crosshair className={cn('h-4 w-4', isLoading && 'animate-spin')} />
+        </Button>
+      </div>
+    </>
   );
 }

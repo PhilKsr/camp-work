@@ -40,14 +40,11 @@ describe('useGeolocation', () => {
       result.current.startTracking();
     });
 
-    expect(mockGeolocation.watchPosition).toHaveBeenCalledWith(
+    // Should first call getCurrentPosition
+    expect(mockGeolocation.getCurrentPosition).toHaveBeenCalledWith(
       expect.any(Function),
       expect.any(Function),
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000,
-      },
+      { enableHighAccuracy: true, timeout: 10000 },
     );
     expect(result.current.isLoading).toBe(true);
   });
@@ -63,7 +60,7 @@ describe('useGeolocation', () => {
       result.current.startTracking();
     });
 
-    // Simulate successful position
+    // Simulate successful getCurrentPosition
     const mockPosition = {
       coords: {
         latitude: 51.5074,
@@ -73,7 +70,8 @@ describe('useGeolocation', () => {
     };
 
     act(() => {
-      const successCallback = mockGeolocation.watchPosition.mock.calls[0][0];
+      const successCallback =
+        mockGeolocation.getCurrentPosition.mock.calls[0][0];
       successCallback(mockPosition);
     });
 
@@ -106,7 +104,8 @@ describe('useGeolocation', () => {
     };
 
     act(() => {
-      const successCallback = mockGeolocation.watchPosition.mock.calls[0][0];
+      const successCallback =
+        mockGeolocation.getCurrentPosition.mock.calls[0][0];
       successCallback(mockPosition);
     });
 
@@ -133,7 +132,7 @@ describe('useGeolocation', () => {
     };
 
     act(() => {
-      const errorCallback = mockGeolocation.watchPosition.mock.calls[0][1];
+      const errorCallback = mockGeolocation.getCurrentPosition.mock.calls[0][1];
       errorCallback(mockError);
     });
 

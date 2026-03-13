@@ -21,6 +21,18 @@ import { FEATURES } from '@/lib/features';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import type { Campground } from '@/types/campground';
 
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3 py-3">
+      <div className="h-px flex-1 bg-gray-200" />
+      <span className="text-xs font-medium text-gray-400 uppercase tracking-wider shrink-0">
+        {label}
+      </span>
+      <div className="h-px flex-1 bg-gray-200" />
+    </div>
+  );
+}
+
 interface DetailSheetProps {
   campground: Campground;
   onClose: () => void;
@@ -167,9 +179,7 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
 
           {/* Netzabdeckung - Prominent */}
           <div>
-            <h3 className="text-sm font-medium text-gray-400 mb-2">
-              ─── Netzabdeckung ───────────
-            </h3>
+            <SectionDivider label="Netzabdeckung" />
             {campground.coverageLevel === 'none' ? (
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-2 rounded-full bg-gray-200"></div>
@@ -216,27 +226,29 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
           {/* Ausstattung */}
           {campground.features.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-3">
-                ─── Ausstattung ────────────
-              </h3>
+              <SectionDivider label="Ausstattung" />
               <div className="flex flex-wrap gap-2">
-                {campground.features.map((feature) => (
-                  <span
-                    key={feature}
-                    className="px-3 py-1 bg-[#D8F3DC] text-[#1B4332] rounded-full text-xs font-medium"
-                  >
-                    {FEATURES[feature]?.label || feature}
-                  </span>
-                ))}
+                {campground.features.map((f) => {
+                  const config = FEATURES[f as keyof typeof FEATURES];
+                  if (!config) return null;
+                  const Icon = config.icon;
+                  return (
+                    <span
+                      key={f}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#D8F3DC] text-[#1B4332] text-sm"
+                    >
+                      <Icon className="w-4 h-4" />
+                      {config.label}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           )}
 
           {/* Kontakt */}
           <div>
-            <h3 className="text-sm font-medium text-gray-400 mb-3">
-              ─── Kontakt ─────────────
-            </h3>
+            <SectionDivider label="Kontakt" />
             <div className="space-y-3">
               {campground.website && (
                 <div className="flex items-center gap-3">
@@ -290,7 +302,7 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
           {/* Actions */}
           <div className="sticky bottom-0 bg-white/95 backdrop-blur border-t -mx-4 px-4 py-4 space-y-3">
             <Button
-              className="w-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white"
+              className="w-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white cursor-pointer"
               onClick={() => openRouteInGoogleMaps(lat, lng)}
             >
               <Navigation className="w-4 h-4 mr-2" />
@@ -299,7 +311,7 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
 
             <Button
               variant="outline"
-              className="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 cursor-pointer"
               onClick={() => handleShare(campground)}
               data-share-button
             >

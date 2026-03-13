@@ -38,7 +38,8 @@ export function useGeolocation(): GeolocationState {
 
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-    const id = navigator.geolocation.watchPosition(
+    // First get current position → then start watching
+    navigator.geolocation.getCurrentPosition(
       (position) => {
         setState((prev) => ({
           ...prev,
@@ -47,25 +48,30 @@ export function useGeolocation(): GeolocationState {
           accuracy: position.coords.accuracy,
           isLoading: false,
           isTracking: true,
-          error: null,
         }));
+
+        // Then start tracking
+        const id = navigator.geolocation.watchPosition(
+          (pos) => {
+            setState((prev) => ({
+              ...prev,
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude,
+              accuracy: pos.coords.accuracy,
+            }));
+          },
+          (err) => {
+            setState((prev) => ({ ...prev, error: err }));
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 },
+        );
+        setWatchId(id);
       },
       (error) => {
-        setState((prev) => ({
-          ...prev,
-          error,
-          isLoading: false,
-          isTracking: false,
-        }));
+        setState((prev) => ({ ...prev, isLoading: false, error }));
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000,
-      },
+      { enableHighAccuracy: true, timeout: 10000 },
     );
-
-    setWatchId(id);
   }, []);
 
   const stopTracking = useCallback(() => {
