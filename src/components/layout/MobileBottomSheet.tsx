@@ -2,10 +2,12 @@
 
 import { motion, PanInfo } from 'framer-motion';
 import { useUIStore } from '@/stores/uiStore';
+import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { cn } from '@/lib/utils';
 import { CampingList } from '@/components/cards/CampingList';
 import { CampingCardCompact } from '@/components/cards/CampingCardCompact';
 import { DetailSheet } from '@/components/cards/DetailSheet';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useViewportCampgrounds } from '@/hooks/useViewportCampgrounds';
 import type { Campground } from '@/types/campground';
 
@@ -23,6 +25,7 @@ export default function MobileBottomSheet({
   onSelectCampground,
 }: MobileBottomSheetProps) {
   const { bottomSheetSnap, setBottomSheetSnap } = useUIStore();
+  const { isLoading } = useCampgrounds();
   const viewportCampgrounds = useViewportCampgrounds();
 
   const getHeight = (snap: typeof bottomSheetSnap) => {
@@ -101,21 +104,32 @@ export default function MobileBottomSheet({
         )}
       </motion.div>
 
-      {/* Peek: Horizontale Card-Reihe */}
+      {/* Peek: Horizontale Card-Reihe oder Loading */}
       {bottomSheetSnap === 'peek' && !selectedCampground && (
         <div className="px-4 pb-3 shrink-0 overflow-hidden">
-          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-            {viewportCampgrounds.slice(0, 10).map((campground) => (
-              <CampingCardCompact
-                key={campground.id}
-                campground={campground}
-                onClick={() => {
-                  onSelectCampground?.(campground);
-                  setBottomSheetSnap('full');
-                }}
-              />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="flex gap-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton
+                  key={i}
+                  className="w-[180px] h-[140px] rounded-xl shrink-0"
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+              {viewportCampgrounds.slice(0, 10).map((campground) => (
+                <CampingCardCompact
+                  key={campground.id}
+                  campground={campground}
+                  onClick={() => {
+                    onSelectCampground?.(campground);
+                    setBottomSheetSnap('full');
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 

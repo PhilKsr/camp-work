@@ -1,9 +1,10 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useViewportCampgrounds } from '@/hooks/useViewportCampgrounds';
+import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import { useFilterStore } from '@/stores/filterStore';
 import { useMapStore } from '@/stores/mapStore';
@@ -55,6 +56,7 @@ function getCoverageScore(level: string): number {
 
 export function CampingList() {
   const [sortBy, setSortBy] = useState<SortOption>('coverage');
+  const { data: campgroundsData, isLoading, isError } = useCampgrounds();
   const viewportCampgrounds = useViewportCampgrounds();
   const { toggleFavorite, isFavorite } = useFavoriteStore();
   const {
@@ -169,45 +171,42 @@ export function CampingList() {
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (false) {
-    // Remove loading state since viewport-based data loads instantly
+  // Show skeleton loading while data is loading OR viewport has no data yet
+  if (isLoading || (!viewportCampgrounds.length && campgroundsData)) {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <Skeleton className="h-6 w-32" />
-          <Skeleton className="h-10 w-36" />
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-8 w-32" />
         </div>
-        <div className="space-y-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="space-y-3">
-              <Skeleton className="h-[180px] rounded-2xl" />
-              <div className="space-y-2 px-3 pb-3">
-                <Skeleton className="h-5 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <div className="flex gap-2">
-                  <Skeleton className="h-4 w-4 rounded" />
-                  <Skeleton className="h-4 w-4 rounded" />
-                  <Skeleton className="h-4 w-4 rounded" />
-                </div>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="rounded-xl overflow-hidden">
+            <Skeleton className="h-[140px] w-full" />
+            <div className="p-4 space-y-2">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-3 w-1/2" />
+              <div className="flex gap-2">
+                <Skeleton className="h-6 w-16 rounded-full" />
+                <Skeleton className="h-6 w-16 rounded-full" />
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     );
   }
 
-  if (!filteredAndSortedCampgrounds.length) {
+  if (!isLoading && filteredAndSortedCampgrounds.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-          <ChevronDown className="w-8 h-8 text-muted-foreground" />
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+        <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <MapPin className="w-8 h-8 text-gray-400" />
         </div>
-        <h3 className="font-semibold text-lg mb-2">
-          Keine Campingplätze gefunden
+        <h3 className="text-base font-medium text-gray-900 mb-1">
+          Keine Campingplätze hier
         </h3>
-        <p className="text-muted-foreground text-sm mb-4">
-          Versuche es mit anderen Suchkriterien oder zoome die Karte heraus.
+        <p className="text-sm text-gray-500 max-w-[240px]">
+          Verschiebe die Karte oder zoome heraus um Campingplätze zu finden.
         </p>
       </div>
     );
@@ -215,12 +214,21 @@ export function CampingList() {
 
   return (
     <div className="space-y-4">
+      {/* Supabase Error State */}
+      {isError && (
+        <div className="mx-4 my-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
+          <p className="text-xs text-amber-700">
+            Offline-Modus: Zeige gespeicherte Daten.
+          </p>
+        </div>
+      )}
+
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-lg">
-          {filteredAndSortedCampgrounds.length} von {totalCampgrounds}{' '}
-          Campingplätze
-        </h2>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm text-gray-600">
+          <span className="font-medium text-gray-900">{totalCampgrounds}</span>{' '}
+          Plätze im Kartenbereich
+        </p>
 
         <Select
           value={sortBy}
