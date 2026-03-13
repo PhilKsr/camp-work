@@ -17,6 +17,7 @@ import { useCampgroundImages } from '@/hooks/useCampgroundImages';
 import { cn } from '@/lib/utils';
 import { colors } from '@/lib/brand';
 import { getCoverageDescription } from '@/lib/coverage';
+import { FEATURES } from '@/lib/features';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import type { Campground } from '@/types/campground';
 
@@ -24,21 +25,6 @@ interface DetailSheetProps {
   campground: Campground;
   onClose: () => void;
 }
-
-const FEATURE_LABELS = {
-  wifi: 'WLAN',
-  power: 'Strom',
-  dogs: 'Hunde erlaubt',
-  shower: 'Duschen',
-  toilet: 'Toiletten',
-  swimming: 'Schwimmbad',
-  shop: 'Einkaufen',
-  restaurant: 'Restaurant',
-  playground: 'Spielplatz',
-  laundry: 'Wäscherei',
-  bbq: 'Grillplatz',
-  campfire: 'Lagerfeuer',
-} as const;
 
 const getCoverageColor = (level: string): string => {
   switch (level) {
@@ -239,8 +225,7 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
                     key={feature}
                     className="px-3 py-1 bg-[#D8F3DC] text-[#1B4332] rounded-full text-xs font-medium"
                   >
-                    {FEATURE_LABELS[feature as keyof typeof FEATURE_LABELS] ||
-                      feature}
+                    {FEATURES[feature]?.label || feature}
                   </span>
                 ))}
               </div>

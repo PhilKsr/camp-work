@@ -15,12 +15,15 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
 import { useFilterStore } from '@/stores/filterStore';
 import { useFavoriteStore } from '@/stores/favoriteStore';
+import { useCoverageStore } from '@/stores/coverageStore';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { colors } from '@/lib/brand';
 import { cn } from '@/lib/utils';
+import { FEATURES, type FeatureConfig } from '@/lib/features';
 import type { CampgroundFeature } from '@/types/campground';
 
 interface FilterPanelProps {
@@ -43,25 +46,6 @@ const TYPE_OPTIONS = [
   { value: 'caravan_site', label: 'Wohnmobilstellplätze' },
 ] as const;
 
-const FEATURE_OPTIONS: Array<{
-  value: CampgroundFeature;
-  label: string;
-  icon: string;
-}> = [
-  { value: 'wifi', label: 'WLAN', icon: '📶' },
-  { value: 'power', label: 'Strom', icon: '⚡' },
-  { value: 'dogs', label: 'Hunde erlaubt', icon: '🐕' },
-  { value: 'shower', label: 'Duschen', icon: '🚿' },
-  { value: 'toilet', label: 'Toiletten', icon: '🚽' },
-  { value: 'swimming', label: 'Schwimmen', icon: '🏊' },
-  { value: 'shop', label: 'Einkaufsmöglichkeit', icon: '🛍️' },
-  { value: 'restaurant', label: 'Restaurant', icon: '🍽️' },
-  { value: 'playground', label: 'Spielplatz', icon: '🛝' },
-  { value: 'laundry', label: 'Wäscherei', icon: '👕' },
-  { value: 'bbq', label: 'Grillplatz', icon: '🔥' },
-  { value: 'campfire', label: 'Lagerfeuer', icon: '🔥' },
-];
-
 function FilterContent({ onClose }: { onClose?: () => void }) {
   const {
     coverageLevels,
@@ -78,6 +62,13 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
     activeFilterCount,
   } = useFilterStore();
 
+  const {
+    isVisible: isCoverageLayerVisible,
+    opacity: coverageOpacity,
+    toggleVisibility: toggleCoverageLayer,
+    setOpacity: setCoverageOpacity,
+  } = useCoverageStore();
+
   const { data: campgroundsData } = useCampgrounds();
   const { favorites } = useFavoriteStore();
 
@@ -88,10 +79,10 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
     ),
   ).sort();
 
-  // Filter feature options to only show those that exist in data
-  const filteredFeatureOptions = FEATURE_OPTIONS.filter((option) =>
-    availableFeatures.includes(option.value),
-  );
+  // Filter feature entries to only show those that exist in data
+  const featureEntries = Object.entries(FEATURES).filter(([value]) =>
+    availableFeatures.includes(value as CampgroundFeature),
+  ) as [CampgroundFeature, FeatureConfig][];
 
   // Calculate result count
   const campgrounds = campgroundsData?.features?.map((f) => f.properties) || [];
@@ -198,6 +189,41 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
 
           <Separator />
 
+          {/* Netzabdeckung auf Karte */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">
+              Netzabdeckung auf Karte
+            </Label>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">O2-Layer anzeigen</span>
+              <Switch
+                checked={isCoverageLayerVisible}
+                onCheckedChange={toggleCoverageLayer}
+              />
+            </div>
+
+            {isCoverageLayerVisible && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">Deckkraft</span>
+                  <span className="text-xs text-gray-400">
+                    {Math.round(coverageOpacity * 100)}%
+                  </span>
+                </div>
+                <Slider
+                  value={[coverageOpacity]}
+                  onValueChange={([v]) => setCoverageOpacity(v)}
+                  min={0.1}
+                  max={0.8}
+                  step={0.05}
+                />
+              </div>
+            )}
+          </div>
+
+          <Separator />
+
           {/* Campground Types */}
           <div className="space-y-3">
             <Label className="text-base font-medium">Typ</Label>
@@ -223,22 +249,25 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
           <div className="space-y-3">
             <Label className="text-base font-medium">Ausstattung</Label>
             <div className="grid grid-cols-2 gap-3">
-              {filteredFeatureOptions.map((option) => (
-                <div key={option.value} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`feature-${option.value}`}
-                    checked={features.includes(option.value)}
-                    onCheckedChange={() => toggleFeature(option.value)}
-                  />
-                  <Label
-                    htmlFor={`feature-${option.value}`}
-                    className="flex items-center space-x-2 text-sm"
-                  >
-                    <span>{option.icon}</span>
-                    <span>{option.label}</span>
-                  </Label>
-                </div>
-              ))}
+              {featureEntries.map(([value, config]) => {
+                const Icon = config.icon;
+                return (
+                  <div key={value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`feature-${value}`}
+                      checked={features.includes(value)}
+                      onCheckedChange={() => toggleFeature(value)}
+                    />
+                    <Label
+                      htmlFor={`feature-${value}`}
+                      className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer"
+                    >
+                      <Icon className="w-4 h-4 text-gray-500" />
+                      {config.label}
+                    </Label>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -266,23 +295,21 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 border-t border-gray-200 bg-white sticky bottom-0">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button
-            variant="outline"
-            onClick={resetFilters}
-            className="flex-1 sm:flex-initial"
-            disabled={activeFilterCount() === 0}
-          >
-            Filter zurücksetzen
-          </Button>
-          <Button
-            onClick={onClose}
-            className="flex-1 bg-[#1B4332] hover:bg-[#2D6A4F] text-white"
-          >
-            {filteredCount} Ergebnisse anzeigen
-          </Button>
-        </div>
+      <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 space-y-2">
+        <Button
+          className="w-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white cursor-pointer"
+          onClick={onClose}
+        >
+          {filteredCount} Ergebnisse anzeigen
+        </Button>
+        <Button
+          variant="ghost"
+          className="w-full text-gray-500 hover:text-gray-700 cursor-pointer"
+          onClick={resetFilters}
+          disabled={activeFilterCount() === 0}
+        >
+          Filter zurücksetzen
+        </Button>
       </div>
     </div>
   );

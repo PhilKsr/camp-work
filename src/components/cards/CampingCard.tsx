@@ -1,24 +1,10 @@
 import { useState } from 'react';
-import {
-  Heart,
-  Wifi,
-  Zap,
-  Dog,
-  Droplets,
-  Phone,
-  Globe,
-  Mail,
-  UtensilsCrossed,
-  ShoppingBag,
-  Flame,
-  Baby,
-  Shirt,
-  Bath,
-} from 'lucide-react';
+import { Heart, Phone, Globe, Mail } from 'lucide-react';
 import { ImageCarousel } from '@/components/ui/ImageCarousel';
 import { ImageLightbox } from '@/components/ui/ImageLightbox';
 import { cn } from '@/lib/utils';
 import { colors } from '@/lib/brand';
+import { FEATURES } from '@/lib/features';
 import type { Campground } from '@/types/campground';
 import type { CampgroundImage } from '@/hooks/useBatchCampgroundImages';
 
@@ -29,36 +15,6 @@ interface CampingCardProps {
   onClick: () => void;
   images?: CampgroundImage[];
 }
-
-const FEATURE_ICONS = {
-  wifi: Wifi,
-  power: Zap,
-  dogs: Dog,
-  shower: Droplets,
-  toilet: Bath,
-  swimming: Droplets,
-  shop: ShoppingBag,
-  restaurant: UtensilsCrossed,
-  playground: Baby,
-  laundry: Shirt,
-  bbq: Flame,
-  campfire: Flame,
-} as const;
-
-const FEATURE_LABELS = {
-  wifi: 'WiFi',
-  power: 'Strom',
-  dogs: 'Hunde',
-  shower: 'Dusche',
-  toilet: 'WC',
-  swimming: 'Schwimmbad',
-  shop: 'Einkauf',
-  restaurant: 'Restaurant',
-  playground: 'Spielplatz',
-  laundry: 'Wäscherei',
-  bbq: 'Grill',
-  campfire: 'Lagerfeuer',
-} as const;
 
 const getCoverageColor = (level: string): string => {
   switch (level) {
@@ -172,20 +128,17 @@ export function CampingCard({
         {campground.features.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {campground.features.slice(0, 4).map((feature) => {
-              const Icon = FEATURE_ICONS[feature as keyof typeof FEATURE_ICONS];
-              const label =
-                FEATURE_LABELS[feature as keyof typeof FEATURE_LABELS];
+              const config = FEATURES[feature];
+              if (!config) return null;
+              const Icon = config.icon;
               return (
-                Icon &&
-                label && (
-                  <span
-                    key={feature}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D8F3DC] text-[#1B4332] text-xs"
-                  >
-                    <Icon className="w-3 h-3" />
-                    {label}
-                  </span>
-                )
+                <span
+                  key={feature}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D8F3DC] text-[#1B4332] text-xs"
+                >
+                  <Icon className="w-3 h-3" />
+                  {config.label}
+                </span>
               );
             })}
             {campground.features.length > 4 && (

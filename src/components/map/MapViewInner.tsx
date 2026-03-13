@@ -4,16 +4,16 @@ import { useCallback, useEffect, useState } from 'react';
 import Map from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useMapStore } from '@/stores/mapStore';
+import { useCoverageStore } from '@/stores/coverageStore';
 import type { MapLayerMouseEvent } from 'maplibre-gl';
 import MapControls from './MapControls';
 import GeolocationMarker from './GeolocationMarker';
 import CoverageLayer from './CoverageLayer';
-import CoverageLegend from './CoverageLegend';
-import CoverageControls from './CoverageControls';
 import { CampingMarkers } from './CampingMarkers';
 
 export default function MapViewInner() {
   const { viewport, setViewport, setSelectedCampground, flyTo } = useMapStore();
+  const { isVisible } = useCoverageStore();
   const [cursor, setCursor] = useState('auto');
 
   // Map style with fallback
@@ -102,11 +102,20 @@ export default function MapViewInner() {
         <GeolocationMarker />
       </Map>
 
-      {/* Coverage Controls & Legend - Bottom Left */}
-      <div className="absolute bottom-6 left-4 z-20 flex flex-col gap-2">
-        <CoverageControls />
-        <CoverageLegend />
-      </div>
+      {/* Minimal Coverage Legend - Only when layer is active */}
+      {isVisible && (
+        <div className="absolute bottom-4 left-4 z-10 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm">
+          <p className="text-[10px] text-gray-400 mb-1">O2 Netz · © BNetzA</p>
+          <div className="flex items-center gap-3 text-xs text-gray-600">
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-blue-500" /> Indoor
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-orange-500" /> Outdoor
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Map Controls - Bottom Right */}
       <MapControls />

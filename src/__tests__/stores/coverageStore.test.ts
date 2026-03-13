@@ -6,7 +6,7 @@ describe('coverageStore', () => {
   it('should have correct initial state', () => {
     const { result } = renderHook(() => useCoverageStore());
 
-    expect(result.current.isVisible).toBe(true);
+    expect(result.current.isVisible).toBe(false);
     expect(result.current.opacity).toBe(0.35);
   });
 
@@ -17,13 +17,13 @@ describe('coverageStore', () => {
       result.current.toggleVisibility();
     });
 
-    expect(result.current.isVisible).toBe(false);
+    expect(result.current.isVisible).toBe(true);
 
     act(() => {
       result.current.toggleVisibility();
     });
 
-    expect(result.current.isVisible).toBe(true);
+    expect(result.current.isVisible).toBe(false);
   });
 
   it('should set opacity within bounds', () => {
