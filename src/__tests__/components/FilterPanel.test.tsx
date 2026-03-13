@@ -2,23 +2,25 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import FilterPanel from '@/components/search/FilterPanel';
 import { useFilterStore } from '@/stores/filterStore';
 import { useFavoriteStore } from '@/stores/favoriteStore';
-import { useCampgrounds } from '@/hooks/useCampgrounds';
-import { mockGeoJSON, createMockQueryResult } from '../helpers';
+import { useViewportCampgrounds } from '@/hooks/useViewportCampgrounds';
+import { mockGeoJSON } from '../helpers';
 import { vi } from 'vitest';
 
 // Mock Supabase
 vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: vi.fn(() => ({
-      select: vi.fn(() => Promise.reject(new Error('Supabase not available in tests')))
-    }))
-  }
+      select: vi.fn(() =>
+        Promise.reject(new Error('Supabase not available in tests')),
+      ),
+    })),
+  },
 }));
 
 // Mock the stores and hooks
 vi.mock('@/stores/filterStore');
 vi.mock('@/stores/favoriteStore');
-vi.mock('@/hooks/useCampgrounds');
+vi.mock('@/hooks/useViewportCampgrounds');
 
 const mockFilterStore = {
   coverageLevels: ['5g', '4g', '3g', 'none'],
@@ -39,15 +41,14 @@ const mockFavoriteStore = {
   favorites: ['1', '2'],
 };
 
-const mockCampgroundsData = mockGeoJSON;
+// Mock viewport campgrounds - just the properties array
+const mockViewportCampgrounds = mockGeoJSON.features.map((f) => f.properties);
 
 describe('FilterPanel', () => {
   beforeEach(() => {
     vi.mocked(useFilterStore).mockReturnValue(mockFilterStore);
     vi.mocked(useFavoriteStore).mockReturnValue(mockFavoriteStore);
-    vi.mocked(useCampgrounds).mockReturnValue(
-      createMockQueryResult(mockCampgroundsData),
-    );
+    vi.mocked(useViewportCampgrounds).mockReturnValue(mockViewportCampgrounds);
   });
 
   afterEach(() => {
@@ -144,7 +145,9 @@ describe('FilterPanel', () => {
     fireEvent.click(screen.getByText('Open Filter'));
 
     // Should show filtered result count (both campgrounds match all filters)
-    expect(screen.getByText('3 Ergebnisse anzeigen')).toBeInTheDocument();
+    expect(
+      screen.getByText('3 Ergebnisse im Kartenbereich'),
+    ).toBeInTheDocument();
   });
 
   it('should call reset filters when reset button is clicked', () => {

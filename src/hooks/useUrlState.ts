@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMapStore } from '@/stores/mapStore';
 import { useFilterStore } from '@/stores/filterStore';
 
 export function useUrlState() {
   const { viewport, setViewport } = useMapStore();
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const {
     coverageLevels,
     types,
@@ -83,53 +84,67 @@ export function useUrlState() {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Update URL when state changes
+  // Update URL when state changes – DEBOUNCED
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const params = new URLSearchParams();
-
-    // Map viewport
-    params.set('lat', viewport.latitude.toFixed(4));
-    params.set('lng', viewport.longitude.toFixed(4));
-    params.set('zoom', viewport.zoom.toFixed(1));
-
-    // Coverage levels (only if not default)
-    const defaultCoverage = ['4g', '3g'];
-    if (
-      JSON.stringify([...coverageLevels].sort()) !==
-      JSON.stringify([...defaultCoverage].sort())
-    ) {
-      params.set('coverage', coverageLevels.join(','));
+    // Clear previous timer
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
     }
 
-    // Types (only if not default)
-    const defaultTypes = ['camp_site', 'caravan_site'];
-    if (
-      JSON.stringify([...types].sort()) !==
-      JSON.stringify([...defaultTypes].sort())
-    ) {
-      params.set('type', types.join(','));
-    }
+    // Debounce: Wait 500ms after last change
+    debounceTimer.current = setTimeout(() => {
+      const params = new URLSearchParams();
 
-    // Features
-    if (features.length > 0) {
-      params.set('features', features.join(','));
-    }
+      // Map viewport
+      params.set('lat', viewport.latitude.toFixed(4));
+      params.set('lng', viewport.longitude.toFixed(4));
+      params.set('zoom', viewport.zoom.toFixed(1));
 
-    // Work-friendly
-    if (workFriendlyOnly) {
-      params.set('workFriendly', 'true');
-    }
+      // Coverage levels (only if not default)
+      const defaultCoverage = ['4g', '3g'];
+      if (
+        JSON.stringify([...coverageLevels].sort()) !==
+        JSON.stringify([...defaultCoverage].sort())
+      ) {
+        params.set('coverage', coverageLevels.join(','));
+      }
 
-    // Favorites only
-    if (favoritesOnly) {
-      params.set('favorites', 'true');
-    }
+      // Types (only if not default)
+      const defaultTypes = ['camp_site', 'caravan_site'];
+      if (
+        JSON.stringify([...types].sort()) !==
+        JSON.stringify([...defaultTypes].sort())
+      ) {
+        params.set('type', types.join(','));
+      }
 
-    // Update URL without triggering navigation
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.replaceState(null, '', newUrl);
+      // Features
+      if (features.length > 0) {
+        params.set('features', features.join(','));
+      }
+
+      // Work-friendly
+      if (workFriendlyOnly) {
+        params.set('workFriendly', 'true');
+      }
+
+      // Favorites only
+      if (favoritesOnly) {
+        params.set('favorites', 'true');
+      }
+
+      // Update URL without triggering navigation
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+    }, 500);
+
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
   }, [
     viewport,
     coverageLevels,

@@ -20,7 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import { useFilterStore } from '@/stores/filterStore';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import { useCoverageStore } from '@/stores/coverageStore';
-import { useCampgrounds } from '@/hooks/useCampgrounds';
+import { useViewportCampgrounds } from '@/hooks/useViewportCampgrounds';
 import { colors } from '@/lib/brand';
 import { cn } from '@/lib/utils';
 import { FEATURES, type FeatureConfig } from '@/lib/features';
@@ -69,24 +69,21 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
     setOpacity: setCoverageOpacity,
   } = useCoverageStore();
 
-  const { data: campgroundsData } = useCampgrounds();
+  const viewportCampgrounds = useViewportCampgrounds();
   const { favorites } = useFavoriteStore();
 
-  // Get available features from actual data
+  // Get available features from viewport campgrounds only
   const availableFeatures = Array.from(
-    new Set(
-      campgroundsData?.features?.flatMap((f) => f.properties.features) || [],
-    ),
+    new Set(viewportCampgrounds?.flatMap((c) => c.features) || []),
   ).sort();
 
-  // Filter feature entries to only show those that exist in data
+  // Filter feature entries to only show those that exist in viewport data
   const featureEntries = Object.entries(FEATURES).filter(([value]) =>
     availableFeatures.includes(value as CampgroundFeature),
   ) as [CampgroundFeature, FeatureConfig][];
 
-  // Calculate result count
-  const campgrounds = campgroundsData?.features?.map((f) => f.properties) || [];
-  const filteredCount = campgrounds.filter((c) => {
+  // Calculate result count - only for viewport campgrounds
+  const filteredCount = viewportCampgrounds.filter((c) => {
     // Coverage filter
     if (!coverageLevels.includes(c.coverageLevel)) return false;
 
@@ -300,7 +297,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
           className="w-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white cursor-pointer"
           onClick={onClose}
         >
-          {filteredCount} Ergebnisse anzeigen
+          {filteredCount} Ergebnisse im Kartenbereich
         </Button>
         <Button
           variant="ghost"
