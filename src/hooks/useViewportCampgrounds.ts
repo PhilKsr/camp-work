@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useDeferredValue } from 'react';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { useMapStore } from '@/stores/mapStore';
 
@@ -58,12 +58,13 @@ function isInBounds(coordinates: [number, number], bounds: Bounds): boolean {
 export function useViewportCampgrounds() {
   const { data } = useCampgrounds();
   const { viewport } = useMapStore();
+  const deferredViewport = useDeferredValue(viewport);
 
   return useMemo(() => {
     if (!data) return [];
 
     // Calculate visible bounds based on viewport + zoom
-    const bounds = getViewportBounds(viewport);
+    const bounds = getViewportBounds(deferredViewport);
 
     // Filter campgrounds to only those within viewport bounds
     return data.features
@@ -73,5 +74,5 @@ export function useViewportCampgrounds() {
           isInBounds(feature.geometry.coordinates as [number, number], bounds),
       )
       .map((feature) => feature.properties);
-  }, [data, viewport]);
+  }, [data, deferredViewport]);
 }

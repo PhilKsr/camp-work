@@ -88,7 +88,7 @@ export const useFilterStore = create<FilterState>()(
 
         // Coverage levels (not default)
         if (
-          JSON.stringify(state.coverageLevels.sort()) !==
+          JSON.stringify([...state.coverageLevels].sort()) !==
           JSON.stringify(['3g', '4g', '5g', 'none'])
         )
           count++;
@@ -98,7 +98,7 @@ export const useFilterStore = create<FilterState>()(
 
         // Types (not default)
         if (
-          JSON.stringify(state.types.sort()) !==
+          JSON.stringify([...state.types].sort()) !==
           JSON.stringify(['camp_site', 'caravan_site'])
         )
           count++;

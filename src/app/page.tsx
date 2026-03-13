@@ -49,71 +49,71 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen flex flex-col">
-      <Header />
+    <ErrorBoundary>
+      <div className="h-screen flex flex-col">
+        <Header />
 
-      {/* Location Warning - direkt unter dem Header, nicht über der Karte */}
-      {locationState.error && !locationState.hasLocation && showBanner && (
-        <div className="bg-[#F59E0B]/10 border-b border-[#F59E0B]/20 px-4 py-2 flex items-center justify-between">
-          <p className="text-sm text-[#D97706]">
-            <strong>Hinweis:</strong> {locationState.error}. Verwende die
-            Suchleiste um zu einem Ort zu navigieren.
-          </p>
-          <button
-            onClick={() => setShowBanner(false)}
-            className="text-[#D97706] hover:text-[#F59E0B] ml-2 shrink-0 p-1 rounded-md hover:bg-[#F59E0B]/10 transition-colors"
-            aria-label="Banner schließen"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
-      <div className="flex-1 flex overflow-hidden">
-        {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex w-[420px] flex-col bg-white overflow-y-auto shadow-[4px_0_12px_-4px_rgba(0,0,0,0.08)]">
-          <div className="p-4 flex-1">
-            {selectedCampgroundData ? (
-              <DetailSheet
-                campground={selectedCampgroundData}
-                onClose={handleCloseDetail}
-              />
-            ) : (
-              <CampingList />
-            )}
+        {/* Location Warning - direkt unter dem Header, nicht über der Karte */}
+        {locationState.error && !locationState.hasLocation && showBanner && (
+          <div className="bg-[#F59E0B]/10 border-b border-[#F59E0B]/20 px-4 py-2 flex items-center justify-between">
+            <p className="text-sm text-[#D97706]">
+              <strong>Hinweis:</strong> {locationState.error}. Verwende die
+              Suchleiste um zu einem Ort zu navigieren.
+            </p>
+            <button
+              onClick={() => setShowBanner(false)}
+              className="text-[#D97706] hover:text-[#F59E0B] ml-2 shrink-0 p-1 rounded-md hover:bg-[#F59E0B]/10 transition-colors"
+              aria-label="Banner schließen"
+            >
+              ✕
+            </button>
           </div>
-        </aside>
+        )}
 
-        {/* Map */}
-        <main id="main-content" className="flex-1 relative">
-          <ErrorBoundary>
-            <MapView />
-          </ErrorBoundary>
-
-          {/* Location Loading Overlay */}
-          {locationState.isLoading && (
-            <div className="absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl px-6 py-4 shadow-lg flex items-center gap-3">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#1B4332]"></div>
-                <span className="text-foreground font-medium">
-                  Standort wird ermittelt...
-                </span>
-              </div>
+        <div className="flex-1 flex overflow-hidden">
+          {/* Desktop Sidebar */}
+          <aside className="hidden lg:flex w-[420px] flex-col bg-white overflow-y-auto shadow-[4px_0_12px_-4px_rgba(0,0,0,0.08)]">
+            <div className="p-4 flex-1">
+              {selectedCampgroundData ? (
+                <DetailSheet
+                  campground={selectedCampgroundData}
+                  onClose={handleCloseDetail}
+                />
+              ) : (
+                <CampingList />
+              )}
             </div>
-          )}
-        </main>
+          </aside>
+
+          {/* Map */}
+          <main id="main-content" className="flex-1 relative">
+            <MapView />
+
+            {/* Location Loading Overlay */}
+            {locationState.isLoading && (
+              <div className="absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl px-6 py-4 shadow-lg flex items-center gap-3">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#1B4332]"></div>
+                  <span className="text-foreground font-medium">
+                    Standort wird ermittelt...
+                  </span>
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
+
+        {/* Mobile Bottom Sheet */}
+        <MobileBottomSheet
+          className="lg:hidden"
+          selectedCampground={selectedCampgroundData}
+          onCloseDetail={handleCloseDetail}
+          onSelectCampground={handleSelectCampground}
+        />
+
+        {/* Install Prompt */}
+        <InstallPrompt />
       </div>
-
-      {/* Mobile Bottom Sheet */}
-      <MobileBottomSheet
-        className="lg:hidden"
-        selectedCampground={selectedCampgroundData}
-        onCloseDetail={handleCloseDetail}
-        onSelectCampground={handleSelectCampground}
-      />
-
-      {/* Install Prompt */}
-      <InstallPrompt />
-    </div>
+    </ErrorBoundary>
   );
 }
