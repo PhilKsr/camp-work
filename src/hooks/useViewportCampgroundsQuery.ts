@@ -3,7 +3,6 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useMapStore } from '@/stores/mapStore';
 import { useDeferredValue, useMemo } from 'react';
 import type { Campground, CampgroundGeoJSON } from '@/types/campground';
-import type { Database } from '@/types/database';
 
 // Berechne Viewport Bounds (gleiche Logik wie useViewportCampgrounds)
 function getViewportBounds(viewport: {
@@ -68,40 +67,32 @@ export function useViewportCampgroundsQuery() {
 
       if (error) throw error;
 
-      const campgroundsData = data as
-        | Database['public']['Tables']['campgrounds']['Row'][]
-        | null;
+      // RPC now returns lat/lng directly after migration
+      const campgroundsData = data as Array<{
+        id: string;
+        name: string;
+        type: string;
+        lng: number;
+        lat: number;
+        address: string | null;
+        website: string | null;
+        phone: string | null;
+        email: string | null;
+        rating: number | null;
+        features: string[] | null;
+        coverage_level: string | null;
+        opening_hours: string | null;
+        fee: boolean | null;
+        capacity: number | null;
+        source: string | null;
+        osm_id: string | null;
+        created_at: string;
+        updated_at: string;
+      }> | null;
 
       const features = (campgroundsData || []).map((row) => {
-        // Parse WKB hex format: 0101000020E610000033260EEA6CC622401B8B5C2679544A40
-        // WKB structure: 2 chars byte order + 8 chars type + 2 chars SRID flag + 8 chars SRID + 32 chars coordinates
-        let lng = 0;
-        let lat = 0;
-
-        if (
-          row.location &&
-          typeof row.location === 'string' &&
-          row.location.length >= 50
-        ) {
-          try {
-            // Skip WKB headers (20 hex chars) and extract coordinates (32 hex chars)
-            const coordsHex = row.location.substring(18); // Start after headers
-            const lngHex = coordsHex.substring(0, 16); // First 8 bytes (16 hex chars)
-            const latHex = coordsHex.substring(16, 32); // Next 8 bytes (16 hex chars)
-
-            // Convert hex to double (little-endian)
-            const lngBuffer = Buffer.from(lngHex, 'hex');
-            const latBuffer = Buffer.from(latHex, 'hex');
-            lng = lngBuffer.readDoubleLE(0);
-            lat = latBuffer.readDoubleLE(0);
-          } catch (error) {
-            console.warn('Failed to parse WKB location:', row.location, error);
-            // Fallback to POINT text format attempt
-            const match = row.location.match(/POINT\(([^ ]+) ([^ ]+)\)/);
-            lng = match ? parseFloat(match[1]) : 0;
-            lat = match ? parseFloat(match[2]) : 0;
-          }
-        }
+        const lng = row.lng || 0;
+        const lat = row.lat || 0;
 
         return {
           type: 'Feature' as const,

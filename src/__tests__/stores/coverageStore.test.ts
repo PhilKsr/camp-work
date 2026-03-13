@@ -13,17 +13,25 @@ describe('coverageStore', () => {
   it('should toggle visibility', () => {
     const { result } = renderHook(() => useCoverageStore());
 
+    // Initially no layers are visible
+    expect(result.current.isVisible).toBe(false);
+    expect(result.current.visibleLayers).toEqual([]);
+
+    // Toggle to show all layers
     act(() => {
       result.current.toggleVisibility();
     });
 
     expect(result.current.isVisible).toBe(true);
+    expect(result.current.visibleLayers).toEqual(['5g', 'lte', 'gsm']);
 
+    // Toggle to hide all layers
     act(() => {
       result.current.toggleVisibility();
     });
 
     expect(result.current.isVisible).toBe(false);
+    expect(result.current.visibleLayers).toEqual([]);
   });
 
   it('should set opacity within bounds', () => {
@@ -51,13 +59,17 @@ describe('coverageStore', () => {
   it('should provide BNetzA attribution in simplified store', () => {
     const { result } = renderHook(() => useCoverageStore());
 
-    // Verify that the simplified store only has essential state
-    expect(Object.keys(result.current)).toEqual([
-      'isVisible',
+    // Verify that the store has the expected interface
+    const expectedKeys = [
+      'visibleLayers',
       'opacity',
-      'toggleVisibility',
+      'toggleLayer',
       'setOpacity',
-    ]);
+      'isVisible',
+      'toggleVisibility',
+    ];
+
+    expect(Object.keys(result.current).sort()).toEqual(expectedKeys.sort());
 
     // No source switching needed - always uses BNetzA WMS
     expect('source' in result.current).toBe(false);

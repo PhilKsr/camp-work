@@ -12,27 +12,33 @@ interface CoverageState {
   toggleVisibility: () => void;
 }
 
-export const useCoverageStore = create<CoverageState>((set, get) => ({
+export const useCoverageStore = create<CoverageState>((set) => ({
   visibleLayers: [],
   opacity: 0.35,
+  isVisible: false,
 
   toggleLayer: (layer) =>
-    set((state) => ({
-      visibleLayers: state.visibleLayers.includes(layer)
+    set((state) => {
+      const newVisibleLayers = state.visibleLayers.includes(layer)
         ? state.visibleLayers.filter((l) => l !== layer)
-        : [...state.visibleLayers, layer],
-    })),
+        : [...state.visibleLayers, layer];
+
+      return {
+        visibleLayers: newVisibleLayers,
+        isVisible: newVisibleLayers.length > 0,
+      };
+    }),
 
   setOpacity: (opacity) =>
     set({ opacity: Math.max(0.2, Math.min(0.8, opacity)) }),
 
-  // Legacy support - return true if any layer is visible
-  get isVisible() {
-    return get().visibleLayers.length > 0;
-  },
-
   toggleVisibility: () =>
-    set((state) => ({
-      visibleLayers: state.visibleLayers.length > 0 ? [] : ['5g', 'lte', 'gsm'],
-    })),
+    set((state) => {
+      const newVisibleLayers: CoverageLayer[] =
+        state.visibleLayers.length > 0 ? [] : ['5g', 'lte', 'gsm'];
+      return {
+        visibleLayers: newVisibleLayers,
+        isVisible: newVisibleLayers.length > 0,
+      };
+    }),
 }));
