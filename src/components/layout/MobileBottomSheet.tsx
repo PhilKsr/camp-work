@@ -102,8 +102,8 @@ export default function MobileBottomSheet({
       style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.12)', touchAction: 'none' }}
     >
       {/* Drag Handle */}
-      <div className="flex flex-col items-center pt-2 pb-4 px-4 border-b border-[#E8E4D8]">
-        <div className="w-10 h-1 bg-[#E19B53] rounded-full mb-2" />
+      <div className="flex flex-col items-center pt-2 pb-4 px-4 border-b border-gray-200">
+        <div className="w-10 h-1 bg-gray-300 rounded-full mb-2" />
 
         {/* Peek content */}
         {bottomSheetSnap !== 'closed' && (

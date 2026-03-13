@@ -47,7 +47,9 @@ export function useCampgrounds() {
               },
               properties: {
                 id: row.id,
-                name: row.name,
+                name:
+                  row.name ||
+                  `Stellplatz ${row.osm_id?.replace('osm_node_', '#') || ''}`.trim(),
                 type: row.type as Campground['type'],
                 coordinates: [lng, lat] as [number, number],
                 address: row.address,
@@ -75,7 +77,34 @@ export function useCampgrounds() {
         // Fallback: Statische Datei
         const res = await fetch('/data/campgrounds.geojson');
         if (!res.ok) throw new Error('Failed to load campgrounds');
-        return res.json();
+        const geojson = await res.json();
+
+        // Fix undefined names in GeoJSON fallback
+        geojson.features = geojson.features.map(
+          (feature: {
+            properties: {
+              name?: string;
+              osmId?: string;
+              id?: string;
+              [key: string]: unknown;
+            };
+          }) => {
+            return {
+              ...feature,
+              properties: {
+                ...feature.properties,
+                name:
+                  feature.properties.name === 'Campingplatz undefined' ||
+                  !feature.properties.name ||
+                  feature.properties.name.includes('undefined')
+                    ? `Stellplatz ${feature.properties.osmId?.replace('node/', '#') || feature.properties.id?.replace('osm_node_', '#') || ''}`.trim()
+                    : feature.properties.name,
+              },
+            };
+          },
+        );
+
+        return geojson;
       }
     },
     staleTime: 5 * 60 * 1000, // 5 Minuten Cache statt Infinity

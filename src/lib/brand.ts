@@ -1,34 +1,36 @@
 import type { CoverageType } from '../types/coverage';
 
-// Complete brand color system
 export const colors = {
-  // Primary colors
   primary: {
-    warmGold: '#E19B53',
-    cream: '#F9F8E6',
-    skyBlue: '#ABD8EF',
+    forest: '#1B4332', // Dunkelgrün – CTAs, Primary Actions
+    forestLight: '#2D6A4F', // Hover-State
+    forestMuted: '#40916C', // Sekundäre Elemente
+    sage: '#95D5B2', // Backgrounds, Tags, Light Accents
+    mint: '#D8F3DC', // Sehr helle Flächen, Hover
   },
-  // Extended palette
-  extended: {
-    goldDark: '#C47F35',
-    goldLight: '#F0C48A',
-    skyBlueDark: '#6AA3C9',
-    skyBlueLight: '#D5ECF7',
-    creamDark: '#E8E5C8',
-    border: '#E8E4D8',
+  neutral: {
+    white: '#FFFFFF',
+    gray50: '#FAFAFA', // Page Background
+    gray100: '#F5F5F5', // Card Backgrounds, Sidebar
+    gray200: '#E5E5E5', // Borders
+    gray300: '#D4D4D4', // Disabled States
+    gray400: '#A3A3A3', // Placeholder Text
+    gray500: '#737373', // Secondary Text
+    gray600: '#525252', // Body Text
+    gray800: '#262626', // Headings
+    gray900: '#171717', // Primary Text
   },
-  // Text colors
-  text: {
-    primary: '#2D2A26',
-    secondary: '#5C5650',
-    backgroundWhite: '#FEFDF8',
-  },
-  // Semantic colors for network coverage
   coverage: {
-    excellent: '#28A745', // 5G - Green
-    good: '#E19B53', // LTE/4G - Gold
-    limited: '#FFC107', // 3G - Yellow
-    none: '#9CA3AF', // Unknown - Gray (not red)
+    excellent: '#22C55E', // 5G – Grün
+    good: '#3B82F6', // 4G/LTE – Blau
+    limited: '#F59E0B', // 3G – Amber
+    none: '#D4D4D4', // Unbekannt – Hellgrau
+  },
+  semantic: {
+    error: '#EF4444',
+    warning: '#F59E0B',
+    success: '#22C55E',
+    info: '#3B82F6',
   },
 } as const;
 
@@ -62,7 +64,7 @@ export const coverageColors: Record<
     description: 'Nur für Notfälle',
   },
   wifi: {
-    hex: colors.primary.skyBlue,
+    hex: colors.primary.sage,
     label: 'WiFi',
     description: 'WLAN verfügbar',
   },

@@ -7,6 +7,7 @@ import {
   Droplets,
   Phone,
   Globe,
+  Mail,
   UtensilsCrossed,
   ShoppingBag,
   Flame,
@@ -14,7 +15,6 @@ import {
   Shirt,
   Bath,
 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { ImageCarousel } from '@/components/ui/ImageCarousel';
 import { ImageLightbox } from '@/components/ui/ImageLightbox';
 import { cn } from '@/lib/utils';
@@ -45,6 +45,21 @@ const FEATURE_ICONS = {
   campfire: Flame,
 } as const;
 
+const FEATURE_LABELS = {
+  wifi: 'WiFi',
+  power: 'Strom',
+  dogs: 'Hunde',
+  shower: 'Dusche',
+  toilet: 'WC',
+  swimming: 'Schwimmbad',
+  shop: 'Einkauf',
+  restaurant: 'Restaurant',
+  playground: 'Spielplatz',
+  laundry: 'Wäscherei',
+  bbq: 'Grill',
+  campfire: 'Lagerfeuer',
+} as const;
+
 const getCoverageColor = (level: string): string => {
   switch (level) {
     case '5g':
@@ -61,13 +76,13 @@ const getCoverageColor = (level: string): string => {
 const getCoverageLabel = (level: string): string => {
   switch (level) {
     case '5g':
-      return '5G';
+      return '5G Netz verfügbar';
     case '4g':
-      return 'LTE';
+      return 'LTE Netz verfügbar';
     case '3g':
-      return '3G';
+      return '3G Netz verfügbar';
     default:
-      return 'Kein';
+      return 'Netz prüfen';
   }
 };
 
@@ -82,120 +97,143 @@ export function CampingCard({
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const imageUrls = images.map((img) => img.url);
+
   return (
-    <Card
+    <div
       className={cn(
-        'overflow-hidden rounded-2xl cursor-pointer transition-all duration-200',
-        'hover:shadow-brand-card-hover hover:-translate-y-1',
+        'bg-white rounded-xl overflow-hidden cursor-pointer',
+        'shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5',
       )}
       onClick={onClick}
     >
-      {/* Image Carousel */}
-      <div className="relative">
-        <ImageCarousel
-          images={imageUrls}
-          alt={campground.name}
-          height="h-[180px]"
-          showArrows={true}
-          onImageClick={(index) => {
-            setLightboxIndex(index);
-            setLightboxOpen(true);
-          }}
-        />
+      {/* Bild – NUR wenn vorhanden */}
+      {imageUrls.length > 0 && (
+        <div className="relative">
+          <ImageCarousel
+            images={imageUrls}
+            alt={campground.name}
+            height="h-[160px]"
+            showArrows={true}
+            onImageClick={(index) => {
+              setLightboxIndex(index);
+              setLightboxOpen(true);
+            }}
+          />
 
-        {/* Favorite Heart */}
-        <button
-          className={cn(
-            'absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm transition-colors z-10',
-            isFavorite
-              ? 'bg-[#E19B53]/90 text-white'
-              : 'bg-white/20 text-white hover:bg-white/30',
-          )}
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleFavorite();
-          }}
-        >
-          <Heart className={cn('w-4 h-4', isFavorite && 'fill-current')} />
-        </button>
-
-        {/* Coverage Badge - nur für 5g/4g/3g anzeigen, 'none' überspringen */}
-        {campground.coverageLevel !== 'none' && (
-          <div
-            className="absolute bottom-3 left-3 px-2 py-0.5 rounded-full text-xs font-bold text-white z-10"
-            style={{
-              backgroundColor: getCoverageColor(campground.coverageLevel),
+          {/* Favorite Heart */}
+          <button
+            className={cn(
+              'absolute top-3 right-3 p-1.5 rounded-full backdrop-blur-sm transition-colors z-10',
+              isFavorite
+                ? 'bg-red-500 text-white'
+                : 'bg-white/20 text-white hover:bg-white/30',
+            )}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite();
             }}
           >
-            {getCoverageLabel(campground.coverageLevel)}
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="p-3 space-y-2">
-        {/* Name and Type */}
-        <div className="space-y-1">
-          <h3 className="font-semibold text-sm line-clamp-1">
-            {campground.name}
-          </h3>
-          <p className="text-xs text-muted-foreground">
-            {campground.type === 'camp_site'
-              ? 'Campingplatz'
-              : 'Wohnmobilstellplatz'}
-          </p>
+            <Heart className={cn('w-4 h-4', isFavorite && 'fill-current')} />
+          </button>
         </div>
+      )}
 
-        {/* Features */}
-        <div className="flex items-center gap-2 text-muted-foreground">
-          {campground.features.slice(0, 4).map((feature) => {
-            const Icon = FEATURE_ICONS[feature as keyof typeof FEATURE_ICONS];
-            return Icon ? <Icon key={feature} className="w-3.5 h-3.5" /> : null;
-          })}
-          {campground.features.length > 4 && (
-            <span className="text-xs">+{campground.features.length - 4}</span>
+      <div className="p-4 space-y-2.5">
+        {/* Header: Name + Favorit (wenn kein Bild) */}
+        <div className="flex justify-between items-start gap-2">
+          <div>
+            <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-1">
+              {campground.name}
+            </h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {campground.type === 'camp_site'
+                ? 'Campingplatz'
+                : 'Wohnmobilstellplatz'}
+            </p>
+          </div>
+          {imageUrls.length === 0 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleFavorite();
+              }}
+            >
+              <Heart
+                className={cn(
+                  'w-5 h-5',
+                  isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-300',
+                )}
+              />
+            </button>
           )}
         </div>
 
-        {/* Rating */}
-        {campground.rating && (
-          <div className="flex items-center gap-1">
-            <div className="flex">
-              {Array.from({ length: 5 }).map((_, i) => (
+        {/* Feature Pills */}
+        {campground.features.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {campground.features.slice(0, 4).map((feature) => {
+              const Icon = FEATURE_ICONS[feature as keyof typeof FEATURE_ICONS];
+              const label =
+                FEATURE_LABELS[feature as keyof typeof FEATURE_LABELS];
+              return Icon && label ? (
                 <span
-                  key={i}
-                  className={cn(
-                    'text-xs',
-                    i < Math.floor(campground.rating!)
-                      ? 'text-[#E19B53]'
-                      : 'text-gray-300',
-                  )}
+                  key={feature}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D8F3DC] text-[#1B4332] text-xs"
                 >
-                  ★
+                  <Icon className="w-3 h-3" />
+                  {label}
                 </span>
-              ))}
-            </div>
-            <span className="text-xs text-muted-foreground">
-              {campground.rating.toFixed(1)}
-            </span>
+              ) : null;
+            })}
+            {campground.features.length > 4 && (
+              <span className="text-xs text-gray-400">
+                +{campground.features.length - 4}
+              </span>
+            )}
           </div>
         )}
 
-        {/* Contact Info */}
-        <div className="flex items-center gap-3 text-muted-foreground">
-          {campground.phone && <Phone className="w-3.5 h-3.5" />}
+        {/* Coverage Bar */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1 h-1 rounded-full bg-gray-100 overflow-hidden">
+            <div
+              className="h-full rounded-full"
+              style={{
+                width:
+                  campground.coverageLevel === '5g'
+                    ? '100%'
+                    : campground.coverageLevel === '4g'
+                      ? '75%'
+                      : campground.coverageLevel === '3g'
+                        ? '50%'
+                        : '0%',
+                backgroundColor: getCoverageColor(campground.coverageLevel),
+              }}
+            />
+          </div>
+          <span className="text-xs text-gray-500 whitespace-nowrap">
+            {getCoverageLabel(campground.coverageLevel)}
+          </span>
+        </div>
+
+        {/* Kontakt Icons */}
+        <div className="flex items-center gap-3 text-gray-400">
           {campground.website && <Globe className="w-3.5 h-3.5" />}
+          {campground.phone && <Phone className="w-3.5 h-3.5" />}
+          {campground.email && <Mail className="w-3.5 h-3.5" />}
         </div>
       </div>
 
       {/* Lightbox */}
-      <ImageLightbox
-        images={imageUrls}
-        initialIndex={lightboxIndex}
-        alt={campground.name}
-        isOpen={lightboxOpen}
-        onClose={() => setLightboxOpen(false)}
-      />
-    </Card>
+      {imageUrls.length > 0 && (
+        <ImageLightbox
+          images={imageUrls}
+          initialIndex={lightboxIndex}
+          alt={campground.name}
+          isOpen={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
+    </div>
   );
 }

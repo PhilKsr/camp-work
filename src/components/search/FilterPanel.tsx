@@ -266,7 +266,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 border-t border-[#E8E4D8] bg-white sticky bottom-0">
+      <div className="px-6 py-4 border-t border-gray-200 bg-white sticky bottom-0">
         <div className="flex flex-col sm:flex-row gap-3">
           <Button
             variant="outline"
@@ -278,7 +278,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
           </Button>
           <Button
             onClick={onClose}
-            className="flex-1 bg-[#E19B53] hover:bg-[#C47F35] text-white"
+            className="flex-1 bg-[#1B4332] hover:bg-[#2D6A4F] text-white"
           >
             {filteredCount} Ergebnisse anzeigen
           </Button>
@@ -298,7 +298,7 @@ export default function FilterPanel({ children }: FilterPanelProps) {
       <SheetContent
         side={isMobile ? 'bottom' : 'right'}
         className={cn(
-          'bg-white p-0 overflow-y-auto border-[#E8E4D8]',
+          'bg-white p-0 overflow-y-auto border-gray-200',
           isMobile ? 'h-[85vh] rounded-t-2xl border-t' : 'w-[380px] border-l',
         )}
       >

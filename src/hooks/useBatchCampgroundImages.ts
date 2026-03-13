@@ -29,6 +29,11 @@ export function useBatchCampgroundImages(campgroundIds: string[]) {
 
       if (error) throw error;
 
+      // Debug logging
+      console.log(
+        `Batch images loaded: ${data?.length} for ${campgroundIds.length} campgrounds`,
+      );
+
       // Gruppiere nach campground_id
       const map = new Map<string, CampgroundImage[]>();
       for (const img of (data as CampgroundImage[]) || []) {

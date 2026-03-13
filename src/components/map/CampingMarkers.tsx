@@ -25,7 +25,7 @@ export function CampingMarkers() {
         source="campgrounds"
         filter={['has', 'point_count']}
         paint={{
-          'circle-color': colors.primary.warmGold,
+          'circle-color': colors.primary.forestGreen,
           'circle-radius': [
             'step',
             ['get', 'point_count'],

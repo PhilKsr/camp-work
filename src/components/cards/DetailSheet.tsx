@@ -3,16 +3,13 @@ import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   Heart,
-  MapPin,
   Globe,
   Phone,
   Mail,
   Clock,
-  Signal,
   Navigation,
   Share,
 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ImageCarousel } from '@/components/ui/ImageCarousel';
 import { ImageLightbox } from '@/components/ui/ImageLightbox';
@@ -56,38 +53,39 @@ const getCoverageColor = (level: string): string => {
   }
 };
 
-const getCoverageIcon = (level: string): string => {
-  switch (level) {
-    case '5g':
-      return '📶 5G verfügbar';
-    case '4g':
-      return '📱 LTE verfügbar';
-    case '3g':
-      return '📡 3G verfügbar';
-    default:
-      return '❓ Netzabdeckung unbekannt';
-  }
-};
-
 async function handleShare(campground: Campground) {
   const shareData = {
     title: campground.name,
-    text: `${campground.name} - ${campground.type === 'camp_site' ? 'Campingplatz' : 'Wohnmobilstellplatz'}`,
+    text: `${campground.name} – Campingplatz mit ${campground.coverageLevel !== 'none' ? campground.coverageLevel.toUpperCase() + ' Netz' : 'Netzabdeckung auf der Karte prüfen'}`,
     url: window.location.href,
   };
 
-  try {
-    if (navigator.share) {
+  if (navigator.share) {
+    try {
       await navigator.share(shareData);
-    } else {
-      // Fallback: Copy to clipboard
-      await navigator.clipboard.writeText(
-        `${shareData.title}\n${shareData.text}\n${shareData.url}`,
-      );
-      // Could show a toast notification here
+    } catch {
+      // User cancelled or error - ignore
     }
-  } catch (error) {
-    console.log('Sharing failed:', error);
+  } else {
+    // Fallback: Copy to clipboard
+    try {
+      await navigator.clipboard.writeText(
+        `${shareData.title}\n${shareData.url}`,
+      );
+      // Quick visual feedback - you could replace this with a proper toast
+      const button = document.querySelector(
+        '[data-share-button]',
+      ) as HTMLElement;
+      if (button) {
+        const originalText = button.textContent;
+        button.textContent = 'Link kopiert!';
+        setTimeout(() => {
+          button.textContent = originalText;
+        }, 2000);
+      }
+    } catch (error) {
+      console.log('Clipboard copy failed:', error);
+    }
   }
 }
 
@@ -133,7 +131,7 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
             variant="ghost"
             size="sm"
             onClick={() => toggleFavorite(campground.id)}
-            className={cn('p-2', isFavorite(campground.id) && 'text-[#E19B53]')}
+            className={cn('p-2', isFavorite(campground.id) && 'text-red-500')}
           >
             <Heart
               className={cn(
@@ -145,13 +143,13 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
         </div>
 
         <div className="p-4 space-y-6">
-          {/* Gallery */}
-          <Card className="overflow-hidden">
-            <div className="relative">
+          {/* Gallery - nur wenn Bilder vorhanden */}
+          {imageUrls.length > 0 && (
+            <div className="overflow-hidden rounded-xl">
               <ImageCarousel
                 images={imageUrls}
                 alt={campground.name}
-                height="h-[250px]"
+                height="h-[220px]"
                 showArrows={true}
                 onImageClick={(index) => {
                   setLightboxIndex(index);
@@ -166,126 +164,148 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
                 </div>
               )}
             </div>
-          </Card>
+          )}
 
-          {/* Coverage Section */}
-          <Card className="p-4">
+          {/* Name & Type */}
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">
+              {campground.name}
+            </h1>
+            <p className="text-gray-500 mt-1">
+              {campground.type === 'camp_site'
+                ? 'Campingplatz'
+                : 'Wohnmobilstellplatz'}
+              {campground.address && ` · ${campground.address.split(',')[0]}`}
+            </p>
+          </div>
+
+          {/* Netzabdeckung - Prominent */}
+          <div>
+            <h3 className="text-sm font-medium text-gray-400 mb-2">
+              ─── Netzabdeckung ───────────
+            </h3>
             {campground.coverageLevel === 'none' ? (
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <Signal className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Netzabdeckung unbekannt</p>
-                  <p className="text-xs text-muted-foreground">
-                    Prüfe den Coverage-Layer auf der Karte für diesen Standort
-                  </p>
-                </div>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-2 rounded-full bg-gray-200"></div>
+                <span className="text-sm text-gray-500">Netz prüfen</span>
               </div>
             ) : (
-              <div className="flex items-center gap-3">
-                <div
-                  className="p-3 rounded-full"
-                  style={{
-                    backgroundColor: `${getCoverageColor(campground.coverageLevel)}20`,
-                  }}
-                >
-                  <Signal
-                    className="w-5 h-5"
-                    style={{
-                      color: getCoverageColor(campground.coverageLevel),
-                    }}
-                  />
+              <>
+                <div className="flex items-center gap-3 mb-1">
+                  <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width:
+                          campground.coverageLevel === '5g'
+                            ? '100%'
+                            : campground.coverageLevel === '4g'
+                              ? '80%'
+                              : campground.coverageLevel === '3g'
+                                ? '60%'
+                                : '0%',
+                        backgroundColor: getCoverageColor(
+                          campground.coverageLevel,
+                        ),
+                      }}
+                    />
+                  </div>
+                  <span className="text-sm font-medium">
+                    {campground.coverageLevel === '5g'
+                      ? '5G'
+                      : campground.coverageLevel === '4g'
+                        ? 'LTE/4G'
+                        : campground.coverageLevel === '3g'
+                          ? '3G'
+                          : 'Unbekannt'}
+                  </span>
                 </div>
-                <div>
-                  <h3 className="font-medium">
-                    {getCoverageIcon(campground.coverageLevel)}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {getCoverageDescription(campground.coverageLevel)}
-                  </p>
-                </div>
-              </div>
+                <p className="text-sm text-gray-500">
+                  {getCoverageDescription(campground.coverageLevel)}
+                </p>
+              </>
             )}
-          </Card>
+          </div>
 
-          {/* Info Section */}
-          <Card className="p-4 space-y-4">
-            <h3 className="font-medium">Kontakt & Informationen</h3>
-
-            {campground.address && (
-              <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 mt-1 text-muted-foreground" />
-                <p className="text-sm">{campground.address}</p>
-              </div>
-            )}
-
-            {campground.website && (
-              <div className="flex items-start gap-3">
-                <Globe className="w-4 h-4 mt-1 text-muted-foreground" />
-                <a
-                  href={campground.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[#ABD8EF] hover:text-[#6AA3C9] hover:underline"
-                >
-                  Website besuchen
-                </a>
-              </div>
-            )}
-
-            {campground.phone && (
-              <div className="flex items-start gap-3">
-                <Phone className="w-4 h-4 mt-1 text-muted-foreground" />
-                <a
-                  href={`tel:${campground.phone}`}
-                  className="text-sm text-[#ABD8EF] hover:text-[#6AA3C9] hover:underline"
-                >
-                  {campground.phone}
-                </a>
-              </div>
-            )}
-
-            {campground.email && (
-              <div className="flex items-start gap-3">
-                <Mail className="w-4 h-4 mt-1 text-muted-foreground" />
-                <a
-                  href={`mailto:${campground.email}`}
-                  className="text-sm text-[#ABD8EF] hover:text-[#6AA3C9] hover:underline"
-                >
-                  {campground.email}
-                </a>
-              </div>
-            )}
-
-            {campground.openingHours && (
-              <div className="flex items-start gap-3">
-                <Clock className="w-4 h-4 mt-1 text-muted-foreground" />
-                <p className="text-sm">{campground.openingHours}</p>
-              </div>
-            )}
-          </Card>
-
-          {/* Features */}
+          {/* Ausstattung */}
           {campground.features.length > 0 && (
-            <Card className="p-4">
-              <h3 className="font-medium mb-3">Ausstattung</h3>
+            <div>
+              <h3 className="text-sm font-medium text-gray-400 mb-3">
+                ─── Ausstattung ────────────
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {campground.features.map((feature) => (
-                  <div
+                  <span
                     key={feature}
-                    className="px-3 py-1.5 bg-muted rounded-full text-xs font-medium"
+                    className="px-3 py-1 bg-[#D8F3DC] text-[#1B4332] rounded-full text-xs font-medium"
                   >
                     {FEATURE_LABELS[feature as keyof typeof FEATURE_LABELS] ||
                       feature}
-                  </div>
+                  </span>
                 ))}
               </div>
-            </Card>
+            </div>
           )}
 
+          {/* Kontakt */}
+          <div>
+            <h3 className="text-sm font-medium text-gray-400 mb-3">
+              ─── Kontakt ─────────────
+            </h3>
+            <div className="space-y-3">
+              {campground.website && (
+                <div className="flex items-center gap-3">
+                  <Globe className="w-4 h-4 text-gray-400" />
+                  <a
+                    href={campground.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[#1B4332] hover:text-[#2D6A4F] hover:underline"
+                  >
+                    Website besuchen
+                  </a>
+                </div>
+              )}
+
+              {campground.phone && (
+                <div className="flex items-center gap-3">
+                  <Phone className="w-4 h-4 text-gray-400" />
+                  <a
+                    href={`tel:${campground.phone}`}
+                    className="text-sm text-[#1B4332] hover:text-[#2D6A4F] hover:underline"
+                  >
+                    {campground.phone}
+                  </a>
+                </div>
+              )}
+
+              {campground.email && (
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 text-gray-400" />
+                  <a
+                    href={`mailto:${campground.email}`}
+                    className="text-sm text-[#1B4332] hover:text-[#2D6A4F] hover:underline"
+                  >
+                    {campground.email}
+                  </a>
+                </div>
+              )}
+
+              {campground.openingHours && (
+                <div className="flex items-center gap-3">
+                  <Clock className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm text-gray-600">
+                    {campground.openingHours}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Actions */}
-          <div className="sticky bottom-0 bg-background/95 backdrop-blur border-t -mx-4 px-4 py-4 space-y-3">
+          <div className="sticky bottom-0 bg-white/95 backdrop-blur border-t -mx-4 px-4 py-4 space-y-3">
             <Button
-              className="w-full bg-[#E19B53] hover:bg-[#C47F35] text-white"
+              className="w-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white"
               onClick={() => openRouteInGoogleMaps(lat, lng)}
             >
               <Navigation className="w-4 h-4 mr-2" />
@@ -294,8 +314,9 @@ export function DetailSheet({ campground, onClose }: DetailSheetProps) {
 
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
               onClick={() => handleShare(campground)}
+              data-share-button
             >
               <Share className="w-4 h-4 mr-2" />
               Teilen
