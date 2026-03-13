@@ -62,10 +62,13 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
   } = useFilterStore();
 
   const {
-    isVisible: isCoverageLayerVisible,
+    visibleLayers,
     opacity: coverageOpacity,
-    toggleVisibility: toggleCoverageLayer,
+    toggleLayer,
     setOpacity: setCoverageOpacity,
+    // Legacy support
+    isVisible: isCoverageLayerVisible,
+    toggleVisibility: toggleCoverageLayer,
   } = useCoverageStore();
 
   const viewportCampgrounds = useViewportCampgrounds();
@@ -179,15 +182,62 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
               Netzabdeckung auf Karte
             </Label>
 
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">O2-Layer anzeigen</span>
+            {/* Layer toggles */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: colors.coverage.excellent }}
+                  />
+                  <span className="text-sm text-gray-600">5G Layer</span>
+                </div>
+                <Switch
+                  checked={visibleLayers.includes('5g')}
+                  onCheckedChange={() => toggleLayer('5g')}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: colors.coverage.good }}
+                  />
+                  <span className="text-sm text-gray-600">LTE Layer</span>
+                </div>
+                <Switch
+                  checked={visibleLayers.includes('lte')}
+                  onCheckedChange={() => toggleLayer('lte')}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: colors.coverage.limited }}
+                  />
+                  <span className="text-sm text-gray-600">GSM Layer</span>
+                </div>
+                <Switch
+                  checked={visibleLayers.includes('gsm')}
+                  onCheckedChange={() => toggleLayer('gsm')}
+                />
+              </div>
+            </div>
+
+            {/* All layers toggle */}
+            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              <span className="text-sm text-gray-600">Alle Layer</span>
               <Switch
                 checked={isCoverageLayerVisible}
                 onCheckedChange={toggleCoverageLayer}
               />
             </div>
 
-            {isCoverageLayerVisible && (
+            {/* Opacity slider */}
+            {visibleLayers.length > 0 && (
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">Deckkraft</span>

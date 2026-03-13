@@ -166,25 +166,31 @@ export default function MapViewInner() {
         )}
       </Map>
 
-      {/* Minimal Coverage Legend - Only when layer is active */}
+      {/* Dynamic Coverage Legend - Shows active layers */}
       {isVisible && (
         <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm">
           <p className="text-[10px] text-gray-400 mb-1.5">
-            O2 Mobilfunk · © BNetzA
+            Mobilfunk · © BNetzA
           </p>
           <div className="flex flex-col gap-1 text-xs text-gray-600">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-              Gutes Netz (auch in Gebäuden)
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />
-              Netz nur im Freien
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-gray-300" />
-              Kein Mobilfunk
-            </span>
+            {useCoverageStore.getState().visibleLayers.includes('5g') && (
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                5G verfügbar
+              </span>
+            )}
+            {useCoverageStore.getState().visibleLayers.includes('lte') && (
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-yellow-600" />
+                LTE/4G verfügbar
+              </span>
+            )}
+            {useCoverageStore.getState().visibleLayers.includes('gsm') && (
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+                GSM/3G verfügbar
+              </span>
+            )}
           </div>
         </div>
       )}

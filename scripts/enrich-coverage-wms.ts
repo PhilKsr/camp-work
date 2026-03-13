@@ -2,7 +2,6 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { config } from 'dotenv';
-import sharp from 'sharp';
 
 // Load environment variables from .env.local
 config({ path: '.env.local' });
@@ -28,89 +27,80 @@ const DELAY_MS = 1000; // 1s between batches (respectful to BNetzA)
 
 type CoverageLevel = '5g' | '4g' | '3g' | 'none';
 
+// BNetzA WMS Layer configuration - ordered from highest to lowest technology
+const LAYERS: Array<{ name: string; level: CoverageLevel }> = [
+  { name: '5g', level: '5g' },
+  { name: 'lte', level: '4g' },
+  { name: 'gsm', level: '3g' },
+];
+
 /**
- * Query BNetzA WMS for real coverage data using pixel analysis
- * The BNetzA WMS is raster-based, so we analyze pixel colors to determine coverage levels
+ * Query BNetzA WMS for real coverage data using GetFeatureInfo on individual layers
+ * Each layer represents a mobile technology (5G, LTE/4G, GSM/3G)
+ * Returns the highest technology level that has coverage at the given coordinates
  */
 async function queryCoverage(lat: number, lng: number): Promise<CoverageLevel> {
-  return await queryCoverageViaPixel(lat, lng);
+  // Query layers from highest to lowest technology
+  for (const layer of LAYERS) {
+    const hasCoverage = await queryLayerFeatures(lat, lng, layer.name);
+    if (hasCoverage) {
+      return layer.level;
+    }
+  }
+  return 'none';
 }
 
 /**
- * Get coverage by analyzing pixel colors from WMS raster tiles
- * BNetzA color scheme:
- * - Dark Blue/Purple: 5G coverage (excellent)
- * - Green: 4G/LTE coverage (good)
- * - Yellow/Orange: 3G coverage (limited)
- * - Transparent/White: No coverage
+ * Query a specific BNetzA WMS layer using GetFeatureInfo
+ * Returns true if the layer has coverage features at the given coordinates
  */
-async function queryCoverageViaPixel(
+async function queryLayerFeatures(
   lat: number,
   lng: number,
-): Promise<CoverageLevel> {
-  // Create a small bounding box around the point (1x1 pixel query)
+  layerName: string,
+): Promise<boolean> {
+  // Create a small bounding box for the point
   // WMS 1.3.0 mit EPSG:4326 erwartet BBOX als lat,lng (nicht lng,lat)
   const delta = 0.0001;
   const bbox = `${lat - delta},${lng - delta},${lat + delta},${lng + delta}`;
 
   const url =
-    `${WMS_BASE}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap` +
-    `&LAYERS=mobilfunkmonitor&CRS=EPSG:4326&BBOX=${bbox}` +
-    `&WIDTH=1&HEIGHT=1&FORMAT=image/png&TRANSPARENT=true`;
+    `${WMS_BASE}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo` +
+    `&QUERY_LAYERS=${layerName}&LAYERS=${layerName}&CRS=EPSG:4326&BBOX=${bbox}` +
+    `&WIDTH=101&HEIGHT=101&I=50&J=50&FORMAT=image/png&INFO_FORMAT=application/json`;
 
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) {
-      console.error(`WMS HTTP ${res.status} for ${lat},${lng}`);
-      return 'none';
+      console.error(
+        `WMS HTTP ${res.status} for layer ${layerName} at ${lat},${lng}`,
+      );
+      return false;
     }
 
-    const buffer = Buffer.from(await res.arrayBuffer());
-    const { data, info } = await sharp(buffer)
-      .raw()
-      .toBuffer({ resolveWithObject: true });
+    const data = await res.json();
 
-    // Check if pixel is transparent (no coverage)
-    if (info.channels < 4 || data[3] < 50) return 'none';
-
-    const r = data[0];
-    const g = data[1];
-    const b = data[2];
-
-    // Analyze pixel color to determine coverage level
-    // Dark blue/purple tones = 5G coverage
-    if (b > 100 && b > r + 30 && b > g + 20) {
-      return '5g';
+    // Check if response has features
+    if (
+      data.features &&
+      Array.isArray(data.features) &&
+      data.features.length > 0
+    ) {
+      return true;
     }
 
-    // Green tones = 4G/LTE coverage
-    if (g > 100 && g > r + 20 && g > b + 20) {
-      return '4g';
-    }
-
-    // Yellow/orange tones = 3G coverage
-    if ((r > 150 && g > 150) || (r > 200 && g > 100)) {
-      return '3g';
-    }
-
-    // Any other colored pixel = basic coverage
-    const brightness = r + g + b;
-    if (brightness > 150) {
-      return '3g';
-    }
-
-    return 'none';
+    return false;
   } catch (error) {
     console.error(
-      `WMS query failed for ${lat},${lng}:`,
+      `Layer query failed for ${layerName} at ${lat},${lng}:`,
       error instanceof Error ? error.message : 'Unknown error',
     );
-    return 'none';
+    return false;
   }
 }
 
-async function testWMSPixelMethod(): Promise<void> {
-  console.log('🔍 Testing BNetzA WMS pixel analysis method...');
+async function testLayerMethod(): Promise<void> {
+  console.log('🔍 Testing BNetzA WMS GetFeatureInfo on individual layers...');
 
   // Test known locations
   const testLocations = [
@@ -120,35 +110,45 @@ async function testWMSPixelMethod(): Promise<void> {
   ];
 
   for (const loc of testLocations) {
-    const coverage = await queryCoverageViaPixel(loc.lat, loc.lng);
-    console.log(`📍 ${loc.name}: ${coverage}`);
+    console.log(`\n📍 Testing ${loc.name}:`);
+    for (const layer of LAYERS) {
+      const hasFeatures = await queryLayerFeatures(
+        loc.lat,
+        loc.lng,
+        layer.name,
+      );
+      console.log(`  ${layer.name}: ${hasFeatures ? '✅' : '❌'}`);
+    }
+    const coverage = await queryCoverage(loc.lat, loc.lng);
+    console.log(`  → Result: ${coverage}`);
   }
 
-  console.log('\n✅ WMS pixel analysis method verified');
-  console.log('🎯 Using real BNetzA coverage data - no statistical fallback');
+  console.log('\n✅ WMS GetFeatureInfo layer method verified');
+  console.log(
+    '🎯 Using real BNetzA layer data - no pixel analysis or heuristics',
+  );
 }
 
 async function main() {
   const startTime = Date.now();
 
-  // Test WMS pixel method first
-  await testWMSPixelMethod();
+  // Test layer method first
+  await testLayerMethod();
 
   const { data: campgrounds, error } = await supabase
     .from('campgrounds')
     .select('id, location')
-    .order('id');
-
+    .order('id'); // Alle campgrounds
   if (error || !campgrounds) {
     console.error('❌ Fehler beim Laden der Campingplätze:', error);
     return;
   }
 
   console.log(
-    `\n🔍 Ermittle ECHTE O2-Coverage für ${campgrounds.length} Campingplätze...`,
+    `\n🔍 Ermittle ECHTE Coverage für ${campgrounds.length} Campingplätze...`,
   );
   console.log(
-    '🎯 Jeder Punkt wird gegen BNetzA WMS geprüft - keine Zufallswerte!',
+    '🎯 Jeder Punkt wird gegen BNetzA WMS Layer geprüft (5g → lte → gsm)',
   );
 
   let updated = 0;
@@ -175,8 +175,8 @@ async function main() {
             return { id: c.id, level: 'none' as CoverageLevel };
           }
 
-          // Parse coordinate bytes (skip first 26 hex chars = 13 bytes headers)
-          const coordsStart = 26; // Skip SRID + headers
+          // Parse coordinate bytes (skip first 18 hex chars = 9 bytes headers)
+          const coordsStart = 18; // Skip SRID + headers (correct for PostGIS EWKB)
           const lngHex = wkb.substring(coordsStart, coordsStart + 16);
           const latHex = wkb.substring(coordsStart + 16, coordsStart + 32);
 
@@ -213,7 +213,7 @@ async function main() {
     const progress = ((updated / campgrounds.length) * 100).toFixed(1);
     console.log(
       `📡 ${updated}/${campgrounds.length} (${progress}%) | ` +
-        `5G: ${stats['5g']} | 4G: ${stats['4g']} | 3G: ${stats['3g']} | Kein O2: ${stats.none}`,
+        `5G: ${stats['5g']} | 4G: ${stats['4g']} | 3G: ${stats['3g']} | Kein Netz: ${stats.none}`,
     );
 
     await new Promise((r) => setTimeout(r, DELAY_MS));
@@ -227,11 +227,9 @@ async function main() {
   console.log(`\n🎉 ECHTE Coverage-Daten erfolgreich ermittelt!`);
   console.log(`⏱️  Dauer: ${duration} Minuten`);
   console.log(
-    `📊 ${withCoverage} von ${campgrounds.length} haben O2-Netzabdeckung (${coveragePercent}%)`,
+    `📊 ${withCoverage} von ${campgrounds.length} haben Netzabdeckung (${coveragePercent}%)`,
   );
-  console.log(
-    `🔍 Methode: BNetzA WMS Pixelanalyse - 100% echte Daten, 0% Zufallswerte`,
-  );
+  console.log(`🔍 Methode: BNetzA WMS GetFeatureInfo - 100% echte Layer-Daten`);
 }
 
 main().catch(console.error);

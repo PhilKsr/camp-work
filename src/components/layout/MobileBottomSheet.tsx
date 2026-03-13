@@ -3,7 +3,7 @@
 import { motion, PanInfo } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useUIStore } from '@/stores/uiStore';
-import { useCampgrounds } from '@/hooks/useCampgrounds';
+import { useViewportCampgroundsQuery } from '@/hooks/useViewportCampgroundsQuery';
 import { cn } from '@/lib/utils';
 import { CampingList } from '@/components/cards/CampingList';
 import { CampingCardCompact } from '@/components/cards/CampingCardCompact';
@@ -26,7 +26,7 @@ export default function MobileBottomSheet({
   onSelectCampground,
 }: MobileBottomSheetProps) {
   const { bottomSheetSnap, setBottomSheetSnap } = useUIStore();
-  const { isLoading } = useCampgrounds();
+  const { isLoading } = useViewportCampgroundsQuery();
   const viewportCampgrounds = useViewportCampgrounds();
 
   const getHeight = (snap: typeof bottomSheetSnap) => {

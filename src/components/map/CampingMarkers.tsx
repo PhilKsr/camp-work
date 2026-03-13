@@ -1,11 +1,11 @@
 'use client';
 
 import { Source, Layer } from 'react-map-gl/maplibre';
-import { useCampgrounds } from '@/hooks/useCampgrounds';
+import { useViewportCampgroundsQuery } from '@/hooks/useViewportCampgroundsQuery';
 import { colors } from '@/lib/brand';
 
 export function CampingMarkers() {
-  const { data: campgroundsData } = useCampgrounds();
+  const { data: campgroundsData } = useViewportCampgroundsQuery();
 
   if (!campgroundsData) return null;
 
