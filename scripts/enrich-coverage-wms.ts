@@ -23,8 +23,8 @@ const supabase = createClient(
 );
 
 const WMS_BASE = 'https://sgx.geodatenzentrum.de/wms_bnetza_mobilfunk';
-const BATCH_SIZE = 8; // 8 parallel requests (reduced for image processing)
-const DELAY_MS = 300; // 300ms between batches (more respectful)
+const BATCH_SIZE = 2; // 2 parallel requests (avoid rate limiting)
+const DELAY_MS = 1000; // 1s between batches (respectful to BNetzA)
 
 type CoverageLevel = '5g' | '4g' | '3g' | 'none';
 
@@ -49,8 +49,9 @@ async function queryCoverageViaPixel(
   lng: number,
 ): Promise<CoverageLevel> {
   // Create a small bounding box around the point (1x1 pixel query)
+  // WMS 1.3.0 mit EPSG:4326 erwartet BBOX als lat,lng (nicht lng,lat)
   const delta = 0.0001;
-  const bbox = `${lng - delta},${lat - delta},${lng + delta},${lat + delta}`;
+  const bbox = `${lat - delta},${lng - delta},${lat + delta},${lng + delta}`;
 
   const url =
     `${WMS_BASE}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap` +
@@ -58,8 +59,11 @@ async function queryCoverageViaPixel(
     `&WIDTH=1&HEIGHT=1&FORMAT=image/png&TRANSPARENT=true`;
 
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) return 'none';
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) {
+      console.error(`WMS HTTP ${res.status} for ${lat},${lng}`);
+      return 'none';
+    }
 
     const buffer = Buffer.from(await res.arrayBuffer());
     const { data, info } = await sharp(buffer)
@@ -161,12 +165,35 @@ async function main() {
 
     const results = await Promise.all(
       batch.map(async (c) => {
-        const match = c.location.match(/POINT\(([^ ]+) ([^ ]+)\)/);
-        if (!match) return { id: c.id, level: 'none' as CoverageLevel };
-        const lng = parseFloat(match[1]);
-        const lat = parseFloat(match[2]);
-        const level = await queryCoverage(lat, lng);
-        return { id: c.id, level };
+        try {
+          // Parse PostGIS WKB binary: 0101000020E610000027EB81A0ED022A400598439C98B24940
+          // Format: [byte order][geometry type][SRID][coordinates]
+          const wkb = c.location;
+
+          if (!wkb || wkb.length < 50) {
+            console.error(`Invalid WKB for ${c.id}:`, wkb?.substring(0, 20));
+            return { id: c.id, level: 'none' as CoverageLevel };
+          }
+
+          // Parse coordinate bytes (skip first 26 hex chars = 13 bytes headers)
+          const coordsStart = 26; // Skip SRID + headers
+          const lngHex = wkb.substring(coordsStart, coordsStart + 16);
+          const latHex = wkb.substring(coordsStart + 16, coordsStart + 32);
+
+          const lng = Buffer.from(lngHex, 'hex').readDoubleLE(0);
+          const lat = Buffer.from(latHex, 'hex').readDoubleLE(0);
+
+          if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+            console.error(`Invalid coords for ${c.id}: lat=${lat}, lng=${lng}`);
+            return { id: c.id, level: 'none' as CoverageLevel };
+          }
+
+          const level = await queryCoverage(lat, lng);
+          return { id: c.id, level };
+        } catch {
+          // Silent fail für WKB parsing errors
+          return { id: c.id, level: 'none' as CoverageLevel };
+        }
       }),
     );
 
