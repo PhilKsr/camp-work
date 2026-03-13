@@ -123,18 +123,23 @@ describe('CampingCardCompact', () => {
     expect(image).toHaveAttribute('alt', 'Test Camping am See');
   });
 
-  it('should render tent icon when no images', () => {
+  it('should render text-focused layout when no images', () => {
     const campground = createMockCampground({
       thumbnail: undefined,
+      type: 'caravan_site',
+      features: ['power', 'wifi'],
     });
 
     render(
       <CampingCardCompact campground={campground} onClick={mockOnClick} />,
     );
 
-    // Check if tent icon is rendered (Lucide React component)
-    const tentIcon = document.querySelector('.lucide-tent');
-    expect(tentIcon).toBeInTheDocument();
+    // Should show type when no image
+    expect(screen.getByText('Stellplatz')).toBeInTheDocument();
+
+    // Should show features when no image (using SVG elements)
+    const svgElements = document.querySelectorAll('svg');
+    expect(svgElements.length).toBeGreaterThan(0);
   });
 
   it('should have correct compact dimensions', () => {
@@ -144,10 +149,11 @@ describe('CampingCardCompact', () => {
       <CampingCardCompact campground={campground} onClick={mockOnClick} />,
     );
 
+    // Find the root card element
     const card = screen
       .getByText('Test Camping am See')
-      .closest('div')?.parentElement;
-    expect(card).toHaveClass('w-[180px]', 'h-[140px]', 'flex-shrink-0');
+      .closest('[class*="w-[160px]"]');
+    expect(card).toHaveClass('w-[160px]', 'flex-shrink-0');
   });
 
   it('should truncate long campground names', () => {
@@ -160,6 +166,7 @@ describe('CampingCardCompact', () => {
     );
 
     const nameElement = screen.getByText(/Sehr langer Campingplatz/);
-    expect(nameElement).toHaveClass('line-clamp-2');
+    // Should have a line-clamp class (either 1 or 2 depending on image presence)
+    expect(nameElement.className).toMatch(/line-clamp-[12]/);
   });
 });

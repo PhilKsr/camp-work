@@ -1,8 +1,17 @@
 import Image from 'next/image';
-import { Tent } from 'lucide-react';
+import {
+  Zap,
+  Wifi,
+  Dog,
+  Droplets,
+  ShoppingCart,
+  Utensils,
+  Baby,
+  Flame,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { colors } from '@/lib/brand';
-import type { Campground } from '@/types/campground';
+import type { Campground, CampgroundFeature } from '@/types/campground';
 import type { CampgroundImage } from '@/hooks/useBatchCampgroundImages';
 
 interface CampingCardCompactProps {
@@ -10,6 +19,44 @@ interface CampingCardCompactProps {
   onClick: () => void;
   images?: CampgroundImage[];
 }
+
+const FEATURES: Record<
+  CampgroundFeature,
+  { icon: React.ComponentType<{ className?: string }> }
+> = {
+  power: { icon: Zap },
+  wifi: { icon: Wifi },
+  dogs: { icon: Dog },
+  shower: { icon: Droplets },
+  toilet: { icon: Droplets },
+  swimming: { icon: Droplets },
+  shop: { icon: ShoppingCart },
+  restaurant: { icon: Utensils },
+  playground: { icon: Baby },
+  laundry: { icon: Droplets },
+  bbq: { icon: Flame },
+  campfire: { icon: Flame },
+};
+
+const CoverageBadge = ({
+  level,
+  className,
+}: {
+  level: string;
+  className?: string;
+}) => (
+  <div
+    className={cn(
+      'px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white',
+      className,
+    )}
+    style={{
+      backgroundColor: getCoverageColor(level),
+    }}
+  >
+    {getCoverageLabel(level)}
+  </div>
+);
 
 const getCoverageColor = (level: string): string => {
   switch (level) {
@@ -45,48 +92,68 @@ export function CampingCardCompact({
   images = [],
 }: CampingCardCompactProps) {
   const firstImage = images[0]?.url;
+  const hasImage = !!firstImage;
+
   return (
     <div
-      className={cn(
-        'w-[180px] h-[140px] flex-shrink-0 rounded-xl overflow-hidden shadow-brand-card cursor-pointer',
-        'transition-all duration-200 hover:shadow-brand-card-hover hover:-translate-y-1',
-      )}
+      className="w-[160px] flex-shrink-0 rounded-xl overflow-hidden shadow-sm 
+                 border border-gray-100 cursor-pointer hover:shadow-md 
+                 transition-shadow active:scale-[0.98]"
       onClick={onClick}
     >
-      {/* Thumbnail */}
-      <div className="relative h-[80px] bg-gradient-to-br from-[#E19B53] to-[#ABD8EF]">
-        {firstImage ? (
-          <Image
-            src={firstImage}
-            alt={campground.name}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <Tent className="w-6 h-6 text-white/80" />
+      {hasImage ? (
+        /* Mit Bild: Bild oben, Name unten */
+        <>
+          <div className="relative h-[90px] bg-gray-100">
+            <Image
+              src={firstImage}
+              alt={campground.name}
+              fill
+              className="object-cover"
+            />
+            {campground.coverageLevel !== 'none' && (
+              <CoverageBadge
+                level={campground.coverageLevel}
+                className="absolute bottom-1.5 left-1.5"
+              />
+            )}
           </div>
-        )}
-
-        {/* Coverage Badge - nur für 5g/4g/3g anzeigen, 'none' überspringen */}
-        {campground.coverageLevel !== 'none' && (
-          <div
-            className="absolute bottom-2 left-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white"
-            style={{
-              backgroundColor: getCoverageColor(campground.coverageLevel),
-            }}
-          >
-            {getCoverageLabel(campground.coverageLevel)}
+          <div className="p-2">
+            <p className="text-xs font-medium text-gray-900 line-clamp-1">
+              {campground.name}
+            </p>
           </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="p-2 bg-white">
-        <h4 className="font-medium text-xs line-clamp-2 text-foreground leading-tight">
-          {campground.name}
-        </h4>
-      </div>
+        </>
+      ) : (
+        /* Ohne Bild: Kompakte Text-Card */
+        <div className="p-3 h-[110px] flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-medium text-gray-900 line-clamp-2 mb-1">
+              {campground.name}
+            </p>
+            <p className="text-[10px] text-gray-500">
+              {campground.type === 'caravan_site'
+                ? 'Stellplatz'
+                : 'Campingplatz'}
+            </p>
+          </div>
+          <div className="flex items-center justify-between">
+            {campground.features.length > 0 && (
+              <div className="flex gap-1">
+                {campground.features.slice(0, 3).map((f) => {
+                  const config = FEATURES[f as keyof typeof FEATURES];
+                  if (!config) return null;
+                  const Icon = config.icon;
+                  return <Icon key={f} className="w-3 h-3 text-gray-400" />;
+                })}
+              </div>
+            )}
+            {campground.coverageLevel !== 'none' && (
+              <CoverageBadge level={campground.coverageLevel} />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

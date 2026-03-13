@@ -1,6 +1,7 @@
 'use client';
 
 import { motion, PanInfo } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import { useUIStore } from '@/stores/uiStore';
 import { useCampgrounds } from '@/hooks/useCampgrounds';
 import { cn } from '@/lib/utils';
@@ -91,15 +92,33 @@ export default function MobileBottomSheet({
       >
         <div className="w-10 h-1 bg-gray-300 rounded-full mb-2" />
         {bottomSheetSnap !== 'closed' && (
-          <div className="text-center">
-            <p className="text-sm font-medium text-gray-900">
-              {selectedCampground
-                ? selectedCampground.name
-                : `${viewportCampgrounds.length} Campingplätze in der Nähe`}
-            </p>
-            <p className="text-xs text-gray-500">
-              {selectedCampground ? 'Details ansehen' : 'Nach oben wischen'}
-            </p>
+          <div className="w-full flex items-center justify-between">
+            {selectedCampground ? (
+              <>
+                <button
+                  onClick={() => {
+                    onCloseDetail?.();
+                    // Bleibe im halb-offenen Zustand statt zu peek
+                    setBottomSheetSnap('half');
+                  }}
+                  className="flex items-center gap-1 text-sm text-[#1B4332] font-medium"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Zurück
+                </button>
+                <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+                  {selectedCampground.name}
+                </p>
+                <div className="w-16" /> {/* Spacer für Zentrierung */}
+              </>
+            ) : (
+              <div className="text-center w-full">
+                <p className="text-sm font-medium text-gray-900">
+                  {viewportCampgrounds.length} Campingplätze in der Nähe
+                </p>
+                <p className="text-xs text-gray-500">Nach oben wischen</p>
+              </div>
+            )}
           </div>
         )}
       </motion.div>
