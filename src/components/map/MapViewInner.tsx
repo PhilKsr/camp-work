@@ -11,6 +11,17 @@ import GeolocationMarker from './GeolocationMarker';
 import CoverageLayer from './CoverageLayer';
 import { CampingMarkers } from './CampingMarkers';
 
+// Architecture: Uncontrolled Map
+//
+// Die Map ist "uncontrolled" (initialViewState statt controlled viewport).
+// Das bedeutet: MapLibre handled Panning/Zooming intern ohne React Re-Renders.
+//
+// State-Updates passieren NUR bei:
+// - onMoveEnd: Viewport-Store wird aktualisiert → Sidebar/Filter aktualisieren
+// - flyToTarget Effect: Programmatische Navigation (Search, Card-Click, Geolocation)
+//
+// Vorher (controlled): ~60 State-Updates/Sekunde beim Panning → Mobile Crashes
+// Nachher (uncontrolled): 0 State-Updates beim Panning, 1 bei MoveEnd
 export default function MapViewInner() {
   const mapRef = useRef<MapRef>(null);
   const { viewport, setViewport, setSelectedCampground, flyToTarget } =
